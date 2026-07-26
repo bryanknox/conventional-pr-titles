@@ -1,0 +1,31 @@
+root = true
+
+# All files
+[*]
+end_of_line = lf
+indent_style = space
+indent_size = 4
+tab_width = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Markdown files
+[*.{md,markdown}]
+indent_style = space
+indent_size = 2
+tab_width = 2
+# Don't use trailing whitespace for line breaks in Markdown files.
+# Use <br> for line breaks instead.
+trim_trailing_whitespace = true
+
+# XML, XAML, .csproj, and .props files
+[*.{xml,xaml,csproj,props}]
+indent_style = space
+indent_size = 2
+tab_width = 2
+
+# YAML files
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+tab_width = 2
