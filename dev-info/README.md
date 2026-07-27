@@ -11,3 +11,5 @@ This folder contains information helpful in the planning and development of agen
 - [Setup Guide for Conventional Commits](./setup-guide-for-conventional-commits.md)
 
 - [Type Guide for Conventional Commits](./type-guide-for-conventional-commits.md)
+
+- [Skill Testing Repos](./skill-testing-repos.md)
