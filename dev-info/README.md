@@ -2,6 +2,10 @@
 
 This folder contains information helpful in the planning and development of agent skills in this repo.
 
+## Plans
+
+- [Conventional Commits Skills Plan (genesis handoff packet)](./conventional-commits-skills-plan.md)
+
 ## Dev info for Conventional Commits related skills
 
 - [Conventional Commits Info Links](./conventional-commits-info-links.md)
