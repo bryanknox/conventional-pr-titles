@@ -1,0 +1,180 @@
+---
+name: pr-conventional-commits
+description: >-
+  Use this skill when creating or updating a GitHub pull request
+  whose title must be a Conventional Commits message -- squash-merge
+  repos where the PR title becomes the commit on the default
+  branch. Also use when a "PR Title" / semantic-pull-request check
+  is failing, when the user asks which commit type (feat, fix,
+  chore, ...) a change is, or when opening any PR in a repo set up
+  by setup-conventional-commits. Composes type(scope)!: description
+  titles and BREAKING CHANGE footers from the actual branch diff.
+  Works for any contributor who can open a PR. Does NOT configure
+  repo settings, rulesets, or workflows (see
+  setup-conventional-commits).
+---
+
+# PR Conventional Commits (title authoring)
+
+Create or update a GitHub pull request so its TITLE is a valid
+Conventional Commits message. Built for squash-merge repos where
+the PR title becomes the commit message on the default branch;
+still useful anywhere a conventional PR title is wanted.
+
+Branch commits stay unconstrained by design: compose and check the
+PR title only; never rewrite, squash, or lint the branch's own
+commits.
+
+Boundaries: this skill does NOT configure repo settings, rulesets,
+or workflows (companion skill: `setup-conventional-commits`), and
+it never attempts that scaffold itself, even when it detects the
+scaffold is missing.
+
+## Who can run this
+
+| | |
+|---|---|
+| Intended user | Any contributor who can open a PR |
+| GitHub permission | Push to a branch or fork; `triage`+ only to retitle someone else's PR |
+| gh token scopes | `repo` (default gh auth) |
+| Runs how often | Every PR |
+| On missing permission | Degrade: compose the title anyway; report what could not be applied |
+
+## Title rules
+
+```
+type(scope)!: description
+```
+
+- `type`: lowercase, from the de-facto ten: feat, fix, docs,
+  style, refactor, perf, test, build, ci, chore.
+- `(scope)`: optional; a short noun for the area touched (e.g.
+  `api`, `parser`). Omit rather than invent one.
+- `!`: only when the change is breaking.
+- `description`: imperative mood ("add", not "added" or "adds"),
+  lowercase start, no trailing period.
+- Whole title <= 72 characters.
+- Breaking changes ALSO get a `BREAKING CHANGE: <explanation>`
+  footer as the last paragraph of the PR body.
+
+For spec-edge cases (reverts, multiple footers, unusual formats),
+verify against the live spec at https://www.conventionalcommits.org/
+rather than extrapolating.
+
+## Process
+
+Follow the steps in order. Every fact about the branch, repo, and
+PR comes from a `git`/`gh` read, never from memory or conversation
+history. Every mutation is followed by a read-back verification.
+
+### Step 1 - Gather facts (read-only)
+
+```
+gh repo view --json nameWithOwner,defaultBranchRef   # repo + default branch
+git branch --show-current                            # head branch
+git log {default_branch}..HEAD --oneline             # commits on the branch
+git diff {default_branch}...HEAD --stat              # shape; then read the diff itself
+gh pr list --head {branch} --json number,title,author,body   # existing PR?
+```
+
+If the user named an existing PR number, read it directly with
+`gh pr view {number} --json number,title,author,body`. If the
+branch has no commits ahead of the default branch, report that
+there is nothing to open a PR for and stop.
+
+### Step 2 - Detect the scaffold
+
+```
+gh api repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml   # 404 = absent
+gh api repos/{owner}/{repo} --jq '{allow_squash_merge: .allow_squash_merge, squash_merge_commit_title: .squash_merge_commit_title}'
+```
+
+SCAFFOLDED = the PR-title workflow exists. Also note whether
+`squash_merge_commit_title` is `PR_TITLE` (the title will
+literally become the commit on the default branch).
+
+Not scaffolded? Continue anyway -- a conventional title is
+valuable on its own -- but skip step 7 (check polling) and carry
+into the final report the gap plus a recommendation that a repo
+admin run `setup-conventional-commits`. Never scaffold from here:
+that is repo administration, not title authoring.
+
+### Step 3 - Classify the change
+
+Classify from the DIFF; the branch's commit messages are hints,
+not truth. Decision rules:
+
+- Behavior users can observe changed? Broken behavior corrected ->
+  `fix`; new capability -> `feat`; same behavior but faster ->
+  `perf`.
+- Production code changed without behavior change? Restructuring
+  -> `refactor`; formatting only -> `style`.
+- Tests only -> `test`. Docs only -> `docs`.
+- Tooling: build system or shipped dependencies -> `build`;
+  CI/workflows -> `ci`; other maintenance -> `chore`.
+
+Read `references/type-guide.md` when the change fits more than one
+type or none cleanly.
+
+A squash-merge PR becomes ONE commit, so it gets ONE type. Mixed
+changes: pick by dominant user impact (feat > fix > perf > the
+rest); if two unrelated changes genuinely share the branch,
+recommend splitting the PR instead of blending types.
+
+Breaking = consumers must change their code or configuration
+(removed or renamed public API, changed defaults, schema or config
+format changes). Mark with `!` in the title AND the
+`BREAKING CHANGE:` footer in the body.
+
+### Step 4 - Compose title and body
+
+Title per the rules above. Body: a short summary of what changed
+and why; if breaking, end the body with the `BREAKING CHANGE:`
+footer. If step 2 found the squash message setting is not
+`PR_BODY`, the footer stays PR-only (it will not ride into the
+squash commit); note that in the report rather than trying to
+change the setting.
+
+### Step 5 - Checkpoint (conditional)
+
+Required ONLY when editing a PR whose title this session did not
+compose, or whose author (from step 1) is not the current `gh`
+user: present `old title -> new title` plus the one-sentence type
+rationale, and wait for approval before editing. PRs created fresh
+in this session need no checkpoint.
+
+### Step 6 - Apply and verify
+
+```
+gh pr create --title "{title}" --body "{body}"    # no existing PR
+gh pr edit {number} --title "{title}"             # existing PR
+```
+
+Read back with `gh pr view {number} --json title,body` and confirm
+the title matches exactly. A 403 on editing someone else's PR
+means the invoker lacks `triage` on the repo: report the composed
+title and who can apply it; do not retry.
+
+### Step 7 - Verify the check (scaffolded repos only)
+
+Poll `gh pr checks {number}` until the PR-title check completes
+(job name `Validate conventional PR title` in repos scaffolded by
+the companion skill; otherwise any check from a
+semantic-pull-request / PR-title workflow).
+
+On failure: read the exact complaint
+(`gh run view {run_id} --log-failed`), fix the title accordingly,
+`gh pr edit`, and re-poll. Maximum 2 retries; after that, report
+the check's complaint verbatim and stop.
+
+### Step 8 - Report
+
+```markdown
+## PR title: {owner}/{repo}#{number}
+Title: {title}
+Type rationale: {one sentence: why this type / scope / breaking marker}
+Check: {pass | fail: reason | skipped: repo not scaffolded}
+{If not scaffolded: this repo does not enforce PR titles; a repo
+admin can run the companion skill setup-conventional-commits to
+add the check.}
+```

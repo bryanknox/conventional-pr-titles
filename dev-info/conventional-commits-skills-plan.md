@@ -634,7 +634,7 @@ Declared stance: `balanced`. Cap check: N/A.
 |---|---|---|
 | 1 | DONE 2026-07-28 -- Verify the two MEDIUM C6 facts against live GitHub docs (ruleset check-by-name; private-plan error shape). Results in step 5 finding. (a) confirmed; (b) revised: silent non-enforcement, not an error | packet |
 | 2 | DONE 2026-07-28 -- Draft `skills/setup-conventional-commits/` (SKILL.md + workflow asset) per interface sketch. 7a confirmed `common-only` (frontmatter = name + description only; B15 allowed-tools OMITTED -- it is per-harness syntax and would break the common-only declaration). Structural lint passed: 288 lines, ASCII, description 642 chars, name = dir. Real-run validation remains todo #6 | 1 |
-| 3 | Draft `skills/pr-conventional-commits/` (SKILL.md + type-guide reference) per interface sketch | packet (parallel with 2) |
+| 3 | DONE 2026-07-28 -- Draft `skills/pr-conventional-commits/` (SKILL.md + references/type-guide.md) per interface sketch. 7a confirmed `common-only` (frontmatter = name + description only; B15 allowed-tools OMITTED, same rationale as todo #2). Type guide trimmed per dev strategy #2 (decision rules + one-liners + tie-breakers; version-bump narrative dropped). Structural lint passed: SKILL.md 180 lines, reference 65 lines, ASCII, description 645 chars, name = dir. Real-run validation remains todo #7 | packet (parallel with 2) |
 | 4 | Author `dev/evals/` for both skills (content + trigger, 60/40 split) | 2, 3 |
 | 5 | Write `dev/test-repos.md` (create-from-base, reset, delete procedures; human-checkpoint list) | packet |
 | 6 | Step 8 validation, Skill A: lint + evals + real run on scenario S1; capture trace; revise | 2, 4, 5 |
