@@ -633,7 +633,7 @@ Declared stance: `balanced`. Cap check: N/A.
 | # | Task | Depends on |
 |---|---|---|
 | 1 | DONE 2026-07-28 -- Verify the two MEDIUM C6 facts against live GitHub docs (ruleset check-by-name; private-plan error shape). Results in step 5 finding. (a) confirmed; (b) revised: silent non-enforcement, not an error | packet |
-| 2 | Draft `skills/setup-conventional-commits/` (SKILL.md + workflow asset) per interface sketch | 1 |
+| 2 | DONE 2026-07-28 -- Draft `skills/setup-conventional-commits/` (SKILL.md + workflow asset) per interface sketch. 7a confirmed `common-only` (frontmatter = name + description only; B15 allowed-tools OMITTED -- it is per-harness syntax and would break the common-only declaration). Structural lint passed: 288 lines, ASCII, description 642 chars, name = dir. Real-run validation remains todo #6 | 1 |
 | 3 | Draft `skills/pr-conventional-commits/` (SKILL.md + type-guide reference) per interface sketch | packet (parallel with 2) |
 | 4 | Author `dev/evals/` for both skills (content + trigger, 60/40 split) | 2, 3 |
 | 5 | Write `dev/test-repos.md` (create-from-base, reset, delete procedures; human-checkpoint list) | packet |
