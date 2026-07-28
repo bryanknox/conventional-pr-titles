@@ -46,10 +46,12 @@ Find leftovers after a test session:
 
 ## Create-from-base procedure
 
-gh account note: this machine has two gh accounts and the default
-active one is NOT `bryanknox`. Before any campaign run
-`gh auth switch -h github.com -u bryanknox` (test repos live in
-that account), and switch back afterward.
+gh account note: this machine has two gh accounts; the standing
+default is `bryanknox`, which is also the account the test repos
+live in. Verify with `gh auth status` before a campaign; if some
+other account happens to be active, run
+`gh auth switch -h github.com -u bryanknox`. No switch-back
+afterward -- `bryanknox` active IS the normal state.
 
 Creating a repo in the personal account is a HUMAN CHECKPOINT:
 confirm with the operator before each `gh repo create`.
