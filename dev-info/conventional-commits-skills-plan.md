@@ -48,9 +48,17 @@ classifies the change into the de-facto 10-type set, composes
 `type(scope)!: description` plus a body with a `BREAKING CHANGE:`
 footer when warranted, applies via `gh pr create` / `gh pr edit`,
 and verifies the repo's PR-title check passes (bounded retry).
-Boundary: does NOT configure repo settings, rulesets, or workflows
-(that is Skill A); does NOT enforce conventional commits on branch
-commits (per desires, branches are unconstrained).
+Preflight: detects whether the repo has been scaffolded for
+conventional commits (PR-title lint workflow present; squash merge
+enabled). If NOT scaffolded, the skill still composes and applies
+the conventional title (it is valuable on its own), skips the
+check-polling step, and reports the gap with a recommendation to
+run setup-conventional-commits -- it never attempts the scaffold
+itself (permission asymmetry: the invoking user is often a
+contributor without admin rights). Boundary: does NOT configure
+repo settings, rulesets, or workflows (that is Skill A); does NOT
+enforce conventional commits on branch commits (per desires,
+branches are unconstrained).
 
 ### Dispatch descriptions (draft; final wording validated by trigger evals)
 
@@ -65,8 +73,9 @@ mode BOTH):
 > main", "prevent direct pushes", "enforce commit message format on
 > main", or is setting up a new .NET (or any) app repo that should
 > keep a clean conventional history. Configures the repo via gh
-> CLI. Does NOT create the repo or app code, and does NOT write PR
-> titles (see pr-conventional-commits).
+> CLI. Requires ADMIN access to the target repo. Does NOT create
+> the repo or app code, and does NOT write PR titles (see
+> pr-conventional-commits).
 
 Skill B (~600 chars, imperative, intent-first, indirect triggers,
 mode BOTH):
@@ -79,7 +88,8 @@ mode BOTH):
 > is, or when opening any PR in a repo set up by
 > setup-conventional-commits. Composes type(scope)!: description
 > titles and BREAKING CHANGE footers from the actual branch diff.
-> Does NOT configure repo settings, rulesets, or workflows (see
+> Works for any contributor who can open a PR. Does NOT configure
+> repo settings, rulesets, or workflows (see
 > setup-conventional-commits).
 
 ---
@@ -133,6 +143,8 @@ Pattern selection (tier order):
 3. Tier 2: S7 DETERMINISTIC TOOL BRIDGE (route 1, preloaded
    terminal + gh CLI), S4 VALIDATION DECORATOR (read-back verify
    after every mutation; PR-title check status as the gate in B),
+   B2 CONDITIONAL DISPATCH (Skill B branches on the detected
+   scaffold state; Skill A fails fast on missing admin permission),
    B4 PLAN MEMENTO (Skill A writes a setup checklist artifact
    before mutating; reloaded per level), B8 ATTENTION ANCHOR
    (goal + constraints restated at each level boundary), B10 HUMAN
@@ -155,8 +167,10 @@ sequenceDiagram
     participant S as Session (skill A)
     participant G as GitHub via gh CLI
 
-    S->>G: preflight reads (auth, visibility, plan, settings, rulesets, workflow)
+    S->>G: preflight reads (auth + token scopes, permission level, visibility, plan, settings, rulesets, workflow)
     G-->>S: current state (facts via tool, not recall)
+    Note over S: not admin or missing workflow scope -> fail fast with who-to-ask guidance
+
     S->>S: compute diff current vs target; write checklist (B4)
     S->>U: B10 checkpoint - proposed changes incl. private-plan gap if any
     U-->>S: approve / adjust
@@ -186,13 +200,19 @@ sequenceDiagram
 
     S->>G: read branch, diff vs default, commits, existing PR
     G-->>S: facts (S7 reads)
+    S->>G: scaffold detection (pr-title workflow present? squash enabled?)
+    G-->>S: scaffolded yes/no (B2 conditional branch)
     S->>S: classify type/scope/breaking (type guide lazy-loaded if ambiguous)
     S->>U: B10 checkpoint if editing a title not authored this session
     S->>G: gh pr create / gh pr edit
     G-->>S: read-back title (S4)
-    S->>G: poll PR-title check result
-    G-->>S: pass -> done; fail -> read check log, fix title, retry (max 2)
-    S->>U: report title, type rationale, check status
+    alt repo scaffolded
+        S->>G: poll PR-title check result
+        G-->>S: pass -> done; fail -> read check log, fix title, retry (max 2)
+    else not scaffolded
+        S->>S: skip check polling; note gap
+    end
+    S->>U: report title, type rationale, check status or scaffold gap + recommend skill A
 ```
 
 ## Step 3.1 - Tradeoff check
@@ -330,6 +350,12 @@ the change fits more than one type or none cleanly").
 ### Interface sketches
 
 **setup-conventional-commits** (SKILL, new, invocation: BOTH)
+- Intended user: repo OWNER / ADMIN (in personal accounts: the
+  account owner). Preconditions verified at preflight, fail fast
+  otherwise: gh authenticated; `admin` permission on the target
+  repo; token scopes sufficient to edit settings, create rulesets,
+  and commit workflow files (`repo` + `workflow`). On failure the
+  skill names the missing permission and who can grant/run it.
 - Inputs: target repo (defaults to cwd origin); operator approval
   at the B10 checkpoint; optional flags (pin allowed types, enable
   auto-delete-branches, PR body in squash message).
@@ -347,21 +373,47 @@ the change fits more than one type or none cleanly").
   a no-op diff and says so at the checkpoint.
 
 **pr-conventional-commits** (SKILL, new, invocation: BOTH)
+- Intended user: any CONTRIBUTOR who can open a PR against the
+  repo (push access to a branch, or a fork). Editing the title of
+  a PR authored by someone else additionally requires triage or
+  better on the repo; the skill detects this and reports rather
+  than failing mid-flight.
 - Inputs: current branch + working repo; optional existing PR
   number; user intent description if provided.
 - Outputs: created/updated PR with conventional title (+ BREAKING
   CHANGE footer in body when warranted); short report of type
   rationale and check status (EXTERNAL, normal prose).
-- Process spine: S7 reads (diff, commits, existing PR) -> classify
-  (body decision rules; lazy type guide on ambiguity) -> compose
-  title/body -> B10 checkpoint when rewriting someone else's title
-  -> gh pr create/edit -> verify title + poll check -> bounded
-  retry (max 2) -> report.
+- Process spine: S7 reads (diff, commits, existing PR) -> scaffold
+  detection (PR-title workflow present? squash merging enabled?)
+  -> classify (body decision rules; lazy type guide on ambiguity)
+  -> compose title/body -> B10 checkpoint when rewriting someone
+  else's title -> gh pr create/edit -> verify title; IF scaffolded:
+  poll check, bounded retry (max 2); ELSE: skip polling, report the
+  gap and recommend setup-conventional-commits -> report.
 - Dependencies: references/type-guide.md (INLINE lazy); gh CLI
   (S7); conventionalcommits.org spec (C6, only on spec-edge cases).
 - Title rules carried in body: imperative description, lowercase
   type from the 10-type set, optional scope, `!` and/or footer for
   breaking, target <= 72 chars.
+
+### Permissions and intended users
+
+Who installs and runs what. This table also goes (condensed) into
+each skill's README/body so consumers see it before invoking.
+
+| | setup-conventional-commits | pr-conventional-commits |
+|---|---|---|
+| Intended user | Repo owner / admin | Any contributor opening PRs |
+| GitHub permission on repo | `admin` (settings PATCH, ruleset create, workflow commit to main) | Push to a branch or fork + PR create; `triage`+ only to retitle others' PRs |
+| gh token scopes | `repo`, `workflow` | `repo` (default gh auth) |
+| Typical install location | Admin's environment; not needed by contributors | Every contributor's environment for the repo |
+| Runs how often | Once per repo (idempotent re-runs OK) | Every PR |
+| On missing permission | Fail fast BEFORE any mutation; name the gap and who can run it | Degrade: compose title anyway; report what it could not do |
+
+Personal-account note (from desires): in personal accounts the
+owner is the only admin, so Skill A's audience is effectively the
+account owner. Collaborators on a personal repo have push access
+but not admin -- they are Skill B's audience.
 
 ### Declared targets
 
@@ -397,6 +449,12 @@ blocked by the ruleset it just created; committing the workflow
 first keeps the whole scaffold single-pass. Why B10 sits before
 Level 1 (one checkpoint, not three): the three levels are one
 reviewable diff; per-level checkpoints would be a CHATTY GATE.
+Why B detects the scaffold but never performs it: permission
+asymmetry (B's audience is contributors, who usually lack admin)
+and boundary discipline (auto-invoking A from B would silently
+escalate a title-authoring request into repo administration); the
+detection result instead branches B's own behavior (poll the check
+vs report the gap) and produces a companion-skill recommendation.
 
 ### Development strategy
 
@@ -437,6 +495,11 @@ Grounded in `skill-testing-repos.md`; base repo
   - Scenario S4 partially/conflictingly configured repo (e.g.
     merge commits enabled, stray ruleset): correct reconcile diff
     shown at checkpoint.
+  - Scenario S5 non-admin invoker (collaborator account or a token
+    missing the workflow scope): fails fast BEFORE any mutation,
+    names the missing permission and who can run the skill.
+    (Needs a second account or a scoped-down token; human admin
+    participation.)
 - Skill B tests REUSE one scaffolded repo (`k0x-test-cc-pr`) with
   reset between runs (close PRs, delete branches) rather than
   recreate.
@@ -446,7 +509,12 @@ Grounded in `skill-testing-repos.md`; base repo
   - Scenario P3 docs-only change -> `docs: ...`.
   - Scenario P4 existing PR with bad title -> title fixed, check
     goes red -> green (exercises the bounded retry loop).
-  - Integration property: B tested inside a repo scaffolded by A.
+  - Scenario P5 UNSCAFFOLDED repo (fresh clone of the base, Skill A
+    never run): conventional title still composed and applied,
+    check polling skipped, gap reported with a recommendation to
+    run setup-conventional-commits.
+  - Integration property: B tested inside a repo scaffolded by A
+    (P1-P4); P5 deliberately runs outside one.
 - GitHub workflow development (the pr-title.yml template itself)
   is exercised only in test repos, never in this dev repo --
   matching the dev-info guidance that workflow run histories
@@ -474,6 +542,10 @@ outputs are indistinguishable, the skill is not adding value):
   `fix: <imperative summary>` title; without skill: generic title.
 - B-CE2: breaking change branch. Expected: `!` marker + BREAKING
   CHANGE footer; without skill: typically missed.
+- B-CE3: "open a PR" in an unscaffolded repo. Expected:
+  conventional title applied, explicit note that the repo lacks
+  the PR-title check + pointer to setup-conventional-commits;
+  without skill: generic title, no gap detection.
 
 Trigger evals: ~20 per skill, 60/40 train/val split; validation
 split is the ship gate (>= 0.5 hit rate on should-trigger, < 0.5
