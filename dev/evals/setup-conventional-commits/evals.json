@@ -1,0 +1,80 @@
+{
+  "skill_name": "setup-conventional-commits",
+  "methodology": "Content evals: run each prompt twice, with_skill and without_skill, in the setup described; if outputs are indistinguishable the skill is not adding value. Trigger evals: present each prompt to a fresh session with the skill installed (repo-scoped) and record whether the skill is invoked. Tune wording against train only; validation is the ship gate.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "A-CE1 fresh public repo, full scaffold",
+      "prompt": "Set up this repo to use conventional commits with squash merges.",
+      "setup": "Scenario S1 (dev/test-repos.md): fresh PUBLIC test repo created from the k0x-workbench base; gh authenticated as the repo owner with repo+workflow scopes; skill installed repo-scoped; cwd is a clone of the test repo.",
+      "expected_output": "All three levels applied in the documented order (Level 1 merge settings, Level 3 workflow, Level 2 ruleset), one human checkpoint before any mutation, read-back verification after every mutation, and a final verification report with the residual-soft-spot note.",
+      "expectations": [
+        "Preflight reads (gh auth status, repo settings, owner plan, rulesets, workflow file) all happen BEFORE any mutation",
+        "Exactly one human checkpoint presents the full three-level diff, and no mutation happens before it is approved",
+        "Merge settings are patched to allow_squash_merge=true, allow_merge_commit=false, allow_rebase_merge=false, squash_merge_commit_title=PR_TITLE",
+        "The workflow is committed to .github/workflows/pr-title.yml BEFORE the ruleset is created (Level 3 before Level 2)",
+        "The committed workflow includes 'edited' in the pull_request trigger types, job name 'Validate conventional PR title', and pins amannn/action-semantic-pull-request@v6",
+        "The ruleset targets the default branch with enforcement 'active', an EMPTY bypass_actors list, and rules deletion, non_fast_forward, pull_request, and required_status_checks with context 'Validate conventional PR title'",
+        "Every mutation is followed by a read-back verification (repo settings GET, workflow contents GET + decode, rules/branches/{default_branch})",
+        "The final report shows before/after per level with a verified column, and names the residual soft spot (merge-box hand-edit of the squash message is unvalidated)"
+      ],
+      "baseline_failure_modes": [
+        "Workflow trigger missing the 'edited' type, leaving stale failures after a title fix",
+        "Non-empty bypass list on the ruleset",
+        "Mutations applied with no read-back verification",
+        "Ruleset created before the workflow, blocking the workflow commit to the default branch"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "A-CE2 private free-plan repo, graceful degrade",
+      "prompt": "Set up this repo to use conventional commits with squash merges.",
+      "setup": "Scenario S2 (dev/test-repos.md): PRIVATE test repo on a free-plan personal account, otherwise as S1.",
+      "expected_output": "Levels 1 and 3 applied and verified normally; the ruleset plan gap detected at preflight and surfaced at the checkpoint; the ruleset still created but reported as not enforced; no crash.",
+      "expectations": [
+        "The private-repo free-plan gap is detected at preflight (visibility=private plus owner plan=free) and stated at the checkpoint BEFORE any mutation, not discovered after the fact",
+        "Levels 1 and 3 are applied and read-back verified exactly as in the public-repo case",
+        "The ruleset is still created (so it activates on upgrade or on making the repo public), not skipped",
+        "Read-back via rules/branches/{default_branch} returning no ruleset rules is interpreted as 'created but NOT enforced' and reported as the plan gap, and the ruleset is NOT deleted in response",
+        "The final report names the gap and the remedy (upgrade to Pro or make the repo public); the run completes without error"
+      ],
+      "baseline_failure_modes": [
+        "Aborting the whole setup because the ruleset is not enforceable",
+        "Reporting the ruleset as active because the create call returned success",
+        "No mention of the plan limitation anywhere in the output"
+      ]
+    }
+  ],
+  "trigger_evals": {
+    "gate": {
+      "split": "validation",
+      "should_trigger_min_hit_rate": 0.5,
+      "near_miss_max_hit_rate": 0.5,
+      "note": "Ship gate (todo #9): on the validation split, should-trigger prompts must invoke the skill at a rate >= 0.5 and near-miss prompts at a rate < 0.5. Only the train split may be used while tuning the name/description."
+    },
+    "train": [
+      { "id": "A-T1", "prompt": "scaffold conventional commits in this repo", "expected": "trigger" },
+      { "id": "A-T2", "prompt": "make main only accept squash merges", "expected": "trigger" },
+      { "id": "A-T4", "prompt": "set up commit lint for PR titles", "expected": "trigger" },
+      { "id": "A-T6", "prompt": "prevent direct pushes to main", "expected": "trigger" },
+      { "id": "A-T8", "prompt": "enforce conventional commits on main", "expected": "trigger" },
+      { "id": "A-T9", "prompt": "I just created a repo for a new app -- lock down main so we keep a clean conventional commit history", "expected": "trigger" },
+      { "id": "A-N1", "prompt": "write a conventional commit message for these changes", "expected": "no-trigger", "note": "local commit-message authoring; not repo configuration" },
+      { "id": "A-N3", "prompt": "set up branch naming conventions", "expected": "no-trigger" },
+      { "id": "A-N4", "prompt": "add a CI build workflow for .NET", "expected": "no-trigger" },
+      { "id": "A-N6", "prompt": "review this PR", "expected": "no-trigger" },
+      { "id": "A-N8", "prompt": "squash my local commits", "expected": "no-trigger" },
+      { "id": "A-N9", "prompt": "open a PR with a conventional commit title", "expected": "no-trigger", "note": "belongs to pr-conventional-commits" }
+    ],
+    "validation": [
+      { "id": "A-T3", "prompt": "protect main so the PR title becomes the commit message", "expected": "trigger" },
+      { "id": "A-T5", "prompt": "configure this new .NET repo for conventional commits", "expected": "trigger" },
+      { "id": "A-T7", "prompt": "add a PR title check", "expected": "trigger" },
+      { "id": "A-T10", "prompt": "require pull requests and a conventional title check before anything lands on main", "expected": "trigger" },
+      { "id": "A-N2", "prompt": "fix the failing PR title check on my PR", "expected": "no-trigger", "note": "belongs to pr-conventional-commits" },
+      { "id": "A-N5", "prompt": "rebase my branch onto main", "expected": "no-trigger" },
+      { "id": "A-N7", "prompt": "what does the ruleset on main do?", "expected": "no-trigger", "note": "read-only question, not setup" },
+      { "id": "A-N10", "prompt": "what are conventional commits and why would I use them?", "expected": "no-trigger", "note": "informational; no repo mutation asked for" }
+    ]
+  }
+}
