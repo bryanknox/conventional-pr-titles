@@ -64,7 +64,9 @@ gh api repos/{owner}/{repo}             # permissions.admin, visibility, default
                                         #   allow_squash_merge, allow_merge_commit,
                                         #   allow_rebase_merge, squash_merge_commit_title,
                                         #   delete_branch_on_merge
-gh api user --jq .plan.name             # free | pro | ... (owner's plan, personal accounts)
+gh api user --jq .plan.name             # owner's plan (personal accounts); EMPTY unless
+                                        #   the token has the user scope (gh default
+                                        #   auth does not) -> treat empty as unknown
 gh api repos/{owner}/{repo}/rulesets    # existing rulesets
 gh api repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml
                                         # existing workflow? (404 = absent)
@@ -84,10 +86,15 @@ Fail fast (before ANY mutation) when:
 Detect the private-plan gap: if `visibility` is `private` AND the
 owner's plan is `free`, rulesets can be created but are NOT
 enforced (GitHub Pro is required for rulesets on private personal
-repos). Do not abort: Levels 1 and 3 work on any plan, and the
+repos). The plan read is best-effort: `GET /user` includes `plan`
+only when the token has the `user` scope, which gh's default auth
+does not -- an empty result means UNKNOWN, not `free`. Do not
+abort in either case: Levels 1 and 3 work on any plan, and the
 plan is to still create the ruleset so it activates automatically
-if the repo goes public or the plan is upgraded. Carry this gap
-into the checkpoint and the final report.
+if the repo goes public or the plan is upgraded. On a private
+repo, carry the gap (plan `free`) or the uncertainty (plan
+unknown) into the checkpoint; the Level 2 read-back is the
+definitive enforcement detector either way.
 
 ### Step 2 - Compute the diff
 
@@ -244,10 +251,10 @@ gh api repos/{owner}/{repo}/rules/branches/{default_branch}
 
 Expect entries for `deletion`, `non_fast_forward`, `pull_request`,
 and `required_status_checks`. An EMPTY result after a successful
-create on a private free-plan repo confirms the predicted gap: the
-ruleset exists but is not enforced. Record it as inactive in the
-checklist; do not delete it (it activates on upgrade or when the
-repo goes public).
+create on a private repo (free or unknown plan) confirms the
+predicted gap: the ruleset exists but is not enforced. Record it
+as inactive in the checklist; do not delete it (it activates on
+upgrade or when the repo goes public).
 
 ### Step 8 - Final report
 

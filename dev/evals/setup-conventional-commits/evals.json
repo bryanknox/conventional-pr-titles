@@ -32,7 +32,7 @@
       "setup": "Scenario S2 (dev/test-repos.md): PRIVATE test repo on a free-plan personal account, otherwise as S1.",
       "expected_output": "Levels 1 and 3 applied and verified normally; the ruleset plan gap detected at preflight and surfaced at the checkpoint; the ruleset still created but reported as not enforced; no crash.",
       "expectations": [
-        "The private-repo free-plan gap is detected at preflight (visibility=private plus owner plan=free) and stated at the checkpoint BEFORE any mutation, not discovered after the fact",
+        "The private-repo enforcement risk is detected at preflight (visibility=private; owner plan read as free, or as UNKNOWN when the token lacks the user scope) and stated at the checkpoint BEFORE any mutation, not discovered after the fact",
         "Levels 1 and 3 are applied and read-back verified exactly as in the public-repo case",
         "The ruleset is still created (so it activates on upgrade or on making the repo public), not skipped",
         "Read-back via rules/branches/{default_branch} returning no ruleset rules is interpreted as 'created but NOT enforced' and reported as the plan gap, and the ruleset is NOT deleted in response",
