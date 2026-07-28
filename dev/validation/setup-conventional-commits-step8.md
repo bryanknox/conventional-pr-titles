@@ -1,9 +1,11 @@
 # Step 8 validation record: setup-conventional-commits (plan todo #6)
 
-Status: IN PROGRESS (2026-07-28). Structural lint PASSED; one
-defect found and fixed pre-run (F1); real run on scenario S1 is
-staged but BLOCKED at the repo-creation human checkpoint (see
-"Run status" below).
+Status: COMPLETE (2026-07-28). Structural lint PASSED; real run
+on scenario S1 PASSED 8/8 A-CE1 expectations with independent
+read-back verification; without-skill baseline showed a clear
+value delta (see "Run results"). Findings F1-F4 fixed in
+SKILL.md. Raw traces: `traces/s1-with-skill-trace.md`,
+`traces/s1b-baseline-trace.md`.
 
 ## Structural lint (PASS, 2026-07-28)
 
@@ -62,30 +64,77 @@ path in practice.
   RESTORE AFTERWARD: `gh auth switch -h github.com -u bryanknoxbits`.
 - No leftover `k0x-test-cc-*` repos before the run.
 
-## Run status: S1 staged, blocked at the create checkpoint
+### F2-F4 (frictions from the S1 trace, FIXED 2026-07-28)
 
-Per dev/test-repos.md, `gh repo create` is a human checkpoint; the
-harness permission classifier enforced exactly that (denied the
-command in the autonomous session). Nothing was mutated on GitHub.
+- F2: Step 3 checklist location was ambiguous ("session's working
+  area"); the runner had to decide not to drop it in the repo.
+  Body now says: scratch area OUTSIDE the repo working tree.
+- F3: `gh api` exits nonzero on EXPECTED preflight outcomes (404
+  workflow-absent read; empty `--jq` plan read), breaking `&&`
+  chains / `set -e`. Body now says: run preflight reads as
+  independent commands.
+- F4: the Step 7 `<<'JSON'` heredoc is POSIX-only; on the Windows
+  host it required the Bash tool. Body now names the POSIX-shell
+  requirement and the `--input <temp file>` alternative.
+- Observed, no action: the ruleset POST response contains
+  server-populated fields beyond the request (e.g.
+  `pull_request.allowed_merge_methods`,
+  `do_not_enforce_on_create`); harmless because verification uses
+  the effective-rules endpoint, not a JSON diff.
 
-Staged so far (session scratchpad, ephemeral -- redo the staging
-steps if resuming in a fresh session):
+## Run results (2026-07-28)
 
-- Base cloned to `<scratchpad>/k0x-test-cc-s1`, remote `origin`
-  renamed to `base` (points at read-only k0x-workbench).
-- Revised skill installed repo-scoped at
-  `.claude/skills/setup-conventional-commits/` in the clone,
-  untracked.
+Note on the earlier "blocked" state: the classifier denial of
+`gh repo create` was resolved by the operator adding a
+`Bash(gh repo create:*)` allow rule; repo creation then proceeded.
 
-To resume (operator action, then continue todo #6):
+**With-skill run (A-CE1, `k0x-test-cc-s1`, public,
+create-from-base): PASS 8/8 expectations.** Subagent followed the
+installed skill; checkpoint approval was delegated with a
+match-the-documented-target condition (unattended run). All three
+levels applied in order L1 -> L3 -> L2; exactly one checkpoint
+before any mutation; every mutation read-back verified; final
+report matched the Step 8 template incl. residual soft spot and
+action-version note (latest v6.1.1 = pinned major, no lag).
+Independently re-verified from the dev session (not trusting the
+runner): merge settings squash-only/PR_TITLE/BLANK; ruleset
+19925505 active, empty bypass, `~DEFAULT_BRANCH`;
+`rules/branches/main` returns all four rule types; deployed
+workflow byte-identical to the template modulo CRLF. Run cost:
+~38K subagent tokens, 18 tool uses, ~3.4 min.
 
-    cd <scratchpad>/k0x-test-cc-s1
-    gh repo create bryanknox/k0x-test-cc-s1 --public --source . --push
+**Without-skill baseline (same prompt, `k0x-test-cc-s1b`): value
+delta CLEAR.** The baseline configured squash-only merges and
+built a competent hand-rolled PR-title check (repo-native pwsh
+validator + Pester tests + workflow; even live-tested it via a
+throwaway PR), BUT:
 
-Remaining todo #6 work after the repo exists: with-skill run of
-A-CE1 (fresh session in the clone; capture trace), independent
-`gh api` read-back assertions, without-skill baseline run of A-CE1
-(needs a second fresh repo, suggested name `k0x-test-cc-s1b`),
-grade the A-CE1 expectations + baseline delta here, revise the
-skill from the trace, then run S3 (idempotent re-run) on the same
-repo per test-repos.md before any deletion.
+- declined any ruleset / branch protection ("owner commits
+  directly to main"), so the check is advisory: direct pushes and
+  merges with a failing title remain possible -- the core goal
+  (only path to main = squash-merged PR with valid title) is NOT
+  met. Matches the predicted enforcement-shaped failure band,
+  though not the four specific predicted failure modes (those it
+  avoided).
+- unrequested scope: `delete_branch_on_merge=true`,
+  `squash_merge_commit_message=PR_BODY`, PR template, policy doc,
+  AGENTS.md edits; ~388 lines of bespoke validator code to
+  maintain vs a pinned maintained action.
+- no approval checkpoint before mutating; ~2x cost (71K tokens,
+  35 tool uses, ~8.3 min).
+
+Evals-gate conclusion: with/without outputs are clearly
+distinguishable; the skill's value is enforcement completeness +
+checkpoint discipline + scope restraint, not raw competence.
+
+## Disposition and follow-ups
+
+- `k0x-test-cc-s1` KEPT: S3 (idempotent re-run) runs against it
+  in plan todo #8, per test-repos.md.
+- `k0x-test-cc-s1b` no longer needed: operator deletion per the
+  delete procedure (human checkpoint) whenever convenient.
+- gh active account restored to `bryanknoxbits` after the
+  campaign; switch to `bryanknox` again for todos #7/#8 (note
+  added to dev/test-repos.md).
+- Residuals unchanged: S2 live POST status (todo #8); trigger-eval
+  validation gate (todo #9).

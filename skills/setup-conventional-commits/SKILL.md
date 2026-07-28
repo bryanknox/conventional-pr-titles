@@ -73,7 +73,10 @@ gh api repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml
 ```
 
 Use `default_branch` from the repo read everywhere this skill says
-"main".
+"main". Run the preflight reads as independent commands, not
+`&&`-chained or under `set -e`: `gh api` exits nonzero on the
+EXPECTED outcomes here (404 when the workflow file is absent;
+empty `--jq` result when the plan is unknown).
 
 Fail fast (before ANY mutation) when:
 
@@ -111,7 +114,8 @@ anything.
 ### Step 3 - Write the checklist
 
 Before mutating anything, write this checklist to a working file
-(e.g. `cc-setup-checklist.md` in the session's working area).
+(e.g. `cc-setup-checklist.md` in the session's scratch area,
+OUTSIDE the repo working tree so it cannot end up committed).
 Re-read it at the start of each level and update the Status column
 after each verification; its header restates the goal and
 constraints so they survive a long session.
@@ -235,8 +239,10 @@ gh api -X POST repos/{owner}/{repo}/rulesets --input - <<'JSON'
 JSON
 ```
 
-Notes: required approvals stay 0 (personal repos; the PR just has
-to exist). The bypass list stays EMPTY unless the user explicitly
+Notes: the heredoc form needs a POSIX shell; from other shells,
+write the JSON to a temp file (outside the repo working tree) and
+pass `--input that-file`. Required approvals stay 0 (personal
+repos; the PR just has to exist). The bypass list stays EMPTY unless the user explicitly
 asks otherwise. No merge-method rule is needed; Level 1 already
 makes squash the only option. If the API returns 422, re-verify
 the request shape against the live GitHub REST docs for repository
