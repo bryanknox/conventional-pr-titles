@@ -179,7 +179,7 @@ sequenceDiagram
     S->>G: Level 3 commit pr-title workflow to main
     G-->>S: read-back verify (S4)
     S->>G: Level 2 create main ruleset (required check by name)
-    G-->>S: read-back verify (S4) or plan-limit error -> report gap
+    G-->>S: read-back verify (S4) via rules/branches/main; empty on free-plan private repo -> report gap
     S->>U: final verification report + residual soft spots
 ```
 
@@ -187,8 +187,8 @@ Ordering note: Level 3 (workflow file) lands BEFORE Level 2 (the
 ruleset that requires a PR), so the workflow can be committed
 directly to `main` without being blocked by the ruleset the skill
 itself creates. The required status check is added to the ruleset
-by name via the REST API (no prior run needed via API -- VERIFY
-against live GitHub docs at 7b; C6).
+by name via the REST API (no prior run needed via API -- VERIFIED
+2026-07-28 against live GitHub REST docs; see step 5 finding (a)).
 
 ### Skill B thread
 
@@ -318,15 +318,35 @@ Classic + PROSE + LLM-physics: no BLOCKER, no HIGH.
 
 Open findings:
 
-- MEDIUM: Skill A depends on two GitHub API behaviors that must be
-  verified live at 7b, not recalled (C6): (a) required status
-  checks can be added to a ruleset by context name via REST without
-  a prior workflow run; (b) the exact error shape when creating a
-  ruleset on a private free-plan personal repo (needed for the
-  graceful-degrade branch). If (a) is false, Skill A becomes a
-  two-phase saga (scaffold, first PR runs check, then bind check to
-  ruleset) -- the packet's sequence diagram must be revised at that
-  point.
+- MEDIUM -> RESOLVED (verified 2026-07-28 against live GitHub docs;
+  todo #1):
+  - (a) CONFIRMED. The ruleset `required_status_checks` rule takes a
+    free-text `context` string ("The status check context name that
+    must be present on the commit"); no requirement that the check
+    exist or have run. No two-phase saga; the sequence diagram
+    stands. Documented responses for create-ruleset: 201/404/422/500.
+  - (b) REVISED -- there is likely NO plan-limit error to catch.
+    Availability: rulesets work on private repos only with GitHub
+    Pro/Team/Enterprise; on GitHub Free (personal or org) they are
+    public-repo-only. On a below-plan private repo, rulesets can be
+    CREATED and viewed but are silently NOT ENFORCED (UI banner:
+    "Your rulesets won't be enforced on this private repository
+    until you upgrade..."); the create endpoint documents no 403
+    plan error. Design change for Skill A's degrade branch:
+    (1) detect proactively at preflight -- repo `visibility ==
+    private` + owner plan via `GET /user` -> `plan.name` -- and
+    surface the gap at the B10 checkpoint; (2) read-back verify
+    Level 2 with `GET /repos/{o}/{r}/rules/branches/main`, which
+    returns only ACTIVELY ENFORCED rules ("Rules in rulesets with
+    'evaluate' or 'disabled' enforcement statuses are not
+    returned") -- an empty result after creating an active ruleset
+    confirms non-enforcement. Drafting decision for 7b: on a
+    detected gap, still create the (non-enforced) ruleset so it
+    activates automatically on upgrade or on making the repo
+    public, and report it as inactive. Residual: exact POST status
+    on a free-plan private personal repo (201 vs 403) is only
+    observable live -- confirm in test scenario S2, which already
+    covers this path.
 - LOW: skill names pending trigger-eval validation; alternatives
   considered: `scaffold-conventional-commits` (A),
   `conventional-commit-pr-title` (B).
@@ -612,7 +632,7 @@ Declared stance: `balanced`. Cap check: N/A.
 
 | # | Task | Depends on |
 |---|---|---|
-| 1 | Verify the two MEDIUM C6 facts against live GitHub docs (ruleset check-by-name; private-plan error shape) | packet |
+| 1 | DONE 2026-07-28 -- Verify the two MEDIUM C6 facts against live GitHub docs (ruleset check-by-name; private-plan error shape). Results in step 5 finding. (a) confirmed; (b) revised: silent non-enforcement, not an error | packet |
 | 2 | Draft `skills/setup-conventional-commits/` (SKILL.md + workflow asset) per interface sketch | 1 |
 | 3 | Draft `skills/pr-conventional-commits/` (SKILL.md + type-guide reference) per interface sketch | packet (parallel with 2) |
 | 4 | Author `dev/evals/` for both skills (content + trigger, 60/40 split) | 2, 3 |
