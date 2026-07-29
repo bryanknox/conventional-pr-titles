@@ -85,9 +85,19 @@ Fail fast (before ANY mutation) when:
 
 - `permissions.admin` is false: report that only a repo admin (in
   personal accounts, the account owner) can run this skill, and
-  name them if known.
+  name them. For a personal-account repo the admin IS the owner --
+  take the name from the repo slug / `owner.login`; for an
+  org-owned repo say "an admin of {org}/{repo}" (a non-admin token
+  cannot list who that is).
 - Token lacks `repo` or `workflow` scope: report the missing scope
   and the remedy: `gh auth refresh -h github.com -s repo,workflow`.
+
+Evaluate these as soon as each becomes knowable (scopes from the
+`gh auth status` read; admin from the repo read) and stop at the
+first hit -- the remaining preflight reads are unnecessary. The
+fail-fast report replaces the Step 8 report: state that setup was
+aborted at preflight with NOTHING changed, name the failed
+condition and who can run the skill, and give the remedy.
 
 Detect the private-plan gap: rulesets on private personal repos
 require GitHub Pro. On a free-plan private repo ALL ruleset
