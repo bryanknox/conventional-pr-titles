@@ -85,13 +85,16 @@ there is nothing to open a PR for and stop.
 ### Step 2 - Detect the scaffold
 
 ```
-gh api repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml   # 404 = absent
-gh api repos/{owner}/{repo} --jq '{allow_squash_merge: .allow_squash_merge, squash_merge_commit_title: .squash_merge_commit_title}'
+gh api repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml --jq .name   # 404 = absent; --jq trims the base64 payload
+gh api repos/{owner}/{repo} --jq '{allow_squash_merge: .allow_squash_merge, squash_merge_commit_title: .squash_merge_commit_title, squash_merge_commit_message: .squash_merge_commit_message}'
 ```
 
-SCAFFOLDED = the PR-title workflow exists. Also note whether
-`squash_merge_commit_title` is `PR_TITLE` (the title will
-literally become the commit on the default branch).
+SCAFFOLDED = the PR-title workflow exists. If that exact filename
+is 404, list `.github/workflows` and treat any workflow that lints
+the PR title (e.g. uses amannn/action-semantic-pull-request) as
+the scaffold. Also note whether `squash_merge_commit_title` is
+`PR_TITLE` (the title will literally become the commit on the
+default branch).
 
 Not scaffolded? Continue anyway -- a conventional title is
 valuable on its own -- but skip step 7 (check polling) and carry
@@ -130,7 +133,11 @@ format changes). Mark with `!` in the title AND the
 
 Title per the rules above. Body: a short summary of what changed
 and why; if breaking, end the body with the `BREAKING CHANGE:`
-footer. If step 2 found the squash message setting is not
+footer. The footer must be the LAST paragraph -- attribution or
+tooling trailer lines go above it. When updating an existing PR,
+refresh the body too: replace placeholder bodies (e.g. "wip"),
+keep meaningful existing content, and repair footer placement.
+If step 2 found the squash message setting is not
 `PR_BODY`, the footer stays PR-only (it will not ride into the
 squash commit); note that in the report rather than trying to
 change the setting.
@@ -141,7 +148,9 @@ Required ONLY when editing a PR whose title this session did not
 compose, or whose author (from step 1) is not the current `gh`
 user: present `old title -> new title` plus the one-sentence type
 rationale, and wait for approval before editing. PRs created fresh
-in this session need no checkpoint.
+in this session need no checkpoint, and a request that names the
+PR and asks for the retitle ("fix the title on PR 5") is itself
+the approval -- apply directly and show old -> new in the report.
 
 ### Step 6 - Apply and verify
 
@@ -160,7 +169,11 @@ title and who can apply it; do not retry.
 Poll `gh pr checks {number}` until the PR-title check completes
 (job name `Validate conventional PR title` in repos scaffolded by
 the companion skill; otherwise any check from a
-semantic-pull-request / PR-title workflow).
+semantic-pull-request / PR-title workflow). Only the PR-title
+check gates this skill: ignore other checks (build, tests) and do
+not wait for them. Avoid `--watch` while unrelated checks run --
+it waits for ALL checks; re-run the plain command at short
+intervals instead.
 
 On failure: read the exact complaint
 (`gh run view {run_id} --log-failed`), fix the title accordingly,
@@ -172,6 +185,7 @@ the check's complaint verbatim and stop.
 ```markdown
 ## PR title: {owner}/{repo}#{number}
 Title: {title}
+PR: {url}
 Type rationale: {one sentence: why this type / scope / breaking marker}
 Check: {pass | fail: reason | skipped: repo not scaffolded}
 {If not scaffolded: this repo does not enforce PR titles; a repo
