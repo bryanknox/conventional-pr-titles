@@ -242,7 +242,14 @@ explicitly, deletions happen, then the scope is dropped:
 
     gh auth refresh -h github.com -s delete_repo   # operator approves in browser
     gh repo delete bryanknox/k0x-test-cc-<suffix> --yes
-    gh auth refresh -h github.com -s repo,workflow  # drop delete_repo again
+    gh auth refresh -h github.com --remove-scopes delete_repo
+
+CORRECTED 2026-07-29: the drop step formerly used
+`-s repo,workflow`, but `-s` only ADDS scopes -- it never removes
+any, so that command left `delete_repo` granted (observed live:
+the scope survived the todo #8 deletion session). Only
+`--remove-scopes` removes a scope; `repo`, `read:org`, and `gist`
+are gh's un-removable minimum and need not be re-listed.
 
 Never script a loop over `gh repo delete`; delete one repo per
 confirmed command. The leftover-finder one-liner under Naming
