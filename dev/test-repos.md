@@ -139,15 +139,37 @@ active enforcement. Expected values per scenario live in the eval
   methods corrected, stray ruleset surfaced, overwrite/coexist
   decision made explicit) rather than a blind re-apply.
 - **S5 non-admin invoker (fail fast).** Needs HUMAN ADMIN
-  participation and one of: a second GitHub account added as a
-  plain push collaborator on the test repo, or a scoped-down token
-  missing the `workflow` scope on the owner account (e.g.
-  `gh auth login` with a classic PAT that has `repo` but not
-  `workflow`). Run Skill A as that identity; assert it fails
-  BEFORE any mutation and names the missing permission and who can
-  run the skill. Verify no settings changed afterward via the same
-  read-backs. Restore normal auth when done: `gh auth login` /
-  `gh auth refresh -s repo,workflow`.
+  participation. DECIDED 2026-07-29: use the second gh account
+  already on this machine (`bryanknoxbits`, keyring; its token has
+  both `repo` and `workflow` scopes) as a plain push collaborator,
+  NOT a scoped-down PAT. Rationale: zero credential setup (both
+  accounts are already logged in); it exercises the
+  `permissions.admin: false` fail-fast branch, the one whose
+  report must name who CAN run the skill (with a scoped token the
+  invoker IS the admin, so that half of the assertion degenerates);
+  it leaves the standing `bryanknox` token -- including the
+  `delete_repo` grant state -- untouched; and since the
+  collaborator token has both scopes, missing admin access is the
+  ONLY failing variable. Setup after create-from-base:
+
+      gh api -X PUT \
+        repos/bryanknox/k0x-test-cc-s5/collaborators/bryanknoxbits \
+        -f permission=push
+      gh auth switch -h github.com -u bryanknoxbits
+      gh api user/repository_invitations \
+        --jq '.[] | [.id, .repository.full_name] | @tsv'
+      gh api -X PATCH user/repository_invitations/<id>
+
+  Run Skill A as `bryanknoxbits`; assert it fails BEFORE any
+  mutation and names the missing permission and who can run the
+  skill (the repo owner). Then
+  `gh auth switch -h github.com -u bryanknox` and verify no
+  settings changed via the same read-backs. KNOWN GAP: the
+  missing-`workflow`-scope fail-fast branch stays untested --
+  `gh auth refresh` can only ADD scopes, so only a purpose-made
+  classic PAT (`repo` without `workflow`) could exercise it;
+  record the gap in the S5 validation record rather than minting
+  one.
 
 ## Skill B repo: scaffold once, reset between runs
 
@@ -237,8 +259,9 @@ validation (plan todo #7) is done.
 3. S2: RESOLVED 2026-07-28 -- the live ruleset-create POST status
    was recorded (403 refusal; no ruleset exists, so there is no
    UI banner to eyeball). No longer an open checkpoint.
-4. S5: providing the second account or scoped-down token, and
-   restoring normal auth afterward.
+4. S5: the collaborator invite to `bryanknoxbits`, the switch to
+   that account for the run, and the switch back to `bryanknox`
+   afterward.
 5. Skill A's own in-run approval gate (the B10 checkpoint before
    mutations) -- part of every A scenario run, answered by the
    operator, not pre-approved by test tooling.
