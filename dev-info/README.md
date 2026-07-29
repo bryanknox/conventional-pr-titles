@@ -19,6 +19,24 @@ This folder contains information helpful in the planning and development of agen
     version used to produce the handoff packet.
   - To update: re-run `npx skills add danielmeppiel/genesis`, then
     refresh the commit hash recorded here.
+  - Maintenance policy (contributors): `.agents/skills/genesis/` and
+    `.claude/skills/genesis/` are INSTALLER-MANAGED. Never hand-edit
+    either folder; the only supported way to change their contents is
+    re-running the install command above. Both trees are committed
+    and must stay byte-identical in every commit.
+    - On Windows the installer mirrors `.claude/skills/genesis/` as a
+      directory junction pointing at `.agents/skills/genesis/`, so
+      the two stay in sync automatically. The junction itself is not
+      recorded in git.
+    - On a fresh clone the two folders are independent copies;
+      re-running the install command restores the mirror.
+    - macOS/Linux caution: there the installer creates a true
+      symlink, which git WOULD record — committing from such a
+      machine can silently replace the 31 tracked files under
+      `.claude/skills/genesis/` with a single symlink entry that
+      breaks on Windows checkouts. PR review should reject any diff
+      that turns that folder into a symlink or lets the two trees
+      drift apart.
 - **skill-creator** (<https://github.com/anthropics/skills>) — not
   installed; only its `evals.json` schema convention is borrowed by
   the eval files under `dev/evals/`.
