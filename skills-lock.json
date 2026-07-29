@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "genesis": {
+      "source": "danielmeppiel/genesis",
+      "sourceType": "github",
+      "skillPath": "skills/genesis/SKILL.md",
+      "computedHash": "b96eb67968bb98fc18b80aa90e270fbda29a43ab403fb182746c5476e7f896ca"
+    }
+  }
+}
