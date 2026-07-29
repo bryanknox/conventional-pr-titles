@@ -30,17 +30,16 @@
       "name": "A-CE2 private free-plan repo, graceful degrade",
       "prompt": "Set up this repo to use conventional commits with squash merges.",
       "setup": "Scenario S2 (dev/test-repos.md): PRIVATE test repo on a free-plan personal account, otherwise as S1.",
-      "expected_output": "Levels 1 and 3 applied and verified normally; the ruleset plan gap detected at preflight and surfaced at the checkpoint; the ruleset still created but reported as not enforced; no crash.",
+      "expected_output": "Levels 1 and 3 applied and verified normally; the plan gate detected at preflight (HTTP 403 on the rulesets read) and surfaced at the checkpoint; Level 2 reported as blocked by plan (the create POST is refused with 403 on free-plan private personal repos -- verified live 2026-07-28); no crash.",
       "expectations": [
-        "The private-repo enforcement risk is detected at preflight (visibility=private; owner plan read as free, or as UNKNOWN when the token lacks the user scope) and stated at the checkpoint BEFORE any mutation, not discovered after the fact",
+        "The plan gate is detected at preflight (403 'Upgrade to GitHub Pro...' on the rulesets read is the definitive signal; the plan read may be UNKNOWN without the user scope) and stated at the checkpoint BEFORE any mutation, not discovered after the fact",
         "Levels 1 and 3 are applied and read-back verified exactly as in the public-repo case",
-        "The ruleset is still created (so it activates on upgrade or on making the repo public), not skipped",
-        "Read-back via rules/branches/{default_branch} returning no ruleset rules is interpreted as 'created but NOT enforced' and reported as the plan gap, and the ruleset is NOT deleted in response",
-        "The final report names the gap and the remedy (upgrade to Pro or make the repo public); the run completes without error"
+        "Level 2 is reported as BLOCKED by plan: either the POST is skipped with the confirmed 403 gate as the stated reason, or a single attempted POST's 403 refusal is reported -- no retry loop, nothing deleted, no abort of the run",
+        "The final report names the gap and the remedy (upgrade to Pro or make the repo public, then re-run the skill to add the ruleset); the run completes without error"
       ],
       "baseline_failure_modes": [
-        "Aborting the whole setup because the ruleset is not enforceable",
-        "Reporting the ruleset as active because the create call returned success",
+        "Aborting the whole setup because the ruleset cannot be created",
+        "Retrying the refused ruleset create or mutating other settings to compensate",
         "No mention of the plan limitation anywhere in the output"
       ]
     }

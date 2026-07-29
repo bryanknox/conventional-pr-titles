@@ -67,7 +67,9 @@ gh api repos/{owner}/{repo}             # permissions.admin, visibility, default
 gh api user --jq .plan.name             # owner's plan (personal accounts); EMPTY unless
                                         #   the token has the user scope (gh default
                                         #   auth does not) -> treat empty as unknown
-gh api repos/{owner}/{repo}/rulesets    # existing rulesets
+gh api repos/{owner}/{repo}/rulesets    # existing rulesets; 403 "Upgrade to
+                                        #   GitHub Pro..." = free-plan private
+                                        #   repo (plan gate CONFIRMED)
 gh api repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml
                                         # existing workflow? (404 = absent)
 ```
@@ -76,7 +78,8 @@ Use `default_branch` from the repo read everywhere this skill says
 "main". Run the preflight reads as independent commands, not
 `&&`-chained or under `set -e`: `gh api` exits nonzero on the
 EXPECTED outcomes here (404 when the workflow file is absent;
-empty `--jq` result when the plan is unknown).
+empty `--jq` result when the plan is unknown; 403 on the rulesets
+read when a private repo sits on a free plan).
 
 Fail fast (before ANY mutation) when:
 
@@ -86,18 +89,23 @@ Fail fast (before ANY mutation) when:
 - Token lacks `repo` or `workflow` scope: report the missing scope
   and the remedy: `gh auth refresh -h github.com -s repo,workflow`.
 
-Detect the private-plan gap: if `visibility` is `private` AND the
-owner's plan is `free`, rulesets can be created but are NOT
-enforced (GitHub Pro is required for rulesets on private personal
-repos). The plan read is best-effort: `GET /user` includes `plan`
-only when the token has the `user` scope, which gh's default auth
-does not -- an empty result means UNKNOWN, not `free`. Do not
-abort in either case: Levels 1 and 3 work on any plan, and the
-plan is to still create the ruleset so it activates automatically
-if the repo goes public or the plan is upgraded. On a private
-repo, carry the gap (plan `free`) or the uncertainty (plan
-unknown) into the checkpoint; the Level 2 read-back is the
-definitive enforcement detector either way.
+Detect the private-plan gap: rulesets on private personal repos
+require GitHub Pro. On a free-plan private repo ALL ruleset
+endpoints are plan-gated: the preflight rulesets read fails with
+HTTP 403 "Upgrade to GitHub Pro or make this repository public to
+enable this feature" (verified live 2026-07-28), and the create
+POST would be refused with the same 403 -- the ruleset cannot be
+created at all. That preflight 403 is the DEFINITIVE detector; the
+plan read is only best-effort corroboration (`GET /user` includes
+`plan` only when the token has the `user` scope, which gh's
+default auth does not -- an empty result means UNKNOWN, not
+`free`). Do not abort: Levels 1 and 3 work on any plan. Carry the
+confirmed gate (403) -- Level 2 BLOCKED -- or, on a private repo
+whose rulesets read succeeded, the remaining plan uncertainty,
+into the checkpoint. When the gate is confirmed, plan to skip
+Step 7's POST and report Level 2 as blocked with the remedy:
+upgrade to Pro or make the repo public, then re-run this skill
+(the re-run will be a Levels 1+3 no-op and add only the ruleset).
 
 ### Step 2 - Compute the diff
 
@@ -105,17 +113,27 @@ Compare current state against the target state (see "Target state
 per level" below) and classify each level: `apply` (change
 needed), `no-op` (already configured), or `conflict` (something
 different exists, e.g. a stray ruleset targeting the default
-branch, or a pr-title.yml with different content).
+branch, or a pr-title.yml with different content). A level can be
+`conflict` AND `apply` at once (a stray ruleset exists and this
+skill's ruleset is absent): surface both together. Compare only
+the fields this skill specifies -- ruleset reads include
+server-populated defaults (e.g. `pull_request.allowed_merge_methods`,
+`required_status_checks.do_not_enforce_on_create`) that are NOT
+conflicts.
 
 If all three levels are `no-op`, say so and stop after presenting
 the (empty) diff; re-running on a configured repo must not mutate
-anything.
+anything. The no-op diff doubles as the final report (Steps 3-7
+are skipped); optionally still run Step 6's read-only
+action-version check and note any lag.
 
 ### Step 3 - Write the checklist
 
 Before mutating anything, write this checklist to a working file
-(e.g. `cc-setup-checklist.md` in the session's scratch area,
-OUTSIDE the repo working tree so it cannot end up committed).
+(e.g. `cc-setup-checklist-{repo}.md` -- repo-scoped name, so runs
+against other repos sharing the scratch area never collide -- in
+the session's scratch area, OUTSIDE the repo working tree so it
+cannot end up committed).
 Re-read it at the start of each level and update the Status column
 after each verification; its header restates the goal and
 constraints so they survive a long session.
@@ -147,8 +165,16 @@ acknowledgment, never silent action:
 
 - Overwriting an existing ruleset or an existing pr-title.yml that
   differs from the template.
-- Proceeding on a private free-plan repo (ruleset will be created
-  but inactive).
+- Proceeding on a private repo with the plan gate confirmed
+  (Level 2 blocked: the ruleset cannot be created until the plan
+  is upgraded or the repo goes public) or with the plan unknown.
+
+For a pre-existing ruleset this skill did not create, the default
+is COEXIST: leave it untouched and create this skill's ruleset
+alongside it (effective rules are the union of active rulesets;
+the old ruleset's bypass list applies only to its own rules, never
+to this skill's). Deleting or modifying someone's existing ruleset
+requires explicit approval, never silent action.
 
 ### Step 5 - Level 1: merge settings
 
@@ -204,9 +230,13 @@ the template. Update the checklist.
 
 ### Step 7 - Level 2: ruleset on the default branch
 
-Create the ruleset. The required status check is referenced by the
-workflow's job name string; no prior workflow run is needed when
-creating via the API.
+If preflight confirmed the plan gate (403 on the rulesets read),
+SKIP the create -- it would be refused with the same 403. Record
+Level 2 as `blocked by plan` in the checklist and go to Step 8.
+
+Otherwise create the ruleset. The required status check is
+referenced by the workflow's job name string; no prior workflow
+run is needed when creating via the API.
 
 ```
 gh api -X POST repos/{owner}/{repo}/rulesets --input - <<'JSON'
@@ -246,7 +276,10 @@ repos; the PR just has to exist). The bypass list stays EMPTY unless the user ex
 asks otherwise. No merge-method rule is needed; Level 1 already
 makes squash the only option. If the API returns 422, re-verify
 the request shape against the live GitHub REST docs for repository
-rulesets; do not adjust field names from recall.
+rulesets; do not adjust field names from recall. If it returns 403
+"Upgrade to GitHub Pro...", that is the plan gate surfacing here
+first: record Level 2 as blocked, do not retry, do not abort the
+run.
 
 Verify with the effective-rules endpoint, which returns only
 ACTIVELY ENFORCED rules:
@@ -256,11 +289,13 @@ gh api repos/{owner}/{repo}/rules/branches/{default_branch}
 ```
 
 Expect entries for `deletion`, `non_fast_forward`, `pull_request`,
-and `required_status_checks`. An EMPTY result after a successful
-create on a private repo (free or unknown plan) confirms the
-predicted gap: the ruleset exists but is not enforced. Record it
-as inactive in the checklist; do not delete it (it activates on
-upgrade or when the repo goes public).
+and `required_status_checks`. On a free-plan private repo this
+endpoint is plan-gated too (same 403), consistent with the blocked
+state. An EMPTY result after a successful create means the ruleset
+exists but is not enforced (possible for org-owned repos or
+non-`active` enforcement): record it as inactive in the checklist;
+do not delete it (it activates on upgrade or when the repo goes
+public).
 
 ### Step 8 - Final report
 
@@ -273,7 +308,7 @@ report:
 |---|---|---|---|
 | 1 merge settings | {before} | squash-only, title=PR_TITLE | yes/no |
 | 3 pr-title workflow | {before} | .github/workflows/pr-title.yml @v6 | yes/no |
-| 2 ruleset | {before} | {active | created but NOT enforced (plan gap)} | yes/no |
+| 2 ruleset | {before} | {active | blocked by plan (403, not created) | created but NOT enforced} | yes/no |
 
 Gaps: {none | plan gap details | action version lag}
 Residual soft spot: the PR merge box lets the merger hand-edit the
@@ -285,9 +320,9 @@ Next: open PRs with the companion skill pr-conventional-commits.
 ## Target state per level
 
 - Level 1: `allow_squash_merge=true`, `allow_merge_commit=false`,
-  `allow_rebase_merge=false`, `squash_merge_commit_title=PR_TITLE`.
-  Optional per user: squash message = PR_BODY; auto-delete head
-  branches.
+  `allow_rebase_merge=false`, `squash_merge_commit_title=PR_TITLE`,
+  `squash_merge_commit_message=BLANK`. Optional per user: squash
+  message = PR_BODY instead of BLANK; auto-delete head branches.
 - Level 2: one ruleset targeting the default branch, enforcement
   `active`, empty bypass list, rules: deletion, non_fast_forward,
   pull_request (0 required approvals), required_status_checks with

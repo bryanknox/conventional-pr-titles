@@ -105,29 +105,36 @@ active enforcement. Expected values per scenario live in the eval
   No further setup. Run Skill A; assert the full 3-level scaffold.
 - **S2 private repo, free plan (graceful degrade).** Create-from-base
   with `--private` on the free-plan personal account. Run Skill A;
-  assert Levels 1+3 applied, ruleset created but reported as NOT
-  enforced (`rules/branches/<default>` returns no ruleset rules).
-  HUMAN CHECKPOINT: eyeball the ruleset in the GitHub UI and
-  confirm the "won't be enforced ... until you upgrade" banner.
-  Also record the live POST status for the ruleset create (201 vs
-  403) -- the plan's step 5 finding (b) leaves that as the one
-  fact only observable here.
+  assert Levels 1+3 applied and Level 2 reported as BLOCKED by
+  plan. RESOLVED LIVE 2026-07-28: on free-plan private personal
+  repos ALL ruleset endpoints (list, create, effective-rules) are
+  plan-gated with HTTP 403 "Upgrade to GitHub Pro or make this
+  repository public..." -- the create POST is refused outright
+  (403, NOT 201-then-unenforced as the plan's step 5 finding (b)
+  originally guessed from docs). There is no ruleset to eyeball in
+  the UI; the former banner checkpoint does not apply.
 - **S3 already-configured repo (idempotent no-op).** Run Skill A a
   SECOND time on the repo S1 just configured (`k0x-test-cc-s1`).
   Expect a no-op diff declared at the checkpoint and no mutations.
   Run S3 immediately after S1 passes, before deleting that repo.
 - **S4 partially/conflictingly configured repo (reconcile).**
-  Create-from-base, then dirty it before the run:
+  Create-from-base, then dirty it before the run. Observed
+  2026-07-28: a fresh create-from-base repo is ALREADY in the
+  conflicting merge-settings state (all three merge methods
+  enabled, `squash_merge_commit_title=COMMIT_OR_PR_TITLE`), so no
+  settings PATCH is needed -- and PATCHing squash title/message
+  fields individually can 422 (`invalid_squash_commit_setting_combo`;
+  send both together if a PATCH is ever needed). Only the stray
+  ruleset must be added:
 
-      gh api -X PATCH repos/bryanknox/k0x-test-cc-s4 \
-        -F allow_merge_commit=true -F allow_squash_merge=true \
-        -f squash_merge_commit_title=COMMIT_OR_PR_TITLE
       gh api -X POST repos/bryanknox/k0x-test-cc-s4/rulesets \
         --input stray-ruleset.json
 
   (Any stray ruleset works -- e.g. a `main` ruleset with only a
-  `deletion` rule and a non-empty bypass list. Keep the JSON ad
-  hoc; it is scenario fodder, not a maintained asset.) Run Skill A;
+  `deletion` rule and a non-empty bypass list; bypass actor type
+  is `RepositoryRole` (id 5 = repo admin), NOT `RepoRole`. Keep
+  the JSON ad hoc; it is scenario fodder, not a maintained
+  asset.) Run Skill A;
   assert the checkpoint shows a correct reconcile diff (merge
   methods corrected, stray ruleset surfaced, overwrite/coexist
   decision made explicit) rather than a blind re-apply.
@@ -227,8 +234,9 @@ validation (plan todo #7) is done.
    create-from-base step).
 2. Granting the `delete_repo` scope, and every individual repo
    deletion.
-3. S2: eyeballing the ruleset's non-enforcement banner in the
-   GitHub UI, and recording the live ruleset-create POST status.
+3. S2: RESOLVED 2026-07-28 -- the live ruleset-create POST status
+   was recorded (403 refusal; no ruleset exists, so there is no
+   UI banner to eyeball). No longer an open checkpoint.
 4. S5: providing the second account or scoped-down token, and
    restoring normal auth afterward.
 5. Skill A's own in-run approval gate (the B10 checkpoint before

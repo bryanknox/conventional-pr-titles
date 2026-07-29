@@ -92,9 +92,14 @@ gh api repos/{owner}/{repo} --jq '{allow_squash_merge: .allow_squash_merge, squa
 SCAFFOLDED = the PR-title workflow exists. If that exact filename
 is 404, list `.github/workflows` and treat any workflow that lints
 the PR title (e.g. uses amannn/action-semantic-pull-request) as
-the scaffold. Also note whether `squash_merge_commit_title` is
-`PR_TITLE` (the title will literally become the commit on the
-default branch).
+the scaffold; the listing may include subdirectories -- inspect
+only `.yml`/`.yaml` entries. Also note the
+`squash_merge_commit_title` value: `PR_TITLE` means the title
+literally becomes the commit on the default branch;
+`COMMIT_OR_PR_TITLE` (GitHub's default) means the title is used
+only for MULTI-commit PRs -- a single-commit PR squashes with the
+commit's own message instead. State the setting's effect in the
+report; never change the setting.
 
 Not scaffolded? Continue anyway -- a conventional title is
 valuable on its own -- but skip step 7 (check polling) and carry
@@ -155,7 +160,7 @@ the approval -- apply directly and show old -> new in the report.
 ### Step 6 - Apply and verify
 
 ```
-gh pr create --title "{title}" --body "{body}"    # no existing PR
+gh pr create --base {default_branch} --title "{title}" --body "{body}"   # no existing PR
 gh pr edit {number} --title "{title}"             # existing PR
 ```
 
