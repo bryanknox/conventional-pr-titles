@@ -64,8 +64,9 @@ What it checks:
 
 ### check-links.sh
 
-Every relative markdown link in `docs/` and the root README resolves
-to something that exists. Anchors are not checked.
+Every relative markdown link in `docs/`, the root README, and
+`CLAUDE.md` resolves to something that exists. Anchors are not
+checked.
 
 This exists because moving files breaks links quietly. During the
 repository refactor this check caught broken links three times, each

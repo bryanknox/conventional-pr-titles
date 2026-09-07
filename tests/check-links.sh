@@ -8,9 +8,10 @@
 # the common cause, and a link that silently rots is worse than one
 # that never existed.
 #
-# Scope: docs/ and the root README. Links inside skills/ bundles are
-# checked by lint-skills.sh, which understands the difference between
-# a bundled file and a path in the consumer's repository.
+# Scope: docs/, the root README, and CLAUDE.md. Links inside skills/
+# bundles are checked by lint-skills.sh, which understands the
+# difference between a bundled file and a path in the consumer's
+# repository.
 #
 # Fails loudly: a check that cannot run is an error, not a skip.
 
@@ -22,7 +23,8 @@ files=0
 
 err() { printf 'FAIL  %s\n' "$*" >&2; errors=$((errors + 1)); }
 
-targets=$(find docs -name '*.md' -type f 2>/dev/null; ls README.md 2>/dev/null)
+targets=$(find docs -name '*.md' -type f 2>/dev/null
+          ls README.md CLAUDE.md 2>/dev/null)
 
 if [ -z "$targets" ]; then
     err "no documentation found to check (expected docs/ and README.md)"
