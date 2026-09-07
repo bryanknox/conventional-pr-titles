@@ -1,11 +1,9 @@
 # Test Repos (maintainer-scope)
 
 Lifecycle procedures for the REAL GitHub repos used to test the two
-conventional-commits skills. Grounded in
-`dev-info/skill-testing-repos.md` and the Testing strategy in
-`dev-info/conventional-commits-skills-plan.md` (step 6). The eval
-`setup` fields in `dev/evals/*/evals.json` reference the scenarios
-defined here by id (S1-S5, P1-P5).
+conventional-commits skills. The eval `setup` fields in
+`dev/evals/*/evals.json` reference the scenarios defined here by id
+(S1-S5, P1-P5).
 
 Why real repos: Skill A's footprint (merge settings, rulesets,
 required checks) and Skill B's check-polling are server-side GitHub
