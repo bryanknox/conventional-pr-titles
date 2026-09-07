@@ -14,7 +14,8 @@ If you want to *use* the skills, you want
 | `docs/users/` | Documentation for people using the skills |
 | `docs/devs/` | This. Documentation for people changing the skills. |
 | `docs/devs/decisions/` | Why things are the way they are |
-| `dev/` | Evals and test-repo procedures. Moves into `tests/` and here in phase 4. |
+| `docs/devs/validation/` | Dated records of what was run against real repositories |
+| `tests/` | The structural lint, and the eval definitions |
 
 Nothing outside `skills/` is ever distributed. That boundary is
 deliberate and is enforced by review -- see
@@ -28,12 +29,15 @@ deliberate and is enforced by review -- see
   this repo has to follow, and why each one exists.
 - [design-process.md](design-process.md) -- how a new skill gets
   designed before anyone writes prose.
+- [testing.md](testing.md) -- the two testing tiers, what each
+  catches, and how to run them.
+- [test-repos.md](test-repos.md) -- lifecycle procedures for the
+  real GitHub repositories the skills are tested against.
 - [release.md](release.md) -- what "done" means, and how the skills
   reach users.
 - [decisions/](decisions/) -- the decisions worth not re-litigating.
-
-Testing lives in `dev/evals/README.md` and `dev/test-repos.md`
-until phase 4 of [refactor-plan.md](refactor-plan.md) moves it here.
+- [validation/](validation/) -- dated records of what was actually
+  run, and what it found.
 
 ## Working on a skill
 
@@ -64,7 +68,8 @@ read.
 needs a real run against a real GitHub repository before it is
 believable. Repository settings, rulesets, and status checks are
 server-side state that cannot be faked locally. The procedures are
-in `dev/test-repos.md`.
+in [test-repos.md](test-repos.md), and the two testing tiers are
+explained in [testing.md](testing.md).
 
 ## Commit and pull request titles
 

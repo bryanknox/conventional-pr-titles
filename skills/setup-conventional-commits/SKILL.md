@@ -282,8 +282,9 @@ JSON
 Notes: the heredoc form needs a POSIX shell; from other shells,
 write the JSON to a temp file (outside the repo working tree) and
 pass `--input that-file`. Required approvals stay 0 (personal
-repos; the PR just has to exist). The bypass list stays EMPTY unless the user explicitly
-asks otherwise. No merge-method rule is needed; Level 1 already
+repos; the PR just has to exist). The bypass list stays EMPTY
+unless the user explicitly asks otherwise. No merge-method rule is
+needed; Level 1 already
 makes squash the only option. If the API returns 422, re-verify
 the request shape against the live GitHub REST docs for repository
 rulesets; do not adjust field names from recall. If it returns 403

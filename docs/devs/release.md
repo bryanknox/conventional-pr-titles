@@ -13,7 +13,8 @@ order they get cheaper to run:
 
 **1. Structural checks.** Frontmatter, naming, ASCII, wrapping,
 self-containment. Currently a manual read against
-[authoring.md](authoring.md); phase 4 makes it a script in CI.
+[authoring.md](authoring.md). Run `bash tests/lint-skills.sh`;
+phase 5 puts it in CI.
 
 **2. Trigger checks, if the description changed.** Any edit to a
 `description` can change which prompts invoke the skill without
@@ -21,7 +22,8 @@ changing a word of its behavior. Re-score the validation split.
 
 **3. A real run, if behavior changed.** Against a real GitHub
 repository, with the outcome verified by reading state back --
-not by trusting the transcript. Procedures in `dev/test-repos.md`.
+not by trusting the transcript. Procedures in
+[test-repos.md](test-repos.md).
 
 **4. A baseline run, for anything substantial.** The same task
 without the skill installed. If the results are indistinguishable,

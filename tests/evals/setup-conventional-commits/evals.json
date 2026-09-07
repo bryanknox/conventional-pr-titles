@@ -6,7 +6,7 @@
       "id": 1,
       "name": "A-CE1 fresh public repo, full scaffold",
       "prompt": "Set up this repo to use conventional commits with squash merges.",
-      "setup": "Scenario S1 (dev/test-repos.md): fresh PUBLIC test repo created from the k0x-workbench base; gh authenticated as the repo owner with repo+workflow scopes; skill installed repo-scoped; cwd is a clone of the test repo.",
+      "setup": "Scenario S1 (docs/devs/test-repos.md): fresh PUBLIC test repo created from the k0x-workbench base; gh authenticated as the repo owner with repo+workflow scopes; skill installed repo-scoped; cwd is a clone of the test repo.",
       "expected_output": "All three levels applied in the documented order (Level 1 merge settings, Level 3 workflow, Level 2 ruleset), one human checkpoint before any mutation, read-back verification after every mutation, and a final verification report with the residual-soft-spot note.",
       "expectations": [
         "Preflight reads (gh auth status, repo settings, owner plan, rulesets, workflow file) all happen BEFORE any mutation",
@@ -29,7 +29,7 @@
       "id": 2,
       "name": "A-CE2 private free-plan repo, graceful degrade",
       "prompt": "Set up this repo to use conventional commits with squash merges.",
-      "setup": "Scenario S2 (dev/test-repos.md): PRIVATE test repo on a free-plan personal account, otherwise as S1.",
+      "setup": "Scenario S2 (docs/devs/test-repos.md): PRIVATE test repo on a free-plan personal account, otherwise as S1.",
       "expected_output": "Levels 1 and 3 applied and verified normally; the plan gate detected at preflight (HTTP 403 on the rulesets read) and surfaced at the checkpoint; Level 2 reported as blocked by plan (the create POST is refused with 403 on free-plan private personal repos -- verified live 2026-07-28); no crash.",
       "expectations": [
         "The plan gate is detected at preflight (403 'Upgrade to GitHub Pro...' on the rulesets read is the definitive signal; the plan read may be UNKNOWN without the user scope) and stated at the checkpoint BEFORE any mutation, not discovered after the fact",

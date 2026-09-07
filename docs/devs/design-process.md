@@ -48,9 +48,9 @@ Some near misses should correctly dispatch to a *sibling* skill.
 That is a pass, not a failure -- note it in the eval so nobody
 scores it wrong later.
 
-The procedure and the results for the current skills are in
-`dev/evals/README.md` and `dev/validation/trigger-evals.md`,
-moving into this folder in phase 4.
+The procedure is in [testing.md](testing.md); the results for the
+current skills are in
+[validation/trigger-evals.md](validation/trigger-evals.md).
 
 ## Design the process spine before the prose
 

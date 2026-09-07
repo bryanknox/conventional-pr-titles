@@ -4,8 +4,8 @@ Rules a `SKILL.md` in this repository follows, with the reason for
 each. Most are load-bearing; where a rule is only cosmetic, it says
 so.
 
-Phase 4 of [refactor-plan.md](refactor-plan.md) turns the mechanical
-ones into `tests/lint-skills.sh` so CI enforces them.
+The mechanical ones are enforced by `tests/lint-skills.sh`; run it
+before opening a pull request. See [testing.md](testing.md).
 
 ## Frontmatter
 
@@ -74,9 +74,9 @@ wrapped without breaking it, and splitting a table row is not
 possible. Of the 28 lines currently over 72 columns across both
 skills, 27 are table rows or fenced commands.
 
-> **Known violation:** `skills/setup-conventional-commits/SKILL.md`
-> line 285 is prose at 88 columns. Phase 4 fixes it when the lint
-> that catches it lands.
+The lint checks prose only, for exactly this reason. It found one
+real violation when it was first run -- an 88-column line in
+`setup-conventional-commits` -- which is now fixed.
 
 ## Self-containment
 
