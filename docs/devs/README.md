@@ -86,8 +86,16 @@ is a Conventional Commits message, and it becomes the commit on
 [the user guide](../users/conventional-commits-guide.md) for the
 format.
 
-Enforcement is being applied to this repository in phase 6. Until
-then the convention is followed by hand.
+`setup-conventional-commits` has been run against this repository.
+Merge is squash-only with the PR title as the commit subject, and
+[`pr-title.yml`](../../.github/workflows/pr-title.yml) validates
+that title on every pull request.
+
+The branch ruleset that would make the check *required* could not
+be created: ruleset endpoints are plan-gated on a private
+free-plan repository. So the check is advisory, direct pushes to
+`main` are still possible, and using PRs here is a choice rather
+than enforcement.
 
 ## The current refactor
 

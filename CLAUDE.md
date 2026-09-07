@@ -112,8 +112,15 @@ Bash locally. Do not add a PowerShell equivalent.
 
 This repository follows its own convention. The pull request title
 is a Conventional Commits message and becomes the commit on `main`
-at squash-merge time. Enforcement is applied to this repository in
-phase 6 of the refactor; until then it is followed by hand.
+at squash-merge time. `setup-conventional-commits` has been run
+here: merge is squash-only with the PR title as the commit subject,
+and `.github/workflows/pr-title.yml` validates that title.
+
+The branch ruleset is not in place -- ruleset endpoints are
+plan-gated on a private free-plan repository -- so the title check
+is advisory, not required. Direct pushes to `main` remain
+possible; using PRs here is a choice, not enforcement. Making the
+repository public and re-running the skill adds only the ruleset.
 
 ## Refactor in progress
 
