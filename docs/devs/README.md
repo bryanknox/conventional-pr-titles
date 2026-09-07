@@ -11,6 +11,7 @@ If you want to *use* the skills, you want
 | Path | What it holds |
 |---|---|
 | `skills/` | The skills themselves. The only thing that ships. |
+| `CLAUDE.md` | Instructions for Claude Code working in this repo |
 | `docs/users/` | Documentation for people using the skills |
 | `docs/devs/` | This. Documentation for people changing the skills. |
 | `docs/devs/decisions/` | Why things are the way they are |
