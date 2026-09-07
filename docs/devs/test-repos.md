@@ -2,7 +2,7 @@
 
 Lifecycle procedures for the REAL GitHub repos used to test the two
 conventional-commits skills. The eval `setup` fields in
-`dev/evals/*/evals.json` reference the scenarios defined here by id
+`tests/evals/*/evals.json` reference the scenarios defined here by id
 (S1-S5, P1-P5).
 
 Why real repos: Skill A's footprint (merge settings, rulesets,
@@ -14,7 +14,7 @@ muddy development repos.
 
 All helpers below are documented `gh` one-liners, run from a
 POSIX shell (the Bash tool; `--jq`/`xargs` forms assume it).
-Promote them to `dev/scripts/` only if the rule of three fires.
+Promote them to `tests/scripts/` only if the rule of three fires.
 
 ## Base repo (READ-ONLY)
 
@@ -97,7 +97,7 @@ skill itself uses): `repos/{o}/{r}` for merge settings,
 workflow, `repos/{o}/{r}/rulesets` and
 `repos/{o}/{r}/rules/branches/<default>` for ruleset existence vs
 active enforcement. Expected values per scenario live in the eval
-`expectations` (`dev/evals/setup-conventional-commits/evals.json`).
+`expectations` (`tests/evals/setup-conventional-commits/evals.json`).
 
 - **S1 fresh public repo (happy path).** Create-from-base, public.
   No further setup. Run Skill A; assert the full 3-level scaffold.
@@ -206,7 +206,7 @@ repo and scaffold again.
 Each P scenario = reset, then create a branch with the described
 change (ad hoc edits to the base repo's files), then run Skill B.
 Expected titles and check behavior live in the eval `expectations`
-(`dev/evals/pr-conventional-commits/evals.json`).
+(`tests/evals/pr-conventional-commits/evals.json`).
 
 - **P1 single bug-fix branch.** One small defect-fix commit ahead of
   `main`; no existing PR. Expect `fix: ...`, check green.
