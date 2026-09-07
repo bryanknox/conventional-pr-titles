@@ -39,6 +39,21 @@ err()  { printf 'FAIL  %s\n' "$*" >&2; errors=$((errors + 1)); }
 pass() { checks=$((checks + 1)); }
 info() { printf '      %s\n' "$*"; }
 
+# Resolve a python interpreter once, by RUNNING each candidate rather
+# than trusting that the name exists. Ubuntu runners ship python3 but
+# not always a bare `python`; Windows ships a `python3` that is a
+# Microsoft Store stub -- it resolves on PATH, prints an install
+# advert, and exits 49. Probing by name alone picks the stub and turns
+# a working machine into a false failure.
+PYTHON=""
+for candidate in python3 python py; do
+    command -v "$candidate" >/dev/null 2>&1 || continue
+    if "$candidate" -c 'import sys; sys.exit(0)' >/dev/null 2>&1; then
+        PYTHON="$candidate"
+        break
+    fi
+done
+
 # A check that cannot run is a failure, not a skip.
 require_tool() {
     if ! command -v "$1" >/dev/null 2>&1; then
@@ -267,12 +282,12 @@ fi
 if [ -d tests/evals ]; then
     printf 'evals\n'
     while IFS= read -r j; do
-        if require_tool python "evals.json parsing"; then
-            if python -c "import json,sys; json.load(open(sys.argv[1]))" "$j" 2>/dev/null; then
-                pass
-            else
-                err "$j: does not parse as JSON"
-            fi
+        if [ -z "$PYTHON" ]; then
+            err "no python interpreter found (cannot verify $j parses)"
+        elif "$PYTHON" -c "import json,sys; json.load(open(sys.argv[1]))" "$j" 2>/dev/null; then
+            pass
+        else
+            err "$j: does not parse as JSON"
         fi
     done < <(find tests/evals -name '*.json' -type f | sort)
     printf '\n'

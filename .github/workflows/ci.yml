@@ -1,0 +1,53 @@
+# Tier 1 checks: free, deterministic, no model calls.
+#
+# Tier 2 -- content and trigger evals -- is deliberately NOT here. It
+# needs real GitHub repositories, model calls, and human checkpoints.
+# See docs/devs/testing.md for the split and why it matters.
+#
+# One job with named steps rather than parallel jobs: this produces a
+# single status-check context, which is what a branch ruleset would
+# require by name, and avoids paying runner startup three times on a
+# repository this small.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A newer push to the same branch makes an in-flight run irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Tier 1 checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Explicit rather than relying on whatever the runner image
+      # happens to ship. The checks fail loudly on a missing
+      # interpreter, so an image change would break the build rather
+      # than silently skip a check -- but not having to find that out
+      # is better.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install check dependencies
+        run: python -m pip install --disable-pip-version-check pyyaml
+
+      - name: Lint skills
+        run: bash tests/lint-skills.sh
+
+      - name: Check documentation links
+        run: bash tests/check-links.sh
+
+      - name: Check workflow template
+        run: bash tests/check-workflow-template.sh

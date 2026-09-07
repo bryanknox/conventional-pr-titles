@@ -19,15 +19,31 @@ skipped.
 A green tier 1 says a skill is well-formed. It says nothing about
 whether it works.
 
-## Tier 1: structural lint
+## Tier 1: the checks CI runs
+
+Three scripts, all exiting non-zero on any violation. Run them
+before opening a pull request; `.github/workflows/ci.yml` runs the
+same three on every pull request and every push to `main`.
 
 ```
 bash tests/lint-skills.sh
+bash tests/check-links.sh
+bash tests/check-workflow-template.sh
 ```
 
-Exits non-zero on any violation. Every rule is explained in
-[authoring.md](authoring.md); the script is the enforcement, that
-page is the reasoning.
+One prerequisite: `check-workflow-template.sh` needs PyYAML.
+
+```
+python -m pip install pyyaml
+```
+
+It is a required dependency rather than an optional extra -- the
+script says so and stops, rather than skipping the check.
+
+### lint-skills.sh
+
+Every rule is explained in [authoring.md](authoring.md); the script
+is the enforcement, that page is the reasoning.
 
 What it checks:
 
@@ -46,13 +62,51 @@ What it checks:
   references that escape the folder fail.
 - The eval files parse as JSON.
 
-### It is written to fail loudly
+### check-links.sh
+
+Every relative markdown link in `docs/` and the root README resolves
+to something that exists. Anchors are not checked.
+
+This exists because moving files breaks links quietly. During the
+repository refactor this check caught broken links three times, each
+after a rename.
+
+### check-workflow-template.sh
+
+Targeted invariant checks on
+`skills/setup-conventional-commits/assets/pr-title-workflow.yml` --
+the one artifact that lands in other people's repositories and
+becomes their enforcement.
+
+It asserts the file parses, and then the four couplings that would
+otherwise break silently:
+
+- **The job name is exactly `Validate conventional PR title`.** The
+  ruleset the skill creates requires this status check *by name
+  string*. Rename the job and enforcement stops working with no
+  error anywhere.
+- **`edited` is in the trigger types.** Without it, a corrected
+  title leaves the old failure sitting there.
+- **The action is pinned to `@v6`.**
+- **`permissions.pull-requests` is `read`.**
+
+These are deliberately not a generic workflow linter. The failure
+that matters here is not a YAML error -- it is a rename, which a
+general-purpose linter cannot see.
+
+### The checks are written to fail loudly
 
 A missing tool is an error, not a skip. This is deliberate: an
 earlier ad-hoc version of these checks reported a clean pass because
 `grep -P` was unavailable in Git Bash, and the check simply never
 ran. A lint that can silently do nothing is worse than no lint,
 because it is trusted.
+
+The same principle applies to *finding* tools. Both scripts resolve
+a Python interpreter by running each candidate, not by checking that
+the name exists on `PATH`. Windows ships a `python3` that resolves
+fine, prints an advert for the Microsoft Store, and exits 49;
+probing by name picks that stub and fails on a working machine.
 
 If you add a check, make its failure path the loud one.
 
