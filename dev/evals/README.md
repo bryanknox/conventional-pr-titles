@@ -2,9 +2,14 @@
 
 Evals for the two conventional-commits skills. This directory is
 OUTSIDE the skill folders on purpose: nothing here ships with a
-skill (bundle-leakage / dispatch-contamination guard). Source of
-truth for what these evals must cover: the EVALS PLAN in
-`dev-info/conventional-commits-skills-plan.md` (step 6).
+skill, and the near-miss prompts below must never sit next to a
+description whose job is matching prompts. See
+`docs/devs/decisions/0008-maintainer-material-outside-skill-folders.md`.
+
+The eval files themselves are the source of truth for what is
+covered. The methodology behind them -- why the near-miss half
+carries the information, and how the trigger gate is scored -- is in
+`docs/devs/design-process.md`.
 
 ```
 evals/setup-conventional-commits/evals.json
