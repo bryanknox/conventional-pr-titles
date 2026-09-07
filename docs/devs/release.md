@@ -109,5 +109,7 @@ Deferred deliberately, recorded so the reasoning is not lost:
   Cursor, Codex, and Copilot, so it is a two-directory install
   rather than four.
 - **Going public.** Currently private, which blocks this repository
-  from getting its own ruleset and complicates sharing with
-  collaborators.
+  from getting its own ruleset and limits installation to accounts
+  that can already read it. The reasoning, and the ordered steps
+  for reversing it, are in
+  [decision 0009](decisions/0009-stay-private-for-now.md).

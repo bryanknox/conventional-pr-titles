@@ -19,3 +19,4 @@ obvious from the code.
 | [0006](0006-apply-order-workflow-before-ruleset.md) | Apply the workflow before the ruleset |
 | [0007](0007-one-approval-not-three.md) | One approval, not one per level |
 | [0008](0008-maintainer-material-outside-skill-folders.md) | Maintainer material stays outside the skill folders |
+| [0009](0009-stay-private-for-now.md) | Stay private for now, and what going public would take |

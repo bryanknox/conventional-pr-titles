@@ -189,8 +189,31 @@ not read `AGENTS.md`; the other three read `AGENTS.md`.
 
 - Multi-harness distribution (Cursor, Codex, Copilot). Door kept
   open by the frontmatter lint rule; no machinery built.
-- Making the repo public, and with it the Level 2 ruleset.
+- Making the repo public, and with it the Level 2 ruleset. The
+  reasoning and the ordered steps now live in
+  [decision 0009](decisions/0009-stay-private-for-now.md), which
+  outlives this file.
 - Publishing to a separate marketplace repo. Phase 8 makes this
   repo its own marketplace; splitting that out is worth doing only
   once there is a second unrelated plugin or an outside
   collaborator.
+
+## Before deleting this file
+
+Four documents link here. Deleting the plan without rehoming them
+turns `check-links.sh` red, which is the checker working, but the
+fix is cheaper decided in advance than discovered in CI:
+
+| Referent | What it needs instead |
+|---|---|
+| `README.md` | Drop the "refactor in progress" paragraph; the restructure is the repo's normal shape by then. |
+| `CLAUDE.md` | Drop the "Refactor in progress" section. |
+| `docs/devs/README.md` | Drop "The current refactor" section. |
+| `docs/devs/release.md` | The phase 8 forward-looking framing becomes present tense: publishing exists, so say what it is rather than what it will be. |
+
+Check that nothing else here is load-bearing before deleting. As
+of phase 6 the content worth keeping had already moved out: the
+visibility decision to
+[decision 0009](decisions/0009-stay-private-for-now.md), the
+deferred distribution notes to the "Notes for later" section of
+[release.md](release.md).
