@@ -59,10 +59,16 @@ whatever it carries alongside it. Read [authoring.md](authoring.md)
 first; several of the conventions there are load-bearing rather than
 cosmetic.
 
-**Before opening a pull request**, check your change against the
-conventions in [authoring.md](authoring.md). Phase 4 turns those
-checks into a script that runs in CI; until then they are a manual
-read.
+**Before opening a pull request**, run the tier 1 checks:
+
+```
+bash tests/lint-skills.sh
+bash tests/check-links.sh
+bash tests/check-workflow-template.sh
+```
+
+CI runs the same three. See [testing.md](testing.md) for what each
+one covers and its one prerequisite.
 
 **Changing behavior** -- as opposed to wording -- means the change
 needs a real run against a real GitHub repository before it is

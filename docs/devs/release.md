@@ -13,8 +13,9 @@ order they get cheaper to run:
 
 **1. Structural checks.** Frontmatter, naming, ASCII, wrapping,
 self-containment. Currently a manual read against
-[authoring.md](authoring.md). Run `bash tests/lint-skills.sh`;
-phase 5 puts it in CI.
+[authoring.md](authoring.md). Enforced by CI on every pull request;
+run the same checks locally with the commands in
+[testing.md](testing.md).
 
 **2. Trigger checks, if the description changed.** Any edit to a
 `description` can change which prompts invoke the skill without
