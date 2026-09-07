@@ -36,7 +36,7 @@ jobs:
       # interpreter, so an image change would break the build rather
       # than silently skip a check -- but not having to find that out
       # is better.
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
