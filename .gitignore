@@ -3,7 +3,14 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Agent harness config, and agent skills installed for development
+# only (e.g. genesis). Installed skills are never committed: see
+# docs/devs/design-process.md for what they are and how to re-add
+# them. This repo's own skills live in skills/ and are loaded with
+# `claude --plugin-dir .`, so nothing needs to be mirrored here.
 .claude/settings.local.json
+.claude/skills/
+.agents/
 
 # User-specific files
 *.rsuser
