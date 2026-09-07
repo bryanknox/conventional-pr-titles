@@ -1,0 +1,18 @@
+{
+  "name": "skills-thrill",
+  "description": "Enforce Conventional Commits through pull request titles: one skill configures a GitHub repository, the other writes the title.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Bryan Knox",
+    "email": "bryan@knoxbits.com"
+  },
+  "homepage": "https://github.com/bryanknox/skills-thrill",
+  "repository": "https://github.com/bryanknox/skills-thrill",
+  "keywords": [
+    "conventional-commits",
+    "pull-request",
+    "github",
+    "squash-merge",
+    "semver"
+  ]
+}
