@@ -137,9 +137,3 @@ plan-gated on a private free-plan repository -- so the title check
 is advisory, not required. Direct pushes to `main` remain
 possible; using PRs here is a choice, not enforcement. Making the
 repository public and re-running the skill adds only the ruleset.
-
-## Refactor in progress
-
-[docs/devs/refactor-plan.md](docs/devs/refactor-plan.md) tracks a
-restructuring. Progress is the merged PR list, one PR per phase.
-Delete the plan when the phases are done.
