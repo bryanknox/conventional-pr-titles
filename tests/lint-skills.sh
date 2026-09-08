@@ -79,7 +79,11 @@ check_ascii() {
 
 check_line_endings() {
     local f=$1
-    if grep -q $'\r' "$f" 2>/dev/null; then
+    # -U is load-bearing. Without it Git Bash's grep treats the
+    # file as text, strips CR before matching, and reports a clean
+    # pass on a file that is CRLF from end to end -- on the one
+    # platform most likely to produce one.
+    if grep -qU $'\r' "$f" 2>/dev/null; then
         err "$f: contains CR (expected LF endings)"
     else
         pass
