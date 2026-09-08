@@ -11,6 +11,7 @@ If you want to *use* the skills, you want
 | Path | What it holds |
 |---|---|
 | `skills/` | The skills themselves. The only thing that ships. |
+| `.claude-plugin/` | The plugin manifest and the marketplace catalog |
 | `CLAUDE.md` | Instructions for Claude Code working in this repo |
 | `docs/users/` | Documentation for people using the skills |
 | `docs/devs/` | This. Documentation for people changing the skills. |
@@ -55,6 +56,11 @@ Claude Code expects from a plugin, so both skills load as
 into `.claude/skills/` -- that path is gitignored precisely so no
 second copy can drift from the first.
 
+This loads the working tree, not an installed copy, which is what
+you want while editing. It is the same plugin users install from
+`.claude-plugin/`; see [release.md](release.md) for how a change
+here becomes a release.
+
 **Editing a skill** means editing `skills/<name>/SKILL.md` and
 whatever it carries alongside it. Read [authoring.md](authoring.md)
 first; several of the conventions there are load-bearing rather than
@@ -66,9 +72,10 @@ cosmetic.
 bash tests/lint-skills.sh
 bash tests/check-links.sh
 bash tests/check-workflow-template.sh
+bash tests/check-plugin-manifests.sh
 ```
 
-CI runs the same three. See [testing.md](testing.md) for what each
+CI runs the same four. See [testing.md](testing.md) for what each
 one covers and its one prerequisite.
 
 **Changing behavior** -- as opposed to wording -- means the change

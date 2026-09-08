@@ -51,3 +51,10 @@ jobs:
 
       - name: Check workflow template
         run: bash tests/check-workflow-template.sh
+
+      # Offline on purpose. `claude plugin validate` is the richer
+      # check and is the release-time gate, but it needs the Claude
+      # Code CLI -- a new warning in a future release would turn this
+      # repository red without anyone changing a file here.
+      - name: Check plugin manifests
+        run: bash tests/check-plugin-manifests.sh

@@ -12,6 +12,11 @@ repository, `pr-conventional-commits` writes the title. Both live
 in `skills/`, which is the source of truth and the only thing that
 ships.
 
+They ship as one Claude Code plugin, catalogued by this repository
+itself: `.claude-plugin/plugin.json` and
+`.claude-plugin/marketplace.json`. Neither manifest names a path --
+`skills/` at the root is the layout a plugin already expects.
+
 Nothing outside `skills/` is ever distributed. Docs, tests, evals,
 and validation records are maintainer material -- do not move any
 of it into a skill folder to make it "available".
@@ -77,13 +82,14 @@ Easy to erode by a well-meaning edit:
 
 ## Testing is two tiers, and they are not interchangeable
 
-**Tier 1** is free and deterministic. Run all three before opening
-a pull request; CI runs the same three.
+**Tier 1** is free and deterministic. Run all four before opening
+a pull request; CI runs the same four.
 
 ```
 bash tests/lint-skills.sh
 bash tests/check-links.sh
 bash tests/check-workflow-template.sh
+bash tests/check-plugin-manifests.sh
 ```
 
 `check-workflow-template.sh` needs PyYAML (`python -m pip install
@@ -101,6 +107,16 @@ not a skip. An earlier version reported a clean pass because
 `grep -P` was unavailable and the check never ran. If you add a
 check, make its failure path the loud one, and resolve interpreters
 by running candidates rather than testing for the name on `PATH`.
+
+## Releasing
+
+`version` in `plugin.json` and in the marketplace entry must match
+and must be bumped on every release -- an unbumped version leaves
+installed copies cached, silently.
+`tests/check-plugin-manifests.sh` catches the mismatch but cannot
+know that a changed skill needed a bump. The full sequence, and
+why `claude plugin validate` is a release step rather than a CI
+step, is in [docs/devs/release.md](docs/devs/release.md).
 
 ## Platform
 

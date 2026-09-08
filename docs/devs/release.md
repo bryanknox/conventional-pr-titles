@@ -2,19 +2,14 @@
 
 How a change to a skill reaches the people using it.
 
-Much of this is forward-looking: the publishing mechanism arrives in
-phase 8 of [refactor-plan.md](refactor-plan.md). What is true today
-is marked as such.
-
 ## What "done" means
 
 A skill change is not done because it reads well. The gates, in the
 order they get cheaper to run:
 
 **1. Structural checks.** Frontmatter, naming, ASCII, wrapping,
-self-containment. Currently a manual read against
-[authoring.md](authoring.md). Enforced by CI on every pull request;
-run the same checks locally with the commands in
+self-containment, and the plugin manifests. Enforced by CI on every
+pull request; run the same checks locally with the commands in
 [testing.md](testing.md).
 
 **2. Trigger checks, if the description changed.** Any edit to a
@@ -33,49 +28,75 @@ the change is not earning its place.
 Wording-only edits need 1. Description edits need 1 and 2. Behavior
 changes need all four.
 
-## How users get it today
+## How users get it
 
-By copying the skill folder, as described in
-[the install guide](../users/install.md). There is no version
-number, no update mechanism, and no way to tell an installed copy
-from a newer one.
+This repository is a Claude Code plugin and its own marketplace. Two
+manifests, both in `.claude-plugin/`:
 
-That is acceptable while the audience is the author, and it is the
-main thing phase 8 fixes.
+- `plugin.json` -- what ships. `skills/` at the repository root is
+  already the layout it expects, so the manifest names no paths and
+  no files moved to create it.
+- `marketplace.json` -- the catalog, listing this plugin with
+  `"source": "./"`.
 
-## How users will get it
+Users add the marketplace once and install from it; see
+[the install guide](../users/install.md) for the commands. Updates
+then arrive through `claude plugin update` rather than by copying
+folders.
 
-Phase 8 makes this repository a Claude Code plugin and its own
-marketplace. Two files:
+Copying the skill folder by hand still works and is documented as
+the fallback, because a marketplace entry pointing at a private
+repository resolves only for someone who can already read it. That
+constraint is [decision 0009](decisions/0009-stay-private-for-now.md),
+not a property of the packaging.
 
-- `.claude-plugin/plugin.json` -- the plugin manifest. `skills/` at
-  the repository root is already the layout it expects, so no files
-  move.
-- `.claude-plugin/marketplace.json` -- a catalog listing the plugin,
-  with `"source": "./"`.
+## Cutting a release
 
-Users then run `/plugin marketplace add bryanknox/skills-thrill`
-once, and `/plugin install` from it. Updates arrive without anyone
-copying folders.
+**1. Bump `version` in `plugin.json` and in the matching
+`marketplace.json` entry.** Both, to the same value -- the manifest
+check and `claude plugin tag` each refuse a mismatch. What size of
+bump is the table below.
 
-### The versioning trap
+An unbumped version is the one failure that is silent end to end:
+installed copies stay cached no matter what else changed, and new
+commits alone reach nobody. The reasoning for declaring a version
+at all, rather than dodging that trap by omitting the field, is
+[decision 0010](decisions/0010-declare-a-plugin-version.md).
 
-If `plugin.json` declares a `version` and it is not bumped, users
-keep their cached copy no matter what else changed. New commits
-alone do not reach them.
-
-So: **bump `version` on every release, or omit the field entirely**
-and let the resolved commit be the version. Picking one and holding
-to it matters more than which one.
-
-### Validate before publishing
+**2. Validate both manifests with the real thing.**
 
 ```
-claude plugin validate .
+claude plugin validate .claude-plugin/plugin.json
+claude plugin validate .claude-plugin/marketplace.json --strict
 ```
 
-Add `--strict` to treat warnings as errors. Worth wiring into CI
-alongside the structural lint once the manifests exist.
+Name the plugin manifest explicitly. Passing the directory
+(`claude plugin validate .`) checks the *marketplace* manifest
+instead, because that is what the command prefers when both are
+present -- so the plugin manifest goes unchecked and the command
+still says it passed.
+
+That first command is deliberately not `--strict`. It emits one
+warning: `CLAUDE.md at the plugin root is not loaded as project
+context`. The warning is correct and inapplicable -- this
+repository is both the plugin and the workspace that develops it,
+and `CLAUDE.md` is maintainer instructions that are deliberately
+not shipped as context. Read the warning list rather than
+silencing it; a *second* warning appearing there is a real signal.
+
+CI does not run these. It runs
+[`tests/check-plugin-manifests.sh`](../../tests/check-plugin-manifests.sh),
+which is offline and covers the couplings this repository owns --
+see [testing.md](testing.md) for why the split is drawn there.
+
+**3. Merge, then tag.**
+
+```
+claude plugin tag . --push
+```
+
+That creates `skills-thrill--v{version}`, after checking that the
+manifests agree and the tree is clean.
 
 ## Versioning the skills
 
@@ -93,6 +114,12 @@ A **narrowed description is a breaking change** even though nothing
 about the behavior changed. Prompts that used to invoke the skill
 stop doing so, which is indistinguishable from removal for the
 people relying on it.
+
+One version covers both skills, because one plugin ships both. A
+patch to one skill therefore bumps the number the other skill's
+users see too. That is the cost of a single package, and it is the
+right trade while the two skills are released together; splitting
+into two plugins is the fix if it ever stops being.
 
 ## Notes for later
 

@@ -4,7 +4,8 @@ Two agent skills that keep a GitHub repository's history readable by
 making every commit on the default branch a valid
 [Conventional Commits](https://www.conventionalcommits.org/) message.
 
-They work as a pair, but you install and use them independently.
+They work as a pair and ship as one plugin, but each is useful
+on its own and neither needs the other at runtime.
 
 ## The idea in one paragraph
 
@@ -26,7 +27,9 @@ correct.
 | Run | Once per repository | Every pull request |
 
 If you are joining a repository someone else already configured, you
-only need **pr-conventional-commits**.
+only need **pr-conventional-commits**. Installing the plugin brings
+both; the one you do not need costs you nothing, because a skill
+that is never triggered is never read.
 
 If you are setting up your own repository, run
 **setup-conventional-commits** once, then use
@@ -34,7 +37,8 @@ If you are setting up your own repository, run
 
 ## Getting started
 
-1. [Install](install.md) -- currently Claude Code only.
+1. [Install](install.md) -- one plugin, currently Claude Code
+   only. Copying a single skill folder also works.
 2. Read the page for the skill you need (linked in the table above).
 3. Ask for what you want in plain language. Both skills are triggered
    by description matching, not by a command you have to memorize:

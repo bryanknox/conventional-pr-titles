@@ -21,14 +21,15 @@ whether it works.
 
 ## Tier 1: the checks CI runs
 
-Three scripts, all exiting non-zero on any violation. Run them
+Four scripts, all exiting non-zero on any violation. Run them
 before opening a pull request; `.github/workflows/ci.yml` runs the
-same three on every pull request and every push to `main`.
+same four on every pull request and every push to `main`.
 
 ```
 bash tests/lint-skills.sh
 bash tests/check-links.sh
 bash tests/check-workflow-template.sh
+bash tests/check-plugin-manifests.sh
 ```
 
 One prerequisite: `check-workflow-template.sh` needs PyYAML.
@@ -95,6 +96,29 @@ These are deliberately not a generic workflow linter. The failure
 that matters here is not a YAML error -- it is a rename, which a
 general-purpose linter cannot see.
 
+### check-plugin-manifests.sh
+
+Checks `.claude-plugin/plugin.json` and
+`.claude-plugin/marketplace.json`: that both parse, that the plugin
+has a name, a description, and a semver `version`, that the
+marketplace entry for this plugin exists and agrees with
+`plugin.json` on that version, that the entry's `source` resolves to
+something with a plugin manifest in it, and that `skills/` still
+holds at least one `<name>/SKILL.md`.
+
+The version agreement is the one worth naming. An unbumped version
+means installed copies stay cached no matter what changed, and a
+version that disagrees between the two files is refused by
+`claude plugin tag` and silent everywhere else. See
+[decision 0010](decisions/0010-declare-a-plugin-version.md).
+
+**This is not a reimplementation of `claude plugin validate`.** That
+command is the richer check and is a release step, documented in
+[release.md](release.md). It stays out of CI on purpose: it needs
+the Claude Code CLI, so a warning added in a future release would
+turn this repository red without anyone changing a file here. What
+runs in CI is offline and covers the couplings this repository owns.
+
 ### The checks are written to fail loudly
 
 A missing tool is an error, not a skip. This is deliberate: an
@@ -103,9 +127,9 @@ earlier ad-hoc version of these checks reported a clean pass because
 ran. A lint that can silently do nothing is worse than no lint,
 because it is trusted.
 
-The same principle applies to *finding* tools. Both scripts resolve
-a Python interpreter by running each candidate, not by checking that
-the name exists on `PATH`. Windows ships a `python3` that resolves
+The same principle applies to *finding* tools. Three of the scripts
+resolve a Python interpreter by running each candidate, not by
+checking that the name exists on `PATH`. Windows ships a `python3` that resolves
 fine, prints an advert for the Microsoft Store, and exits 49;
 probing by name picks that stub and fails on a working machine.
 
@@ -114,7 +138,8 @@ If you add a check, make its failure path the loud one.
 ### What it does not cover
 
 The lint runs against `skills/` only, since that is the only thing
-distributed. Documentation and validation records are not linted.
+distributed. Documentation and validation records are not linted --
+apart from their links, and the two plugin manifests.
 
 Two raw trace captures under `validation/traces/` contain non-ASCII
 bytes. That is left alone on purpose -- they are recorded output,
