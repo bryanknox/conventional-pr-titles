@@ -2,6 +2,8 @@ root = true
 
 # All files
 [*]
+# UTF-8 without BOM (Byte Order Mark). "utf-8-bom" adds one.
+charset = utf-8
 end_of_line = lf
 indent_style = space
 indent_size = 4

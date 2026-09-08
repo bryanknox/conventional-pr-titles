@@ -1,15 +1,19 @@
 # .gitattributes
-# Initially from:
-# https://www.aleksandrhovhannisyan.com/blog/crlf-vs-lf-normalizing-line-endings-in-git/#a-simple-gitattributes-config
 
-# We'll let Git's auto-detection algorithm infer if a file is text.
-# If it is, enforce LF line endings regardless of OS or git configurations.
+# Keep line endings consistent for text files across Windows, macOS, and Linux.
 #
-# The following normalizes line endings to LF for all text files
-# checked in to the repo. And also sets line endings to LF in the
-# working tree when files are checked out.
+# Authoritative sources:
+# - https://git-scm.com/docs/gitattributes#_end_of_line_conversion
+#
+# - https://docs.github.com/en/get-started/git-basics/configuring-git-to-handle-line-endings
+#
+# Further reading / why this works:
+#  - https://www.aleksandrhovhannisyan.com/blog/crlf-vs-lf-normalizing-line-endings-in-git/
 
-# All text files are
-# - checked into the repo with LF and
-# - checked out with LF locally.
-* text=auto eol=lf
+# Let Git detect whether a file is text.
+* text=auto
+
+# Normalize checked-out text files to LF line endings.
+# This keeps committed content and working-tree files consistent for clones on any platform.
+# Also needs `end_of_line = lf` settings in .editorconfig.
+* eol=lf
