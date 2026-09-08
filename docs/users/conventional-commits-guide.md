@@ -113,8 +113,20 @@ purpose, so its absence reads as a decision rather than an omission.
 ### The one residual soft spot
 
 GitHub's merge box lets whoever merges hand-edit the final squash
-message, and nothing validates that edit. The prefilled text is the
-title the check approved. Leave it alone.
+message, and nothing validates that edit. Both fields -- subject
+and body -- are editable whichever squash message setting you
+chose. The setting only decides what is prefilled.
+
+- With *Pull request title*, the body arrives empty, so the risk is
+  something getting **added**.
+- With *Pull request title and description*, the body arrives
+  prefilled from the pull request, footer and all, so the risk is
+  something getting **lost**. Deleting a `BREAKING CHANGE:` footer
+  there takes one keystroke and drops a MAJOR version bump, and
+  nothing will complain: the check reads the title, never the body.
+
+The prefilled text is what the check approved. Leave both fields
+alone.
 
 ## Writing the title
 
@@ -200,6 +212,11 @@ versioning.
 Remember that the footer only reaches the squash commit if the
 repository's squash message setting is *Pull request title and
 description*. Otherwise it lives on the pull request only.
+
+The `!` is the half that enforcement covers. Nothing checks the
+footer, and when it does reach the commit it passes through an
+editable field in the merge box on the way. That is the reason to
+mark breaking changes both ways instead of picking one.
 
 ## For anything not settled here
 
