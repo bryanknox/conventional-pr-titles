@@ -45,6 +45,3 @@ harnesses are a packaging change rather than a rewrite.
 
 This repository is private, so installing from it works only for an
 account that can read it.
-
-A [refactor](docs/devs/refactor-plan.md) of this repository's
-structure is in progress.

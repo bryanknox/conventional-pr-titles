@@ -103,10 +103,3 @@ be created: ruleset endpoints are plan-gated on a private
 free-plan repository. So the check is advisory, direct pushes to
 `main` are still possible, and using PRs here is a choice rather
 than enforcement.
-
-## The current refactor
-
-[refactor-plan.md](refactor-plan.md) tracks a restructuring in
-progress. It records the decisions taken, where each existing file
-ends up, and what is deliberately deferred. Delete it when the
-phases are done.
