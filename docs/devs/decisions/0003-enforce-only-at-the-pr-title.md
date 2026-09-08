@@ -53,3 +53,43 @@ hidden -- Skill A names it in its final report, and
 [the user guide](../../users/conventional-commits-guide.md) repeats
 it. If it ever becomes a real problem, that is the signal to
 reconsider this decision, not to bolt on a partial fix.
+
+### What changes under PR_BODY
+
+Level 1's target state sets `squash_merge_commit_message=BLANK`, so
+the commit body is empty and the only text the merge box offers to
+edit is one subject line. Users may instead choose `PR_BODY`, which
+is what lets a `BREAKING CHANGE:` footer reach the commit. That
+choice does not add a second weakness; it widens this one.
+
+The merge box exposes an editable body field either way -- the
+setting decides only what is prefilled into it.
+
+- Under `BLANK`, the risk is text being **added** at merge time to
+  a commit body that was meant to be empty.
+- Under `PR_BODY`, the risk is text being **lost**. The footer that
+  makes the change a MAJOR version bump arrives prefilled in an
+  editable box, and deleting it is one keystroke away from a merger
+  who reads the body as noise.
+
+Two consequences of the same fact, worth stating plainly because
+they are easy to assume away:
+
+- The body reaching the merge box is the pull request body **as of
+  merge**, not as of the check. Editing the body does re-run the
+  Level 3 workflow -- `edited` fires for body edits too -- but that
+  workflow lints the title. The body is validated by nothing, under
+  either setting.
+- A `BREAKING CHANGE:` footer is therefore advisory. The `!` in the
+  title is the half enforcement covers, which is why the user guide
+  tells authors to mark breaking changes both ways rather than
+  relying on the footer alone.
+
+Two fixes were considered and rejected. A title/body consistency
+check in the Level 3 workflow is straightforward to write, but it
+narrows the gap rather than closing it: the merge-box edit happens
+after every check has reported. Ruleset commit-metadata
+restrictions do not help either -- they are gated to GitHub
+Enterprise organizations, and under squash they validate every
+commit on the branch, which is the enforcement model this decision
+exists to reject.

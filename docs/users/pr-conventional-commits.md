@@ -97,6 +97,14 @@ The same setting decides whether a `BREAKING CHANGE:` footer in the
 PR body rides along into the squash commit. It does so only when the
 squash message is set to the PR body.
 
+When it does ride along, it rides along editable. The merge box
+prefills the commit body from the PR body and lets whoever merges
+change it, and no check ever reads a body -- the title workflow
+lints the title only. So treat the footer as documentation and the
+`!` in the title as the enforced part. That is why the skill writes
+both, and why it says which setting is in effect rather than
+leaving you to guess whether the footer survived.
+
 ## If the check fails
 
 It reads the check's actual complaint, corrects the title, and

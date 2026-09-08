@@ -89,6 +89,14 @@ clicks Merge hand-edit the final squash message, and nothing
 validates that edit. The prefilled message is the title the check
 approved. Do not touch it.
 
+It widens if you take the optional squash-message setting `PR_BODY`
+at the approval step. The merge box then prefills the commit body
+from the pull request body, so the `BREAKING CHANGE:` footer that
+setting exists to carry sits in an editable field on its way into
+history. Nothing validates it -- the workflow lints the title, never
+the body. The default `BLANK` keeps the body empty and the exposure
+down to one subject line.
+
 **The action version is pinned deliberately.** If
 `amannn/action-semantic-pull-request` has a newer major version, the
 skill keeps `v6` and mentions the lag in its report rather than
