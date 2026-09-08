@@ -129,11 +129,20 @@ because it is trusted.
 
 The same principle applies to *finding* tools. Three of the scripts
 resolve a Python interpreter by running each candidate, not by
-checking that the name exists on `PATH`. Windows ships a `python3` that resolves
-fine, prints an advert for the Microsoft Store, and exits 49;
-probing by name picks that stub and fails on a working machine.
+checking that the name exists on `PATH`. Windows ships a `python3`
+that resolves fine, prints an advert for the Microsoft Store, and
+exits 49; probing by name picks that stub and fails on a working
+machine.
 
-If you add a check, make its failure path the loud one.
+It applies to a tool's *defaults* too. Both line-ending checks pass
+`grep -U`, because Git Bash's grep otherwise treats the file as text
+and strips CR before matching. Without it, a SKILL.md that was CRLF
+from end to end linted clean -- on the one platform most likely to
+produce one. Same shape as the `grep -P` bug: the check ran, found
+nothing, and was believed.
+
+If you add a check, make its failure path the loud one, and prove it
+by breaking the thing it guards.
 
 ### What it does not cover
 
