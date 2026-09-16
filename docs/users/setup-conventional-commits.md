@@ -34,7 +34,12 @@ message is set to the pull request title.
 using `amannn/action-semantic-pull-request`, pinned to `v6`. It runs
 on pull request open, edit, synchronize, and reopen -- the *edit*
 trigger is what makes a corrected title re-check immediately instead
-of leaving a stale failure.
+of leaving a stale failure. The allowed commit types are written out
+in the file (`feat`, `fix`, `docs`, `style`, `refactor`, `perf`,
+`test`, `build`, `ci`, `chore`) rather than left to the action's
+defaults, so your repository states which types it accepts. Edit that
+list whenever you like -- it is an ordinary file in your repository
+after the skill hands it over.
 
 **3. A ruleset on the default branch** requiring a pull request,
 requiring that title check to pass, blocking force pushes and

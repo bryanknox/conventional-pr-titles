@@ -80,7 +80,7 @@ Targeted invariant checks on
 the one artifact that lands in other people's repositories and
 becomes their enforcement.
 
-It asserts the file parses, and then the four couplings that would
+It asserts the file parses, and then the five couplings that would
 otherwise break silently:
 
 - **The job name is exactly `Validate conventional PR title`.** The
@@ -90,6 +90,11 @@ otherwise break silently:
 - **`edited` is in the trigger types.** Without it, a corrected
   title leaves the old failure sitting there.
 - **The action is pinned to `@v6`.**
+- **The `with: types:` list is exactly the de-facto ten.** The
+  template pins the allowed types rather than inheriting the
+  action's defaults; consumers edit their own copy, but what ships
+  has to match the list SKILL.md, `pr-conventional-commits`, and
+  the user guide all name.
 - **`permissions.pull-requests` is `read`.**
 
 These are deliberately not a generic workflow linter. The failure

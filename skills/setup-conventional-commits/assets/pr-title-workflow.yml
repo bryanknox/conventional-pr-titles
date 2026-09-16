@@ -25,17 +25,25 @@ jobs:
       - uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # The action's defaults follow the Conventional Commits
-        # de-facto type set. Uncomment to pin the allowed types:
-        # with:
-        #   types: |
-        #     feat
-        #     fix
-        #     docs
-        #     style
-        #     refactor
-        #     perf
-        #     test
-        #     build
-        #     ci
-        #     chore
+        with:
+          # The Conventional Commits de-facto type set: feat and fix
+          # from the specification, the other eight from the Angular
+          # convention. Pinned here rather than left to the action's
+          # defaults so the types this repository accepts are stated
+          # in the repository, not implied by an action version.
+          #
+          # CUSTOMIZE: this list is yours to edit. Remove types you
+          # do not want, or add your own. Keep feat and fix -- they
+          # are what the specification defines, and what semantic
+          # versioning tooling reads.
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore

@@ -47,3 +47,11 @@ versioning mapping deliberately left out of the skill reference, is
 Three copies exist on purpose, with different owners and audiences:
 the skill body has the short list, the skill reference has the
 decision rules, and the user guide has the explanation.
+
+A fourth copy is not documentation at all. `assets/pr-title-workflow.yml`
+pins the same ten in a `with: types:` block, so the enforcing copy
+sits in the consumer's repository where they can edit it -- the list
+they are allowed to change has to be a list they can see. That one is
+guarded: `tests/check-workflow-template.sh` fails if the shipped
+template drifts from the ten, because a template that silently
+accepted a different set would contradict every copy above it.

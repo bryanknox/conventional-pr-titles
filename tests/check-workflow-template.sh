@@ -30,6 +30,13 @@ REQUIRED_JOB_NAME="Validate conventional PR title"
 # a lag rather than following it silently.
 REQUIRED_ACTION="amannn/action-semantic-pull-request@v6"
 
+# The allowed commit types, pinned in the template rather than left to
+# the action's defaults. Consumers are invited to edit their copy; this
+# asserts what SHIPS, which must stay the de-facto ten that SKILL.md,
+# pr-conventional-commits, and the user guide all name. A drift here
+# would hand consumers a type set no document in this repo describes.
+REQUIRED_TYPES="feat,fix,docs,style,refactor,perf,test,build,ci,chore"
+
 errors=0
 err()  { printf 'FAIL  %s\n' "$*" >&2; errors=$((errors + 1)); }
 ok()   { printf 'ok    %s\n' "$*"; }
@@ -96,11 +103,21 @@ uses = [
     for step in (j.get("steps") or [])
     if step.get("uses")
 ]
+# `types` is a block scalar, one type per line, so it arrives as one
+# string with trailing newline -- not a list.
+types_in = [
+    (step.get("with") or {}).get("types", "")
+    for j in jobs.values()
+    for step in (j.get("steps") or [])
+    if (step.get("with") or {}).get("types")
+]
+allowed = types_in[0].split() if types_in else []
 perms = doc.get("permissions") or {}
 
 emit("TRIGGER_TYPES", ",".join(types))
 emit("JOB_NAMES", "|".join(names))
 emit("USES", "|".join(uses))
+emit("ALLOWED_TYPES", ",".join(allowed))
 emit("PERM_PR", perms.get("pull-requests", ""))
 emit("HAS_PULL_REQUEST", "yes" if pr else "no")
 PY
@@ -139,6 +156,15 @@ case "$USES" in
     *)
         err "action must be pinned to $REQUIRED_ACTION (found: '$USES')" ;;
 esac
+
+if [ "$ALLOWED_TYPES" = "$REQUIRED_TYPES" ]; then
+    ok "allowed types pinned to the de-facto ten"
+else
+    err "allowed types must be pinned to: $REQUIRED_TYPES"
+    err "  (found: '$ALLOWED_TYPES')"
+    err "  an unpinned list inherits the action's defaults silently;"
+    err "  a different list contradicts SKILL.md and the type guide"
+fi
 
 if [ "$PERM_PR" = "read" ]; then
     ok "permissions.pull-requests is read"

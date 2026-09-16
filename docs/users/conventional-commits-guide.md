@@ -92,18 +92,38 @@ jobs:
       - uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
 ```
 
-Two details matter:
+Three details matter:
 
 - The `edited` trigger. Without it, fixing a bad title leaves the
   old failure sitting there until something else re-runs the check.
 - The job **name** (`Validate conventional PR title`) is what the
   Level 2 ruleset requires by string. Renaming the job silently
   breaks enforcement.
+- The `types:` list. The action's defaults already match the ten
+  below, but they are written out anyway so the types your
+  repository accepts are visible in your repository rather than
+  implied by a version of somebody else's action.
 
-The action's defaults already follow the standard type set. Add a
-`with: types:` block if you want to narrow it.
+**This list is yours to customize.** Drop the types you will never
+use, or add your own -- `revert` is the common addition. Keep
+`feat` and `fix`: they are what the specification defines, and what
+release tooling reads to decide a version bump. Whatever you keep
+is exactly what the check accepts, so narrowing the list makes the
+check stricter, not looser.
 
 ### Level 4: nothing
 

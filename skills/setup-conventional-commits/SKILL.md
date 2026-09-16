@@ -26,7 +26,8 @@ Conventional Commits message. The whole footprint is three levels:
   bypass list.
 - Level 3 - a PR-title lint workflow
   (`assets/pr-title-workflow.yml`, using
-  amannn/action-semantic-pull-request).
+  amannn/action-semantic-pull-request), pinning the allowed commit
+  types to the Conventional Commits de-facto set.
 
 There is no Level 4: no local git hooks, no commit tooling.
 Branch commits stay unconstrained by design; the PR title at merge
@@ -129,7 +130,11 @@ skill's ruleset is absent): surface both together. Compare only
 the fields this skill specifies -- ruleset reads include
 server-populated defaults (e.g. `pull_request.allowed_merge_methods`,
 `required_status_checks.do_not_enforce_on_create`) that are NOT
-conflicts.
+conflicts. An existing pr-title.yml whose ONLY difference from the
+template is the `with: types:` list is a customization, not a
+conflict -- the list is the user's to set. Report it as a no-op
+naming the types in force; propose reverting it only if the user
+asks.
 
 If all three levels are `no-op`, say so and stop after presenting
 the (empty) diff; re-running on a configured repo must not mutate
@@ -158,7 +163,7 @@ apply order Level 1 -> Level 3 -> Level 2.
 | Step | Target | Current | Action | Status |
 |---|---|---|---|---|
 | L1 merge settings | squash-only, title=PR_TITLE | {found} | {apply/no-op} | pending |
-| L3 pr-title workflow | present, action @v6 | {found} | {apply/no-op} | pending |
+| L3 pr-title workflow | present, action @v6, types pinned | {found} | {apply/no-op} | pending |
 | L2 ruleset on {default_branch} | active; PR + check required | {found} | {apply/no-op} | pending |
 | Read-back verification | all three levels green | - | - | pending |
 
@@ -178,6 +183,12 @@ acknowledgment, never silent action:
 - Proceeding on a private repo with the plan gate confirmed
   (Level 2 blocked: the ruleset cannot be created until the plan
   is upgraded or the repo goes public) or with the plan unknown.
+
+State the allowed commit types the workflow will pin (feat, fix,
+docs, style, refactor, perf, test, build, ci, chore) as part of
+the Level 3 diff, and offer the list as customizable -- one line,
+not a prompt to answer. The de-facto ten is the default; take a
+different list only if the user gives one.
 
 For a pre-existing ruleset this skill did not create, the default
 is COEXIST: leave it untouched and create this skill's ruleset
@@ -222,6 +233,14 @@ If the latest major is newer than `v6`, keep the pinned `v6` (the
 pin is deliberate; silent drift would change lint behavior) but
 note the lag in the final report.
 
+The template pins the allowed types in a `with: types:` block --
+feat, fix, docs, style, refactor, perf, test, build, ci, chore --
+rather than inheriting the action's defaults, so the repo states
+which types it accepts. Commit it AS IS unless the user gave a
+different list at the checkpoint; in that case edit only the
+`types:` entries, leave the rest of the template alone, and note
+the customized list in the final report.
+
 Commit `assets/pr-title-workflow.yml` from this skill's directory
 to the repo as `.github/workflows/pr-title.yml`, base64-encoded
 per platform:
@@ -236,7 +255,8 @@ When overwriting an existing file (approved at the checkpoint),
 include `-f sha={existing file sha}` from the preflight read.
 
 Verify: GET the same contents path, decode, and confirm it matches
-the template. Update the checklist.
+the template (plus any type-list edit the user asked for). Update
+the checklist.
 
 ### Step 7 - Level 2: ruleset on the default branch
 
@@ -318,7 +338,7 @@ report:
 | Level | Before | After | Verified |
 |---|---|---|---|
 | 1 merge settings | {before} | squash-only, title=PR_TITLE | yes/no |
-| 3 pr-title workflow | {before} | .github/workflows/pr-title.yml @v6 | yes/no |
+| 3 pr-title workflow | {before} | .github/workflows/pr-title.yml @v6, types {de-facto ten | customized: ...} | yes/no |
 | 2 ruleset | {before} | {active | blocked by plan (403, not created) | created but NOT enforced} | yes/no |
 
 Gaps: {none | plan gap details | action version lag}
@@ -341,7 +361,10 @@ Next: open PRs with the companion skill pr-conventional-commits.
 - Level 3: `.github/workflows/pr-title.yml` matching
   `assets/pr-title-workflow.yml`. The job name is the status-check
   context the ruleset requires; renaming one without the other
-  breaks enforcement. If the user wants to pin allowed commit
-  types, uncomment the `with: types:` block in the template (the
-  de-facto set: feat, fix, docs, style, refactor, perf, test,
-  build, ci, chore).
+  breaks enforcement. The template pins the allowed types to the
+  de-facto set -- feat, fix, docs, style, refactor, perf, test,
+  build, ci, chore -- in a `with: types:` block, so the accepted
+  types are stated in the consumer's repo rather than inherited
+  from the action's defaults. The user may edit that list; if they
+  ask, apply their list at Step 6 and record the deviation in the
+  final report.
