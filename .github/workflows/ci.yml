@@ -31,11 +31,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # Explicit rather than relying on whatever the runner image
-      # happens to ship. The checks fail loudly on a missing
-      # interpreter, so an image change would break the build rather
-      # than silently skip a check -- but not having to find that out
-      # is better.
+      # Explicitly set up Python version rather than relying on
+      # whatever the runner image happens to ship. The checks fail
+      # loudly on a missing interpreter, so an image change would
+      # break the build rather than silently skip a check.
+      # Not having to find that out is better.
       - uses: actions/setup-python@v6
         with:
           python-version: '3.x'
@@ -52,9 +52,13 @@ jobs:
       - name: Check workflow template
         run: bash tests/check-workflow-template.sh
 
-      # Offline on purpose. `claude plugin validate` is the richer
-      # check and is the release-time gate, but it needs the Claude
-      # Code CLI -- a new warning in a future release would turn this
-      # repository red without anyone changing a file here.
+      # Offline check only on purpose. We don't use `claude plugin
+      # validate` here because that richer check needs the Claude Code
+      # CLI, which CI would install at its latest version on every
+      # run. A future CLI release that adds a rule or a warning would
+      # start failing this job on unchanged files, so a pull request
+      # would go red for a reason its author did not cause and cannot
+      # fix. `claude plugin validate` stays a release step, run
+      # deliberately against a known CLI version.
       - name: Check plugin manifests
         run: bash tests/check-plugin-manifests.sh
