@@ -39,7 +39,9 @@ If you are setting up your own repository, run
 
 1. [Install](install.md) -- one plugin, currently Claude Code
    only. Copying a single skill folder also works.
-2. Read the page for the skill you need (linked in the table above).
+2. Read the page for the skill you need:
+   - [enforce-conventional-commits](enforce-conventional-commits.md)
+   - [write-pr-title](write-pr-title.md)
 3. Ask for what you want in plain language. Both skills are triggered
    by description matching, not by a command you have to memorize:
    "set this repo up for conventional commits", "open a PR for this

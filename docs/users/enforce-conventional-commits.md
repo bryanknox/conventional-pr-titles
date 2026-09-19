@@ -1,6 +1,6 @@
 # enforce-conventional-commits
 
-Configures an existing GitHub repository so the only route to the
+The `enforce-conventional-commits` skill configures an existing GitHub repository so the only route to the
 default branch is a squash-merged pull request whose title is a valid
 Conventional Commits message.
 
