@@ -27,9 +27,11 @@ correct.
 | Run | Once per repository | Every pull request |
 
 If you are joining a repository someone else already configured, you
-only need **write-pr-title**. Installing the plugin brings
-both; the one you do not need costs you nothing, because a skill
-that is never triggered is never read.
+only need **write-pr-title**. Installing the plugin brings both. The
+one you do not need costs you almost nothing: only its short
+description stays in context, and the skill itself is never read
+unless it is triggered. If you would rather not carry it at all,
+[removing a skill](install.md#removing-a-skill) is one command.
 
 If you are setting up your own repository, run
 **enforce-conventional-commits** once, then use

@@ -173,6 +173,56 @@ gh auth status
   changing anything and tells you to run
   `gh auth refresh -h github.com -s repo,workflow`.
 
+## Removing a skill
+
+Removing a skill changes nothing about a repository it has already
+configured. The merge settings, the ruleset, and
+`.github/workflows/pr-title.yml` stay exactly as they are -- they
+live in your repository and in GitHub's settings, not in the skill.
+Undoing that configuration is a separate job, done by hand through
+the GitHub web UI or `gh`.
+
+That workflow file is also the only thing either skill puts inside a
+repository, so there is nothing else per-repository to uninstall.
+
+### If you installed the plugin
+
+```
+claude plugin uninstall conventional-pr-titles
+```
+
+`claude plugin disable conventional-pr-titles` keeps it installed but
+inactive instead, and takes `--scope user|project|local` to match how
+you installed it.
+
+Both act on the whole plugin. There is no way to drop one of the two
+skills and keep the other -- if that is what you want, uninstall the
+plugin and use "Or copy the folders", above, to take back just the
+one you need.
+
+Restart the session afterwards.
+
+### If you copied the folders
+
+Delete the folder. Nothing else refers to it.
+
+PowerShell:
+
+```powershell
+Remove-Item -Recurse -Force "$HOME\.claude\skills\enforce-conventional-commits"
+```
+
+Bash:
+
+```bash
+rm -rf ~/.claude/skills/enforce-conventional-commits
+```
+
+For a project-scoped copy, delete
+`<repo>/.claude/skills/<name>/` and commit the deletion, so it goes
+away for everyone who clones too. Claude Code notices a deleted
+folder during the session; no restart needed.
+
 ## Working on the skills themselves
 
 If you are developing these skills rather than using them, do not

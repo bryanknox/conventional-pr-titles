@@ -22,6 +22,17 @@ Run it once per repository. Re-running is a no-op.
 It works on the repository your current directory points at. If there
 is no `origin` remote it will ask which repository you mean.
 
+The skill also answers to broader phrasings -- "protect main",
+"prevent direct pushes to main". That is deliberate, but it means a
+request for plain branch protection can reach a skill that does
+rather more than that. Nothing is lost when it does. The skill reads
+your repository, shows you the whole three-level diff, and waits:
+there is exactly one approval point, and nothing changes before it.
+If what you wanted was required reviews rather than conventional
+commits, decline and the repository is untouched. It also stops
+before that point, changing nothing, if you lack `admin` or the
+`workflow` scope.
+
 ## What it changes
 
 Two kinds of change: one file added to your repository, and two
