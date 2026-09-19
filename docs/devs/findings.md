@@ -9,6 +9,13 @@ may already be a known, fixed, or deliberately-unfixed finding.
 **Write to it** at the end of every tier-2 campaign, appending to the
 existing numbering.
 
+Each row compresses a campaign finding to a sentence. When that is not
+enough -- most often when an instruction in a `SKILL.md` looks like
+ceremony and the row does not make the case for it -- the dated record
+behind the finding is in [validation-records/](validation-records/),
+whose README maps finding ids back to records and says when opening
+one is worth it.
+
 Findings are numbered per skill and the numbering continues across
 campaigns. The records use bare `F1`, `F2`, ...; this register prefixes
 them `A-F*` and `B-F*` because both skills have an `F1`. The

@@ -109,7 +109,9 @@ The four cheapest things to get wrong, in order:
 - [known-gaps.md](known-gaps.md) -- what has never been proven.
 - [validation-records/](validation-records/) -- archive. The dated
   records the three registers above were harvested from. Read the
-  registers; come here only to check a disputed claim.
+  registers first; open a record to check a disputed claim, to see
+  what forced an instruction that now looks like ceremony, or before
+  repeating a campaign it already covered.
 
 **Shipping**
 

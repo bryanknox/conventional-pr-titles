@@ -300,6 +300,14 @@ verified and when, not as current instructions, and not as a to-do
 list. The two documents above answer most questions without opening
 one.
 
+The question they do not answer is what a campaign was actually like
+to run. Before repeating one of these scenarios, read its record:
+eval expectations that turned out unachievable, a harness that
+measured the wrong thing, and the points where the runner had to
+guess are written down there and nowhere else. Its
+[README](validation-records/README.md) lists the other situations
+that justify the read.
+
 ## Finishing a campaign
 
 A tier-2 campaign is not done when it produces a verdict. It is done

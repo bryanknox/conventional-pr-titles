@@ -23,6 +23,47 @@ go there for the claim itself.
 | What did running it find, and was it fixed? | [findings.md](../findings.md) |
 | What has never been proven? | [known-gaps.md](../known-gaps.md) |
 
+## When a record is worth opening
+
+The registers above are maintained and answer the common questions;
+these records are neither maintained nor common. What they hold that
+nothing else does is the dated narrative -- what the runner actually
+ran, what GitHub actually answered, and what surprised them. Four
+situations make that worth the read.
+
+**A register row is disputed, or looks wrong.** Every verdict in
+`evidence.md` compresses a campaign into one line. The record behind
+it carries the read-backs that line was drawn from -- ruleset ids,
+workflow blob and commit SHAs, byte-identical pre/post snapshots,
+exact PR titles and numbers -- which is how you tell a mistaken
+summary from a mistaken run.
+
+**You are about to undo something that looks like ceremony.** Most of
+the odd-looking instructions in a `SKILL.md` are there because a run
+found something. [findings.md](../findings.md) names the change in a
+sentence; the record shows what forced it. A-F5 is the case to know:
+Skill A's free-plan handling reads as over-cautious until you find
+that every ruleset endpoint returned HTTP 403 where the documentation
+had promised a created-but-unenforced ruleset.
+
+**You need an observed fact about `gh` or the GitHub API rather than
+a documented one.** These records are where this repository watched
+the real thing answer: `gh api user` returning no `plan` key under
+gh's default scopes, `gh pr checks --watch` waiting on every check
+rather than the one that gates, `gh auth refresh -s` adding scopes
+and never removing them. Each contradicted what had been assumed or
+read, and none of them can be re-derived from the skills.
+
+**You are designing a campaign that repeats one of these runs.** The
+record is the closest thing to a rehearsal: which eval expectations
+turned out unachievable and were rewritten, where the harness
+measured the wrong thing, what the test-repo state actually was, and
+what the runner had to guess. Re-running S2 or S5 without reading its
+record pays for the same discoveries twice.
+
+Outside those four, the maintained document is the better answer, and
+a record will only tell you what was true on the day it was written.
+
 ## Paths inside these records are pre-refactor
 
 These files were written between 2026-07-28 and 2026-07-29, against
