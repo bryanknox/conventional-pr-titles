@@ -22,38 +22,38 @@ B-CE1/2/3) in `tests/evals/<skill>/evals.json`.
 
 | Requirement | Exercised by | Record | Date | Verdict |
 |---|---|---|---|---|
-| INV1 | A-CE1/S1, B-CE1/P1, and every run | [S1](validation/setup-conventional-commits-step8.md), [P1](validation/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| INV2 | A-CE1/S1 expectation 7, B-CE1/P1 expectation 4 | [S1](validation/setup-conventional-commits-step8.md), [P1](validation/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| INV3 | S5 (fails before mutating), S2 (degrades after) | [S5](validation/s5-non-admin.md), [S2](validation/todo8-degraded-idempotency.md) | 2026-07-28/29 | PROVEN |
-| INV4 | A-CE1/S1 expectation 2 | [S1](validation/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| INV5 | S2, P5 | [todo #8](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| A-R1 | S5 | [S5](validation/s5-non-admin.md) | 2026-07-29 | PROVEN |
+| INV1 | A-CE1/S1, B-CE1/P1, and every run | [S1](validation-records/setup-conventional-commits-step8.md), [P1](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| INV2 | A-CE1/S1 expectation 7, B-CE1/P1 expectation 4 | [S1](validation-records/setup-conventional-commits-step8.md), [P1](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| INV3 | S5 (fails before mutating), S2 (degrades after) | [S5](validation-records/s5-non-admin.md), [S2](validation-records/todo8-degraded-idempotency.md) | 2026-07-28/29 | PROVEN |
+| INV4 | A-CE1/S1 expectation 2 | [S1](validation-records/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| INV5 | S2, P5 | [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| A-R1 | S5 | [S5](validation-records/s5-non-admin.md) | 2026-07-29 | PROVEN |
 | A-R2 | -- | -- | -- | **NOT PROVEN** -- see [known-gaps.md](known-gaps.md) |
-| A-R3 | A-CE1/S1, A-CE2/S2, S4 | [S1](validation/setup-conventional-commits-step8.md), [todo #8](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| A-R4 | A-CE1/S1, A-CE2/S2, S4 | [S1](validation/setup-conventional-commits-step8.md), [todo #8](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| A-R5 | A-CE1/S1, S4 | [S1](validation/setup-conventional-commits-step8.md), [todo #8](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| A-R6 | S1 mutation summary: exactly three mutations, nothing local | [S1](validation/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| A-R7 | A-CE1/S1 expectation 4 | [S1](validation/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| A-R8 | A-CE1/S1 expectation 2 | [S1](validation/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| A-R9 | S3 | [todo #8](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| A-R10 | S4 | [todo #8](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| A-R11 | A-CE2/S2 | [todo #8](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| A-R12 | A-CE1/S1 expectation 8 | [S1](validation/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| A-R3 | A-CE1/S1, A-CE2/S2, S4 | [S1](validation-records/setup-conventional-commits-step8.md), [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| A-R4 | A-CE1/S1, A-CE2/S2, S4 | [S1](validation-records/setup-conventional-commits-step8.md), [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| A-R5 | A-CE1/S1, S4 | [S1](validation-records/setup-conventional-commits-step8.md), [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| A-R6 | S1 mutation summary: exactly three mutations, nothing local | [S1](validation-records/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| A-R7 | A-CE1/S1 expectation 4 | [S1](validation-records/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| A-R8 | A-CE1/S1 expectation 2 | [S1](validation-records/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| A-R9 | S3 | [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| A-R10 | S4 | [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| A-R11 | A-CE2/S2 | [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| A-R12 | A-CE1/S1 expectation 8 | [S1](validation-records/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
 | A-R13 | -- | -- | -- | **NOT PROVEN** -- see [known-gaps.md](known-gaps.md) |
-| A-R14 | Dispatch only (trigger case A-N9) | [rename gate](validation/rename-trigger-gate.md) | 2026-09-19 | **PARTIAL** -- see [known-gaps.md](known-gaps.md) |
-| B-R1 | P1-P5 | [P1-P4](validation/pr-conventional-commits-step8.md), [P5](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| B-R2 | P1-P5; classification came from the diff in every run, with deliberately vague commit messages as decoys | [P1-P4](validation/pr-conventional-commits-step8.md), [P5](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| B-R3 | P1-P5; P5's title independently measured at 45 chars, no trailing period, no invented scope | [P1-P4](validation/pr-conventional-commits-step8.md), [P5](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| B-R4 | B-CE2/P2 | [P1-P4](validation/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| B-R5 | B-CE1/P1 expectation 1 | [P1-P4](validation/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| B-R6 | B-CE1/P1 (present), B-CE3/P5 (absent) | [P1-P4](validation/pr-conventional-commits-step8.md), [P5](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| B-R7 | P4 -- checkpoint fired on a PR the session did not create, recorded verbatim | [P1-P4](validation/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| B-R8 | P1-P4, every title read back exact | [P1-P4](validation/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| B-R9 | P1-P4 polled; P4 exercised red -> green | [P1-P4](validation/pr-conventional-commits-step8.md) | 2026-07-28 | **PARTIAL** -- the retry loop was never consumed; see [known-gaps.md](known-gaps.md) |
-| B-R10 | B-CE3/P5 | [P5](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| A-R14 | Dispatch only (trigger case A-N9) | [rename gate](validation-records/rename-trigger-gate.md) | 2026-09-19 | **PARTIAL** -- see [known-gaps.md](known-gaps.md) |
+| B-R1 | P1-P5 | [P1-P4](validation-records/pr-conventional-commits-step8.md), [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| B-R2 | P1-P5; classification came from the diff in every run, with deliberately vague commit messages as decoys | [P1-P4](validation-records/pr-conventional-commits-step8.md), [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| B-R3 | P1-P5; P5's title independently measured at 45 chars, no trailing period, no invented scope | [P1-P4](validation-records/pr-conventional-commits-step8.md), [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| B-R4 | B-CE2/P2 | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| B-R5 | B-CE1/P1 expectation 1 | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| B-R6 | B-CE1/P1 (present), B-CE3/P5 (absent) | [P1-P4](validation-records/pr-conventional-commits-step8.md), [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| B-R7 | P4 -- checkpoint fired on a PR the session did not create, recorded verbatim | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| B-R8 | P1-P4, every title read back exact | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| B-R9 | P1-P4 polled; P4 exercised red -> green | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | **PARTIAL** -- the retry loop was never consumed; see [known-gaps.md](known-gaps.md) |
+| B-R10 | B-CE3/P5 | [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
 | B-R11 | -- | -- | -- | **NOT PROVEN** -- see [known-gaps.md](known-gaps.md) |
-| B-R12 | B-CE1/P1 expectation 6, B-CE2/P2 expectation 3 | [P1-P4](validation/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| B-R13 | B-CE3/P5 expectation 4 -- no scaffold attempted in a repo it detected as unscaffolded | [P5](validation/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
+| B-R12 | B-CE1/P1 expectation 6, B-CE2/P2 expectation 3 | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| B-R13 | B-CE3/P5 expectation 4 -- no scaffold attempted in a repo it detected as unscaffolded | [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
 | B-R14 | -- | -- | -- | **NOT PROVEN** -- see [known-gaps.md](known-gaps.md) |
 
 ## Runs
@@ -99,9 +99,9 @@ prediction is a result.
 
 | Run | Split | Names | Model | Result |
 |---|---|---|---|---|
-| [2026-07-29 gate](validation/trigger-evals.md) -- **superseded** | validation (16) | old | `claude-fable-5` | 16/16; both skills 4/4 should-trigger, 0/4 near-miss |
-| [2026-09-19 control](validation/rename-trigger-gate.md) | train (24) | old | `claude-opus-5[1m]` | 24/24; both skills 1.00 / 0.00 |
-| [2026-09-19 gate](validation/rename-trigger-gate.md) | validation (16) | new | `claude-opus-5[1m]` | 15/16 PASS; enforce 4/4 and 0/4, write 4/4 and 1/4 |
+| 2026-07-29 gate -- **superseded**; record removed, see [decision 0013](decisions/0013-archive-the-validation-records.md) | validation (16) | old | `claude-fable-5` | 16/16; both skills 4/4 should-trigger, 0/4 near-miss |
+| [2026-09-19 control](validation-records/rename-trigger-gate.md) | train (24) | old | `claude-opus-5[1m]` | 24/24; both skills 1.00 / 0.00 |
+| [2026-09-19 gate](validation-records/rename-trigger-gate.md) | validation (16) | new | `claude-opus-5[1m]` | 15/16 PASS; enforce 4/4 and 0/4, write 4/4 and 1/4 |
 
 The control exists because scoring new names against a record taken on
 a different model cannot distinguish a naming regression from a model

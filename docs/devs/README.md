@@ -16,7 +16,7 @@ If you want to *use* the skills, you want
 | `docs/users/` | Documentation for people using the skills |
 | `docs/devs/` | This. Documentation for people changing the skills. |
 | `docs/devs/decisions/` | Why things are the way they are |
-| `docs/devs/validation/` | Dated evidence: what was run against real repositories |
+| `docs/devs/validation-records/` | Archived evidence: what was run against real repositories, and when |
 | `tests/` | The structural lint, and the eval definitions |
 
 Nothing outside `skills/` is ever distributed. That boundary is
@@ -107,8 +107,9 @@ The four cheapest things to get wrong, in order:
 - [findings.md](findings.md) -- what running it found, and what
   changed as a result.
 - [known-gaps.md](known-gaps.md) -- what has never been proven.
-- [validation/](validation/) -- the dated records the three registers
-  above were harvested from.
+- [validation-records/](validation-records/) -- archive. The dated
+  records the three registers above were harvested from. Read the
+  registers; come here only to check a disputed claim.
 
 **Shipping**
 

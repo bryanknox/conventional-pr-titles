@@ -61,7 +61,7 @@ achieves, B for what it produces.
 ## Consequences
 
 Measured on the validation split, recorded in
-[validation/rename-trigger-gate.md](../validation/rename-trigger-gate.md):
+[the rename gate record](../validation-records/rename-trigger-gate.md):
 **gate PASS, 15/16**, both skills 4/4 on should-trigger, against a
 control of 24/24 on the train split under the old names.
 

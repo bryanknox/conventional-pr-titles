@@ -22,7 +22,7 @@
         "Type chosen from the branch's commit messages instead of the diff",
         "No verification that the PR-title check passed"
       ],
-      "baseline_failure_modes_measured": "MEASURED FALSE IN PART, 2026-07-28 (docs/devs/validation/pr-conventional-commits-step8.md): in a SCAFFOLDED repo the first mode did not occur -- the baseline read the convention off the pr-title workflow file and produced a comparable title. These modes remain plausible for unscaffolded repos and weaker agents, but should not be expected in scaffolded ones. The skill's measured value in this scenario was process discipline (reads before claims, no unrequested test runs, waiting on the right check), not title quality."
+      "baseline_failure_modes_measured": "MEASURED FALSE IN PART, 2026-07-28 (docs/devs/validation-records/pr-conventional-commits-step8.md): in a SCAFFOLDED repo the first mode did not occur -- the baseline read the convention off the pr-title workflow file and produced a comparable title. These modes remain plausible for unscaffolded repos and weaker agents, but should not be expected in scaffolded ones. The skill's measured value in this scenario was process discipline (reads before claims, no unrequested test runs, waiting on the right check), not title quality."
     },
     {
       "id": 2,

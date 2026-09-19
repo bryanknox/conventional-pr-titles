@@ -51,7 +51,7 @@ scores it wrong later.
 The procedure is in [testing.md](testing.md); the results for the
 current skills are in [evidence.md](evidence.md), under "Trigger
 gates". The record behind the current numbers is
-[validation/rename-trigger-gate.md](validation/rename-trigger-gate.md),
+[the rename gate record](validation-records/rename-trigger-gate.md),
 and it is worth reading for one reason beyond its result: the harness
 was under-measuring dispatch, and a harness that under-measures is
 indistinguishable from a description that stopped working. The

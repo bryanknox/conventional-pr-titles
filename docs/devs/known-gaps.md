@@ -57,6 +57,16 @@ differently near the threshold. The gate thresholds (>= 0.5 and < 0.5)
 are set wide enough to tolerate this, but no confidence interval
 exists and none is claimed.
 
+**A-N1 has not been re-scored under the current names.** "write a
+conventional commit message for these changes" is the same shape as
+the B-N2 near-miss that the rename gate recorded, and it sits in Skill
+A's train near-miss list. It scored `(none)` in the control, under the
+old names. If the `write` verb is systematically attracting
+commit-message prompts, A-N1 is where it would show up next. Closing
+it means re-scoring the train split -- which is free to do, since
+train is the split tuning may consult. See
+[the rename gate record](validation-records/rename-trigger-gate.md).
+
 **Baselines were single runs too.** Both value-delta measurements --
 S1b and the P baseline -- are one run each. The P baseline already
 showed how much that matters: it falsified a predicted failure mode,

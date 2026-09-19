@@ -23,3 +23,4 @@ obvious from the code.
 | [0010](0010-declare-a-plugin-version.md) | Declare a plugin version, and bump it every release |
 | [0011](0011-name-skills-for-the-job.md) | Name the skills for the job, not the convention |
 | [0012](0012-harvest-records-into-durable-artifacts.md) | Harvest the validation records into durable artifacts |
+| [0013](0013-archive-the-validation-records.md) | Archive the validation records rather than maintain them |

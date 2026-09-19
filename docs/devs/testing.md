@@ -291,11 +291,14 @@ been run, and when?" directly, and it is maintained.
 six requirements have never been exercised, and three configurations
 have never been tried at all. Read it before claiming coverage.
 
-[validation/](validation/) holds the dated records themselves: the
-step-8 validation of both skills, the degraded-path and idempotency
-campaign, the non-admin fail-fast scenario, and the two trigger-eval
-gates. They are evidence rather than living documents -- read them for
-what was verified and when, not as current instructions.
+[validation-records/](validation-records/) is the archive holding the
+dated records themselves: the step-8 validation of both skills, the
+degraded-path and idempotency campaign, the non-admin fail-fast
+scenario, and the trigger-eval gate behind the current names. They are
+evidence rather than living documents -- read them for what was
+verified and when, not as current instructions, and not as a to-do
+list. The two documents above answer most questions without opening
+one.
 
 ## Finishing a campaign
 

@@ -1,5 +1,12 @@
 # Step 8 validation record: pr-conventional-commits (plan todo #7)
 
+> **Archived record.** Frozen evidence from 2026-07-28, not
+> instructions and not a to-do list. Skill names and paths are
+> pre-rename -- see [README.md](README.md) for the translation.
+> For what is currently true, read
+> [evidence.md](../evidence.md) and
+> [known-gaps.md](../known-gaps.md).
+
 Status: COMPLETE (2026-07-28). Structural lint PASSED (one defect
 F1 found and fixed pre-run); real runs P1-P4 all PASSED with
 independent read-back verification (P1: 6/6 B-CE1 expectations,
@@ -136,17 +143,9 @@ expected in scaffolded ones.
 
 ## Disposition and follow-ups
 
-- `k0x-test-cc-s1` KEPT and restored to clean S1 end state (no
-  open PRs, only `main`, scaffold untouched) -- S3/S4 (todo #8)
-  run next; delete only after todo #8 per test-repos.md.
-- PRs #1-#6 closed (not merged), branches deleted; closed-PR
-  history is inert for S3.
-- gh active account remains `bryanknox` (normal state; no
-  restore step).
-- P5 (unscaffolded repo, `k0x-test-cc-p5`) NOT run here: todo #7
-  scoped to P1-P4. It needs one repo create (human checkpoint);
-  fold into todo #8's campaign.
-- Residuals unchanged: S2 live POST status (todo #8);
-  trigger-eval validation gate on final descriptions (todo #9 --
-  description text did not change in this todo, so todo #6/#7
-  wording is what the gate will test).
+Removed 2026-09-19: test-repo lifecycle and plan-todo sequencing, all
+long since resolved. See
+[decision 0013](../decisions/0013-archive-the-validation-records.md).
+The original is still in git:
+
+    git show 671d6bd:docs/devs/validation/pr-conventional-commits-step8.md

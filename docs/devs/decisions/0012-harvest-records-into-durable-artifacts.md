@@ -72,7 +72,7 @@ The records are no longer self-sufficient: four of them name
 `traces/...` files in their status lines that are not in the working
 tree. They were not edited, because editing a record to keep its
 references green would falsify it -- the same rule that already governs
-their pre-refactor paths. `validation/README.md` carries the
+their pre-refactor paths. `validation-records/README.md` carries the
 translation, as it already did for the renamed skills and the old
 directory layout.
 
@@ -86,9 +86,12 @@ To restore the traces:
 
     git checkout da6936d -- docs/devs/validation/traces
 
-That commit is the last one that touched them. Nothing else needs
-undoing; `evidence.md` duplicates their verification content rather
-than depending on it.
+That path is pre-rename and correct as written: the folder became
+`docs/devs/validation-records/` in
+[decision 0013](0013-archive-the-validation-records.md), after the
+commit named here. That commit is the last one that touched them.
+Nothing else needs undoing; `evidence.md` duplicates their
+verification content rather than depending on it.
 
 To retire the spec, delete `check-requirement-ids.sh` first, then the
 `requirements` arrays in both `evals.json` files, then the `Covers:`

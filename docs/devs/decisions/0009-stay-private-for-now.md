@@ -52,7 +52,7 @@ Ordered, because step 1 is the only one that cannot be undone.
 
 **1. Audit what becomes visible, including history.** Going public
 exposes every commit, not just the current tip.
-[`validation/`](../validation/) and
+[`validation-records/`](../validation-records/) and
 [`test-repos.md`](../test-repos.md) name real repositories and
 quote real command output; several files mention tokens and
 scopes. Confirm that what they quote is scope *names* and not
