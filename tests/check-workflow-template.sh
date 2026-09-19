@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Verifies the PR-title workflow template that
-# setup-conventional-commits installs into other people's
+# enforce-conventional-commits installs into other people's
 # repositories.
 #
 # This file has the highest blast radius in the repo: it is the one
@@ -20,7 +20,7 @@
 
 set -uo pipefail
 
-TEMPLATE="skills/setup-conventional-commits/assets/pr-title-workflow.yml"
+TEMPLATE="skills/enforce-conventional-commits/assets/pr-title-workflow.yml"
 
 # The job name the skill's ruleset requires as a status check context.
 # Keep in sync with SKILL.md step 7 and the eval expectations.
@@ -33,7 +33,7 @@ REQUIRED_ACTION="amannn/action-semantic-pull-request@v6"
 # The allowed commit types, pinned in the template rather than left to
 # the action's defaults. Consumers are invited to edit their copy; this
 # asserts what SHIPS, which must stay the de-facto ten that SKILL.md,
-# pr-conventional-commits, and the user guide all name. A drift here
+# write-pr-title, and the user guide all name. A drift here
 # would hand consumers a type set no document in this repo describes.
 REQUIRED_TYPES="feat,fix,docs,style,refactor,perf,test,build,ci,chore"
 

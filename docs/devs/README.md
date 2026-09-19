@@ -51,8 +51,8 @@ claude --plugin-dir .
 
 `skills/<name>/SKILL.md` at the repo root is already the layout
 Claude Code expects from a plugin, so both skills load as
-`skills-thrill:setup-conventional-commits` and
-`skills-thrill:pr-conventional-commits`. Do **not** mirror `skills/`
+`conventional-pr-titles:enforce-conventional-commits` and
+`conventional-pr-titles:write-pr-title`. Do **not** mirror `skills/`
 into `.claude/skills/` -- that path is gitignored precisely so no
 second copy can drift from the first.
 
@@ -93,7 +93,7 @@ is a Conventional Commits message, and it becomes the commit on
 [the user guide](../users/conventional-commits-guide.md) for the
 format.
 
-`setup-conventional-commits` has been run against this repository.
+`enforce-conventional-commits` has been run against this repository.
 Merge is squash-only with the PR title as the commit subject, and
 [`pr-title.yml`](../../.github/workflows/pr-title.yml) validates
 that title on every pull request.

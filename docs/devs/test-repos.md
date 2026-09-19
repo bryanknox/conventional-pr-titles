@@ -97,7 +97,7 @@ skill itself uses): `repos/{o}/{r}` for merge settings,
 workflow, `repos/{o}/{r}/rulesets` and
 `repos/{o}/{r}/rules/branches/<default>` for ruleset existence vs
 active enforcement. Expected values per scenario live in the eval
-`expectations` (`tests/evals/setup-conventional-commits/evals.json`).
+`expectations` (`tests/evals/enforce-conventional-commits/evals.json`).
 
 - **S1 fresh public repo (happy path).** Create-from-base, public.
   No further setup. Run Skill A; assert the full 3-level scaffold.
@@ -206,7 +206,7 @@ repo and scaffold again.
 Each P scenario = reset, then create a branch with the described
 change (ad hoc edits to the base repo's files), then run Skill B.
 Expected titles and check behavior live in the eval `expectations`
-(`tests/evals/pr-conventional-commits/evals.json`).
+(`tests/evals/write-pr-title/evals.json`).
 
 - **P1 single bug-fix branch.** One small defect-fix commit ahead of
   `main`; no existing PR. Expect `fix: ...`, check green.
@@ -226,7 +226,7 @@ Expected titles and check behavior live in the eval `expectations`
   Skill A NEVER run (GitHub defaults, no workflow). Branch with a
   small change, run Skill B. Expect a conventional title still
   composed and applied, check-polling skipped, and a report of the
-  gap recommending setup-conventional-commits -- with NO attempt
+  gap recommending enforce-conventional-commits -- with NO attempt
   to scaffold.
 
 Integration property: P1-P4 deliberately run inside a repo

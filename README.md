@@ -1,4 +1,4 @@
-# skills-thrill
+# conventional-pr-titles
 
 Agent skills for enforcing
 [Conventional Commits](https://www.conventionalcommits.org/) through
@@ -6,11 +6,11 @@ pull request titles.
 
 Two skills, used together or separately:
 
-- **setup-conventional-commits** configures a GitHub repository so
+- **enforce-conventional-commits** configures a GitHub repository so
   squash is the only merge method and the pull request title -- which
   becomes the commit message on the default branch -- has to be a
   valid conventional commit. Run once, by an admin.
-- **pr-conventional-commits** writes that title, from the actual
+- **write-pr-title** writes that title, from the actual
   branch diff. Run on every pull request, by anyone.
 
 Commits on branches stay unconstrained. No hooks, no commit-message
@@ -20,8 +20,8 @@ the only gate.
 ## Install
 
 ```
-claude plugin marketplace add bryanknox/skills-thrill
-claude plugin install skills-thrill@skills-thrill
+claude plugin marketplace add bryanknox/conventional-pr-titles
+claude plugin install conventional-pr-titles@conventional-pr-titles
 ```
 
 Both skills arrive together. Copying a single skill folder also

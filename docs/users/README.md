@@ -19,7 +19,7 @@ correct.
 
 ## Which one do you want?
 
-| | [setup-conventional-commits](setup-conventional-commits.md) | [pr-conventional-commits](pr-conventional-commits.md) |
+| | [enforce-conventional-commits](enforce-conventional-commits.md) | [write-pr-title](write-pr-title.md) |
 |---|---|---|
 | Does | Configures a repository to enforce conventional PR titles | Writes the PR title, from the actual diff |
 | For | The repository owner or an admin | Anyone who opens pull requests |
@@ -27,13 +27,13 @@ correct.
 | Run | Once per repository | Every pull request |
 
 If you are joining a repository someone else already configured, you
-only need **pr-conventional-commits**. Installing the plugin brings
+only need **write-pr-title**. Installing the plugin brings
 both; the one you do not need costs you nothing, because a skill
 that is never triggered is never read.
 
 If you are setting up your own repository, run
-**setup-conventional-commits** once, then use
-**pr-conventional-commits** from then on.
+**enforce-conventional-commits** once, then use
+**write-pr-title** from then on.
 
 ## Getting started
 

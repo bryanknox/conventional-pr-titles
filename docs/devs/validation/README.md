@@ -26,6 +26,15 @@ Where a record mentions a path, translate:
 | `dev/validation/` | `docs/devs/validation/` (here) |
 | `dev-info/conventional-commits-skills-plan.md` | Removed. Harvested into `architecture.md` and `decisions/`. |
 
+The skills and the repository were renamed on 2026-09-19. The
+records name them as they were called at the time; translate:
+
+| Written as | Now |
+|---|---|
+| `setup-conventional-commits` | `enforce-conventional-commits` |
+| `pr-conventional-commits` | `write-pr-title` |
+| `skills-thrill` | `conventional-pr-titles` |
+
 ## The records
 
 | File | What it covers |

@@ -1,5 +1,5 @@
 ---
-name: pr-conventional-commits
+name: write-pr-title
 description: >-
   Use this skill when creating or updating a GitHub pull request
   whose title must be a Conventional Commits message -- squash-merge
@@ -7,14 +7,14 @@ description: >-
   branch. Also use when a "PR Title" / semantic-pull-request check
   is failing, when the user asks which commit type (feat, fix,
   chore, ...) a change is, or when opening any PR in a repo set up
-  by setup-conventional-commits. Composes type(scope)!: description
+  by enforce-conventional-commits. Composes type(scope)!: description
   titles and BREAKING CHANGE footers from the actual branch diff.
   Works for any contributor who can open a PR. Does NOT configure
   repo settings, rulesets, or workflows (see
-  setup-conventional-commits).
+  enforce-conventional-commits).
 ---
 
-# PR Conventional Commits (title authoring)
+# Write PR Title (conventional title authoring)
 
 Create or update a GitHub pull request so its TITLE is a valid
 Conventional Commits message. Built for squash-merge repos where
@@ -26,7 +26,7 @@ PR title only; never rewrite, squash, or lint the branch's own
 commits.
 
 Boundaries: this skill does NOT configure repo settings, rulesets,
-or workflows (companion skill: `setup-conventional-commits`), and
+or workflows (companion skill: `enforce-conventional-commits`), and
 it never attempts that scaffold itself, even when it detects the
 scaffold is missing.
 
@@ -104,7 +104,7 @@ report; never change the setting.
 Not scaffolded? Continue anyway -- a conventional title is
 valuable on its own -- but skip step 7 (check polling) and carry
 into the final report the gap plus a recommendation that a repo
-admin run `setup-conventional-commits`. Never scaffold from here:
+admin run `enforce-conventional-commits`. Never scaffold from here:
 that is repo administration, not title authoring.
 
 ### Step 3 - Classify the change
@@ -194,6 +194,6 @@ PR: {url}
 Type rationale: {one sentence: why this type / scope / breaking marker}
 Check: {pass | fail: reason | skipped: repo not scaffolded}
 {If not scaffolded: this repo does not enforce PR titles; a repo
-admin can run the companion skill setup-conventional-commits to
+admin can run the companion skill enforce-conventional-commits to
 add the check.}
 ```

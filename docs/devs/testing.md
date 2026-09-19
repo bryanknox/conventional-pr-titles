@@ -76,7 +76,7 @@ after a rename.
 ### check-workflow-template.sh
 
 Targeted invariant checks on
-`skills/setup-conventional-commits/assets/pr-title-workflow.yml` --
+`skills/enforce-conventional-commits/assets/pr-title-workflow.yml` --
 the one artifact that lands in other people's repositories and
 becomes their enforcement.
 
@@ -93,7 +93,7 @@ otherwise break silently:
 - **The `with: types:` list is exactly the de-facto ten.** The
   template pins the allowed types rather than inheriting the
   action's defaults; consumers edit their own copy, but what ships
-  has to match the list SKILL.md, `pr-conventional-commits`, and
+  has to match the list SKILL.md, `write-pr-title`, and
   the user guide all name.
 - **`permissions.pull-requests` is `read`.**
 
@@ -275,7 +275,7 @@ another score taken on the same model.
 Copy the folder into the test repository's `.claude/skills/`, as
 described in [test-repos.md](test-repos.md). Do **not** use
 `claude --plugin-dir` for evals: that namespaces the skill as
-`skills-thrill:<name>`, which changes the dispatch surface the
+`conventional-pr-titles:<name>`, which changes the dispatch surface the
 trigger evals are measuring. `--plugin-dir` is for working *in this
 repository*, not for testing.
 

@@ -7,8 +7,8 @@ the files do not say on their own; everything else is in
 ## What this repository is
 
 Two agent skills that enforce Conventional Commits through pull
-request titles: `setup-conventional-commits` configures a GitHub
-repository, `pr-conventional-commits` writes the title. Both live
+request titles: `enforce-conventional-commits` configures a GitHub
+repository, `write-pr-title` writes the title. Both live
 in `skills/`, which is the source of truth and the only thing that
 ships.
 
@@ -27,15 +27,15 @@ of it into a skill folder to make it "available".
 claude --plugin-dir .
 ```
 
-`skills/<name>/SKILL.md` is already the plugin layout, so both load
-as `skills-thrill:<name>` with no second copy. Do **not** mirror
-`skills/` into `.claude/skills/`; that path is gitignored precisely
-so nothing can drift.
+`skills/<name>/SKILL.md` is already the plugin layout, so both
+load as `conventional-pr-titles:<name>` with no second copy. Do
+**not** mirror `skills/` into `.claude/skills/`; that path is
+gitignored precisely so nothing can drift.
 
 `--plugin-dir` is for working *here*. It is wrong for evals,
-because the `skills-thrill:` namespace changes the dispatch surface
-the trigger evals measure -- those copy the folder into a test
-repository instead.
+because the `conventional-pr-titles:` namespace changes the
+dispatch surface the trigger evals measure -- those copy the
+folder into a test repository instead.
 
 ## Editing a SKILL.md
 
@@ -128,7 +128,7 @@ Bash locally. Do not add a PowerShell equivalent.
 
 This repository follows its own convention. The pull request title
 is a Conventional Commits message and becomes the commit on `main`
-at squash-merge time. `setup-conventional-commits` has been run
+at squash-merge time. `enforce-conventional-commits` has been run
 here: merge is squash-only with the PR title as the commit subject,
 and `.github/workflows/pr-title.yml` validates that title.
 

@@ -1,7 +1,7 @@
 # 0002 - Two skills, not one
 
-**Decision:** ship `setup-conventional-commits` and
-`pr-conventional-commits` as separate skills rather than one skill
+**Decision:** ship `enforce-conventional-commits` and
+`write-pr-title` as separate skills rather than one skill
 covering both.
 
 ## Why

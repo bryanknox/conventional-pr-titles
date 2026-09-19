@@ -13,17 +13,17 @@ it is one command, it names a version, and it updates.
 This repository is its own marketplace. Add it once:
 
 ```
-claude plugin marketplace add bryanknox/skills-thrill
-claude plugin install skills-thrill@skills-thrill
+claude plugin marketplace add bryanknox/conventional-pr-titles
+claude plugin install conventional-pr-titles@conventional-pr-titles
 ```
 
 The repeated name is not a typo: the marketplace and the plugin
 inside it share the repository's name. `claude plugin install
-skills-thrill` also works while no other marketplace offers a plugin
-by that name.
+conventional-pr-titles` also works while no other marketplace
+offers a plugin by that name.
 
 The same two steps are available inside a session as
-`/plugin marketplace add bryanknox/skills-thrill` and
+`/plugin marketplace add bryanknox/conventional-pr-titles` and
 `/plugin install`, which lists what the marketplace offers rather
 than making you type the name.
 
@@ -38,12 +38,12 @@ clones it is offered the same plugin.
 
 Installation resolves the marketplace by cloning it, so it works
 only for an account that can already read
-`bryanknox/skills-thrill`. If the clone fails with a not-found
+`bryanknox/conventional-pr-titles`. If the clone fails with a not-found
 error, that is what it means -- the repository is not missing, you
 are not on the list. Check with:
 
 ```
-gh repo view bryanknox/skills-thrill
+gh repo view bryanknox/conventional-pr-titles
 ```
 
 Copying the folders, below, needs the same access. There is no
@@ -52,7 +52,7 @@ install path that does not.
 ### Updating
 
 ```
-claude plugin update skills-thrill
+claude plugin update conventional-pr-titles
 ```
 
 Restart the session to pick it up. Updates arrive when the version
@@ -72,11 +72,11 @@ Copy the **whole** folder -- the skills read their own bundled files
 at runtime, so a lone `SKILL.md` will not work.
 
 ```
-skills/setup-conventional-commits/
+skills/enforce-conventional-commits/
   SKILL.md
   assets/pr-title-workflow.yml        <- committed into your repo
 
-skills/pr-conventional-commits/
+skills/write-pr-title/
   SKILL.md
   references/type-guide.md            <- read when a type is ambiguous
 ```
@@ -90,15 +90,15 @@ skills/pr-conventional-commits/
 
 If both exist with the same name, the personal copy wins.
 
-**Personal** is the right choice for `pr-conventional-commits`: you
+**Personal** is the right choice for `write-pr-title`: you
 open pull requests in many repositories and want it everywhere.
 
 **Project** is the right choice when you want everyone working in a
 repository to have the skill without installing anything -- commit
-`.claude/skills/pr-conventional-commits/` and it travels with the
+`.claude/skills/write-pr-title/` and it travels with the
 clone.
 
-`setup-conventional-commits` runs once per repository and only an
+`enforce-conventional-commits` runs once per repository and only an
 admin can use it, so personal scope is usually enough.
 
 ### Copy commands
@@ -110,8 +110,8 @@ PowerShell:
 ```powershell
 $dest = "$HOME\.claude\skills"
 New-Item -ItemType Directory -Force $dest | Out-Null
-Copy-Item -Recurse -Force skills\pr-conventional-commits $dest
-Copy-Item -Recurse -Force skills\setup-conventional-commits $dest
+Copy-Item -Recurse -Force skills\write-pr-title $dest
+Copy-Item -Recurse -Force skills\enforce-conventional-commits $dest
 ```
 
 Bash:
@@ -119,8 +119,8 @@ Bash:
 ```bash
 dest=~/.claude/skills
 mkdir -p "$dest"
-cp -r skills/pr-conventional-commits "$dest"
-cp -r skills/setup-conventional-commits "$dest"
+cp -r skills/write-pr-title "$dest"
+cp -r skills/enforce-conventional-commits "$dest"
 ```
 
 For project scope, use `<your-repo>/.claude/skills` as the
@@ -144,16 +144,16 @@ something in the skill's territory and see whether it engages:
 what type should this change be, feat or fix?
 ```
 
-should invoke `pr-conventional-commits`, and:
+should invoke `write-pr-title`, and:
 
 ```
 set this repo up for conventional commits with squash merges
 ```
 
-should invoke `setup-conventional-commits`.
+should invoke `enforce-conventional-commits`.
 
 If nothing happens after a plugin install, check `claude plugin list`
-shows `skills-thrill` enabled. If nothing happens after a copy,
+shows `conventional-pr-titles` enabled. If nothing happens after a copy,
 confirm the folder name matches the `name` in the `SKILL.md`
 frontmatter, and that `SKILL.md` sits directly inside the skill
 folder rather than in a subdirectory.
@@ -167,8 +167,8 @@ authenticated:
 gh auth status
 ```
 
-- `pr-conventional-commits` works with gh's default `repo` scope.
-- `setup-conventional-commits` also needs `workflow`, because it
+- `write-pr-title` works with gh's default `repo` scope.
+- `enforce-conventional-commits` also needs `workflow`, because it
   commits a workflow file. If it is missing, the skill stops before
   changing anything and tells you to run
   `gh auth refresh -h github.com -s repo,workflow`.

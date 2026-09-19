@@ -1,5 +1,5 @@
 ---
-name: setup-conventional-commits
+name: enforce-conventional-commits
 description: >-
   Use this skill when the user wants to set up, scaffold, or
   configure a GitHub repository to use Conventional Commits enforced
@@ -10,10 +10,10 @@ description: >-
   setting up a new .NET (or any) app repo that should keep a clean
   conventional history. Configures the repo via gh CLI. Requires
   ADMIN access to the target repo. Does NOT create the repo or app
-  code, and does NOT write PR titles (see pr-conventional-commits).
+  code, and does NOT write PR titles (see write-pr-title).
 ---
 
-# Setup Conventional Commits (squash-merge enforcement)
+# Enforce Conventional Commits (squash-merge enforcement)
 
 Configure an EXISTING GitHub repository so that the only path to
 the default branch is a squash-merged PR whose title is a valid
@@ -35,7 +35,7 @@ time is the only gate.
 
 Boundaries: this skill does NOT create the repo, does NOT scaffold
 application code, and does NOT compose PR titles (companion skill:
-`pr-conventional-commits`).
+`write-pr-title`).
 
 ## Who can run this
 
@@ -345,7 +345,7 @@ Gaps: {none | plan gap details | action version lag}
 Residual soft spot: the PR merge box lets the merger hand-edit the
 final squash message, and nothing validates that edit. Don't touch
 the prefilled message.
-Next: open PRs with the companion skill pr-conventional-commits.
+Next: open PRs with the companion skill write-pr-title.
 ```
 
 ## Target state per level

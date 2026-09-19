@@ -8,8 +8,8 @@ without putting any tooling in anyone's local clone.
 
 ```mermaid
 flowchart LR
-    A[setup-conventional-commits]
-    B[pr-conventional-commits]
+    A[enforce-conventional-commits]
+    B[write-pr-title]
     WT[(pr-title-workflow.yml)]
     TG[(type-guide.md)]
     GH[(gh CLI)]
@@ -20,10 +20,10 @@ flowchart LR
     B ==> GH
 ```
 
-`setup-conventional-commits` configures a repository. It runs once,
+`enforce-conventional-commits` configures a repository. It runs once,
 needs admin rights, and carries the workflow file it installs.
 
-`pr-conventional-commits` writes a pull request title. It runs on
+`write-pr-title` writes a pull request title. It runs on
 every pull request, needs only push access, and carries a type
 decision guide it reads when a change is ambiguous.
 

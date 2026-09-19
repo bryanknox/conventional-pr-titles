@@ -27,7 +27,7 @@ anyone else ever wants to install from here.
 
 ## Verified
 
-2026-09-07, while running `setup-conventional-commits` against
+2026-09-07, while running `enforce-conventional-commits` against
 this repository:
 
 ```
@@ -35,6 +35,10 @@ $ gh api repos/bryanknox/skills-thrill/rulesets
 Upgrade to GitHub Pro or make this repository public to enable
 this feature. (HTTP 403)
 ```
+
+The captured command names `skills-thrill`, which is what this
+repository was called before the 2026-09-19 rename. It is left as
+it was run.
 
 That 403 is the definitive detector, and it is what Skill A keys
 on. `GET /user` does not corroborate it: the `plan` field appears
@@ -57,7 +61,7 @@ unpublished. Assume anything that ships public has been read.
 
 **2. Flip visibility to public.**
 
-**3. Re-run `setup-conventional-commits` against this repository.**
+**3. Re-run `enforce-conventional-commits` against this repository.**
 The re-run is idempotent by design: Levels 1 and 3 come back as
 no-ops and it adds only the ruleset. Verify with the
 effective-rules endpoint, which returns only actively enforced

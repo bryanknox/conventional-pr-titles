@@ -95,8 +95,8 @@ see [testing.md](testing.md) for why the split is drawn there.
 claude plugin tag . --push
 ```
 
-That creates `skills-thrill--v{version}`, after checking that the
-manifests agree and the tree is clean.
+That creates `conventional-pr-titles--v{version}`, after checking
+that the manifests agree and the tree is clean.
 
 ## Versioning the skills
 
