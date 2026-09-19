@@ -6,10 +6,6 @@ for enforcing Conventional Commits through pull request titles.
 If you want to *use* the skills, you want
 [the user documentation](../users/README.md) instead.
 
-Contributors should also read [the user documentation](../users/README.md)
-to learn the what the agent skills under development do and how they are
-intended to be used.
-
 ## Repository map
 
 | Path | What it holds |
@@ -29,6 +25,9 @@ deliberate and is enforced by review -- see
 
 ## Start here
 
+- [The user documentation](../users/README.md) -- because you need to
+  know what the skills do and how they are used before you can develop
+  changes for them.
 - [architecture.md](architecture.md) -- what the two skills are,
   why there are two, and where the line between them sits.
 - [authoring.md](authoring.md) -- the conventions a `SKILL.md` in
