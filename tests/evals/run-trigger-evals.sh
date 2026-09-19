@@ -11,6 +11,13 @@
 #   <outdir>  where transcripts, cases.tsv and results.json land
 #
 # This costs real model calls and is deliberately not in CI.
+#
+# Containment uses --tools, not only --allowedTools. --allowedTools
+# is a permission allowlist; it does NOT remove other tools from the
+# session. Measured 2026-09-19: under --allowedTools alone, sessions
+# ran Bash freely, spent the whole turn cap reading the repository,
+# and never reached a Skill call. That scores as a dispatch failure
+# and is not one. --tools restricts what exists.
 
 set -u
 
@@ -90,6 +97,7 @@ while IFS="$(printf '\t')" read -r skill_dir cid expected prompt; do
     claude -p "$prompt" \
       --output-format stream-json --verbose \
       --max-turns 4 \
+      --tools "Skill,Read,Glob,Grep" \
       --allowedTools "Skill,Read,Glob,Grep" \
       < /dev/null > "$out" 2>"$OUTDIR/${cid}.err"
   )

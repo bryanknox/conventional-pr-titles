@@ -232,7 +232,7 @@ procedure survives the script too.
 Each prompt is a fresh headless session:
 
 ```
-claude -p "<prompt>" --output-format stream-json --verbose --max-turns 4 --allowedTools "Skill,Read,Glob,Grep"
+claude -p "<prompt>" --output-format stream-json --verbose --max-turns 4 --tools "Skill,Read,Glob,Grep" --allowedTools "Skill,Read,Glob,Grep"
 ```
 
 **cwd.** A throwaway local git repository -- a README and one
@@ -242,11 +242,25 @@ belongs to the sibling has to be able to dispatch to it, because
 that is a pass, and it cannot be observed if the sibling is not
 installed.
 
-**Containment.** Allowlist `Skill` plus read-only tools and cap
-the turns. Sessions can then dispatch but not mutate anything;
-Bash and PowerShell attempts are auto-denied. Some sessions end
+**Containment.** Restrict the session to `Skill` plus read-only
+tools and cap the turns. Some sessions still end
 `error_max_turns`, which is the cap working as intended -- the
 dispatch decision was already made and recorded by then.
+
+`--tools` is the load-bearing flag here, and `--allowedTools` on
+its own is not enough. The original record described containment
+as "Bash/PowerShell attempts were auto-denied". That is no longer
+true. Measured 2026-09-19 on `claude-opus-5[1m]`: under
+`--allowedTools` alone, sessions ran Bash successfully, spent all
+four turns reading the repository -- in one case `find`-ing and
+`head`-ing the installed `SKILL.md` instead of invoking it -- and
+never reached a Skill call. Three Skill B prompts scored as
+dispatch failures on that basis. Re-run with `--tools`, all three
+dispatched the skill as their **first** tool call.
+
+Watch for this failure mode, because it looks exactly like a skill
+that stopped triggering. If a skill that used to pass suddenly
+drops, re-check containment before touching a description.
 
 **Scoring.** A case counts as a trigger of skill X if and only if
 a `Skill(X)` tool_use appears in the transcript. One run per
