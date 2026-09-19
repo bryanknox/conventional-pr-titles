@@ -13,7 +13,7 @@ before opening a pull request. See [testing.md](testing.md).
 
 ```yaml
 ---
-name: pr-conventional-commits
+name: write-pr-title
 description: >-
   Use this skill when ...
 ---
@@ -34,6 +34,44 @@ to give this up.
 **`name` must equal the directory name.** Harnesses differ on which
 one wins when they disagree; keeping them identical means the
 question never comes up.
+
+## Naming a skill
+
+The `name` is part of the dispatch surface, not a label. A harness
+matches a request against the name and the description together,
+and these skills are installed standalone -- copied as folders into
+`.claude/skills/` -- so the plugin namespace is not there to
+disambiguate them. Each name has to stand on its own.
+
+Mechanically: hyphen-case, at most 64 characters, equal to the
+directory name. `tests/lint-skills.sh` enforces all three.
+
+Past that, what matters is how a name divides the two skills. Score
+each token by how often it appears in one skill's should-trigger
+prompts versus the other's:
+
+| Token | Skill A | Skill B | Separation |
+|---|---|---|---|
+| `main` | 6 | 0 | +6 |
+| `commit` | 6 | 3 | +3 |
+| `conventional` | 5 | 3 | +2 |
+| `repo` | 3 | 1 | +2 |
+| `check` | 2 | 3 | -1 |
+| `title` | 4 | 6 | -2 |
+| `pr` | 4 | 8 | -4 |
+
+A name built out of `pr` and `title` is therefore close to the
+worst available choice for Skill A and close to the best for Skill
+B. That is why the pair is `enforce-conventional-commits` and
+`write-pr-title`, and why they share no token at all: A is named
+for what it achieves, B for what it produces.
+
+Two cautions about that table. **It is a pre-screen, not a
+prediction.** The previous pair scored +2 and 0 and still
+dispatched 16/16, because the description carries most of the load.
+And it is computed from the prompts in `tests/evals/`, so it
+measures the prompt set as much as it measures the name. Use it to
+decide what a trigger-eval run should compare -- never to skip one.
 
 ## The description is the dispatch surface
 
@@ -76,7 +114,7 @@ skills, 27 are table rows or fenced commands.
 
 The lint checks prose only, for exactly this reason. It found one
 real violation when it was first run -- an 88-column line in
-`setup-conventional-commits` -- which is now fixed.
+`enforce-conventional-commits` -- which is now fixed.
 
 ## Self-containment
 
@@ -125,8 +163,8 @@ skill body is context cost paid on each invocation.
 
 | | Lines | Bytes | Description |
 |---|---|---|---|
-| `setup-conventional-commits/SKILL.md` | 346 | 14,952 | 641 chars |
-| `pr-conventional-commits/SKILL.md` | 199 | 8,374 | 645 chars |
+| `enforce-conventional-commits/SKILL.md` | 370 | 16,285 | 632 chars |
+| `write-pr-title/SKILL.md` | 199 | 8,379 | 649 chars |
 | `references/type-guide.md` | 65 | 2,454 | n/a, loaded on demand |
 
 Skill A is larger because it carries API request shapes that have to

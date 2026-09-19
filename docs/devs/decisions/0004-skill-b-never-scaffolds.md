@@ -1,10 +1,10 @@
 # 0004 - Skill B never configures a repository
 
-**Decision:** `pr-conventional-commits` detects whether a repository
+**Decision:** `write-pr-title` detects whether a repository
 has the conventional-commits setup, and changes its own behavior
 accordingly -- but never performs the setup, and never invokes
 Skill A to do it. It reports the gap and recommends that an admin
-run `setup-conventional-commits`.
+run `enforce-conventional-commits`.
 
 This is the decision most likely to be eroded by a well-meaning
 change, because auto-fixing looks helpful.

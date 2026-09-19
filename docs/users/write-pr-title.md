@@ -1,4 +1,4 @@
-# pr-conventional-commits
+# write-pr-title
 
 Creates or updates a GitHub pull request so its **title** is a valid
 Conventional Commits message, composed from what the branch actually
@@ -58,7 +58,7 @@ for that check specifically and reports the result.
   Those stay exactly as you wrote them, by design.
 - It does not configure the repository. If it notices the PR-title
   check is missing it says so and suggests an admin run
-  [setup-conventional-commits](setup-conventional-commits.md), but it
+  [enforce-conventional-commits](enforce-conventional-commits.md), but it
   will not do that itself.
 - It waits only for the PR-title check, not your build or tests.
 
@@ -88,7 +88,7 @@ your PR title only when the PR has **more than one commit**. A
 single-commit PR squashes using that commit's own message instead --
 so a carefully composed title can be quietly discarded.
 
-[setup-conventional-commits](setup-conventional-commits.md) sets this
+[enforce-conventional-commits](enforce-conventional-commits.md) sets this
 to `PR_TITLE`, which always uses the title. This skill reads the
 setting and tells you which behavior is in effect, but never changes
 it -- that is repository configuration, not title authoring.

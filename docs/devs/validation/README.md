@@ -26,6 +26,15 @@ Where a record mentions a path, translate:
 | `dev/validation/` | `docs/devs/validation/` (here) |
 | `dev-info/conventional-commits-skills-plan.md` | Removed. Harvested into `architecture.md` and `decisions/`. |
 
+The skills and the repository were renamed on 2026-09-19. The
+records name them as they were called at the time; translate:
+
+| Written as | Now |
+|---|---|
+| `setup-conventional-commits` | `enforce-conventional-commits` |
+| `pr-conventional-commits` | `write-pr-title` |
+| `skills-thrill` | `conventional-pr-titles` |
+
 ## The records
 
 | File | What it covers |
@@ -34,7 +43,8 @@ Where a record mentions a path, translate:
 | [pr-conventional-commits-step8.md](pr-conventional-commits-step8.md) | Skill B validation: P1-P4, baseline comparison, six fixes from run friction |
 | [todo8-degraded-idempotency.md](todo8-degraded-idempotency.md) | S2 private-plan degrade, S3 idempotent no-op, S4 reconcile, P5 unscaffolded |
 | [s5-non-admin.md](s5-non-admin.md) | Non-admin invoker fails before mutating; one known untested branch |
-| [trigger-evals.md](trigger-evals.md) | The dispatch ship gate: 16/16 correct on frozen descriptions |
+| [trigger-evals.md](trigger-evals.md) | The dispatch ship gate: 16/16 correct on frozen descriptions. **Superseded** by the record below for the current names |
+| [rename-trigger-gate.md](rename-trigger-gate.md) | The 2026-09-19 rename gate: 15/16, plus a harness defect that was under-measuring dispatch |
 
 [traces/](traces/) holds the session transcripts behind those five
 records. They are kept so that a disputed verdict can be checked

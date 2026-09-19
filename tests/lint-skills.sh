@@ -212,7 +212,7 @@ check_self_contained() {
     # Only paths that claim to be part of THIS skill's bundle are
     # checked for existence. A skill legitimately mentions paths in the
     # consumer's repository (`.github/workflows/pr-title.yml` is written
-    # BY setup-conventional-commits, not shipped with it), so existence
+    # BY enforce-conventional-commits, not shipped with it), so existence
     # is asserted only for the bundle subdirectories.
     refs=$(grep -oE '\]\([^)]+\)|`(assets|references|scripts)/[a-zA-Z0-9_./-]+`' "$f" \
            | sed -E 's/^\]\(//; s/\)$//; s/^`//; s/`$//' || true)

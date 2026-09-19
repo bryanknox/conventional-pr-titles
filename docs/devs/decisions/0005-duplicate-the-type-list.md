@@ -37,7 +37,7 @@ list. If two skills need the same paragraph, both get the paragraph.
 ## Where the deeper material lives
 
 The full decision guide -- tie-breakers, ambiguous cases -- is
-`references/type-guide.md` inside `pr-conventional-commits`, which
+`references/type-guide.md` inside `write-pr-title`, which
 is the only skill that needs it, and it is read on demand rather
 than carried in the body.
 
@@ -48,8 +48,9 @@ Three copies exist on purpose, with different owners and audiences:
 the skill body has the short list, the skill reference has the
 decision rules, and the user guide has the explanation.
 
-A fourth copy is not documentation at all. `assets/pr-title-workflow.yml`
-pins the same ten in a `with: types:` block, so the enforcing copy
+A fourth copy is not documentation at all.
+`assets/pr-title-workflow.yml` pins the same ten in a
+`with: types:` block, so the enforcing copy
 sits in the consumer's repository where they can edit it -- the list
 they are allowed to change has to be a list they can see. That one is
 guarded: `tests/check-workflow-template.sh` fails if the shipped

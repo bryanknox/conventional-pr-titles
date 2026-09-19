@@ -1,4 +1,4 @@
-# setup-conventional-commits
+# enforce-conventional-commits
 
 Configures an existing GitHub repository so the only route to the
 default branch is a squash-merged pull request whose title is a valid
@@ -58,7 +58,7 @@ deliberately left alone.
 
 - It does not create the repository or write any application code.
 - It does not write pull request titles. That is
-  [pr-conventional-commits](pr-conventional-commits.md).
+  [write-pr-title](write-pr-title.md).
 - It does not touch a pre-existing ruleset it did not create. The
   default is to leave it alone and add its own alongside. Deleting or
   modifying yours requires you to say so explicitly.
@@ -110,6 +110,6 @@ silently changing how your titles are linted.
 ## After it runs
 
 Open pull requests with
-[pr-conventional-commits](pr-conventional-commits.md). Everyone
+[write-pr-title](write-pr-title.md). Everyone
 contributing to the repository can use that one; they do not need
 admin access, and they do not need this skill.

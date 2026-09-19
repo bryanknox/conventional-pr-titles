@@ -1,12 +1,12 @@
 {
-  "skill_name": "pr-conventional-commits",
+  "skill_name": "write-pr-title",
   "methodology": "Content evals: run each prompt twice, with_skill and without_skill, in the setup described; if outputs are indistinguishable the skill is not adding value. Trigger evals: present each prompt to a fresh session with the skill installed (repo-scoped) and record whether the skill is invoked. Tune wording against train only; validation is the ship gate.",
   "evals": [
     {
       "id": 1,
       "name": "B-CE1 bug-fix branch, scaffolded repo",
       "prompt": "Open a PR for this.",
-      "setup": "Scenario P1 (docs/devs/test-repos.md): scaffolded test repo k0x-test-cc-pr (setup-conventional-commits already run); current branch contains a single bug fix ahead of the default branch; no existing PR; gh authenticated as a user who can push.",
+      "setup": "Scenario P1 (docs/devs/test-repos.md): scaffolded test repo k0x-test-cc-pr (enforce-conventional-commits already run); current branch contains a single bug fix ahead of the default branch; no existing PR; gh authenticated as a user who can push.",
       "expected_output": "A PR whose title is 'fix: <imperative summary>' composed from the actual diff, created via gh, title read back, PR-title check polled to green, and a short report with the type rationale.",
       "expectations": [
         "Facts come from git/gh reads (branch, commits, and the diff itself is read), not from conversation memory",
@@ -21,7 +21,7 @@
         "Type chosen from the branch's commit messages instead of the diff",
         "No verification that the PR-title check passed"
       ],
-      "baseline_failure_modes_measured": "MEASURED FALSE IN PART, 2026-07-28 (docs/devs/validation/pr-conventional-commits-step8.md): in a SCAFFOLDED repo the first mode did not occur -- the baseline read the convention off the pr-title workflow file and produced a comparable title. These modes remain plausible for unscaffolded repos and weaker agents, but should not be expected in scaffolded ones. The skill's measured value in this scenario was process discipline (reads before claims, no unrequested test runs, waiting on the right check), not title quality."
+      "baseline_failure_modes_measured": "MEASURED FALSE IN PART, 2026-07-28 (docs/devs/validation/write-pr-title-step8.md): in a SCAFFOLDED repo the first mode did not occur -- the baseline read the convention off the pr-title workflow file and produced a comparable title. These modes remain plausible for unscaffolded repos and weaker agents, but should not be expected in scaffolded ones. The skill's measured value in this scenario was process discipline (reads before claims, no unrequested test runs, waiting on the right check), not title quality."
     },
     {
       "id": 2,
@@ -44,12 +44,12 @@
       "id": 3,
       "name": "B-CE3 unscaffolded repo, degrade and recommend",
       "prompt": "Open a PR for this.",
-      "setup": "Scenario P5 (docs/devs/test-repos.md): fresh clone of the k0x-workbench base pushed as a new test repo with setup-conventional-commits NEVER run (no pr-title workflow, default merge settings); current branch has a small change ahead of the default branch.",
-      "expected_output": "A conventional title is still composed and applied; check polling is skipped; the report states the repo does not enforce PR titles and recommends a repo admin run setup-conventional-commits; no scaffold is attempted.",
+      "setup": "Scenario P5 (docs/devs/test-repos.md): fresh clone of the k0x-workbench base pushed as a new test repo with enforce-conventional-commits NEVER run (no pr-title workflow, default merge settings); current branch has a small change ahead of the default branch.",
+      "expected_output": "A conventional title is still composed and applied; check polling is skipped; the report states the repo does not enforce PR titles and recommends a repo admin run enforce-conventional-commits; no scaffold is attempted.",
       "expectations": [
         "A valid conventional title is composed from the diff and applied even though the repo is not scaffolded",
         "Check polling is skipped (no waiting on a check that does not exist)",
-        "The report explicitly states the repo lacks PR-title enforcement and recommends that a repo admin run setup-conventional-commits",
+        "The report explicitly states the repo lacks PR-title enforcement and recommends that a repo admin run enforce-conventional-commits",
         "The skill does NOT create or modify any workflow, repo setting, or ruleset"
       ],
       "baseline_failure_modes": [
@@ -73,12 +73,12 @@
       { "id": "B-T6", "prompt": "retitle PR 42 to conventional format", "expected": "trigger" },
       { "id": "B-T8", "prompt": "draft a conventional title for this diff", "expected": "trigger" },
       { "id": "B-T9", "prompt": "open a PR for this branch -- this repo squashes with the PR title as the commit message", "expected": "trigger" },
-      { "id": "B-N1", "prompt": "set up conventional commits in this repo", "expected": "no-trigger", "note": "belongs to setup-conventional-commits" },
+      { "id": "B-N1", "prompt": "set up conventional commits in this repo", "expected": "no-trigger", "note": "belongs to enforce-conventional-commits" },
       { "id": "B-N3", "prompt": "review PR 42", "expected": "no-trigger" },
       { "id": "B-N4", "prompt": "merge PR 42", "expected": "no-trigger" },
       { "id": "B-N6", "prompt": "rename my branch", "expected": "no-trigger" },
-      { "id": "B-N8", "prompt": "configure squash merging for this repo", "expected": "no-trigger", "note": "belongs to setup-conventional-commits" },
-      { "id": "B-N9", "prompt": "protect main so only PRs can merge", "expected": "no-trigger", "note": "belongs to setup-conventional-commits" }
+      { "id": "B-N8", "prompt": "configure squash merging for this repo", "expected": "no-trigger", "note": "belongs to enforce-conventional-commits" },
+      { "id": "B-N9", "prompt": "protect main so only PRs can merge", "expected": "no-trigger", "note": "belongs to enforce-conventional-commits" }
     ],
     "validation": [
       { "id": "B-T3", "prompt": "what type should this change be, feat or fix?", "expected": "trigger" },

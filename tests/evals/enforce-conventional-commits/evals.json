@@ -1,5 +1,5 @@
 {
-  "skill_name": "setup-conventional-commits",
+  "skill_name": "enforce-conventional-commits",
   "methodology": "Content evals: run each prompt twice, with_skill and without_skill, in the setup described; if outputs are indistinguishable the skill is not adding value. Trigger evals: present each prompt to a fresh session with the skill installed (repo-scoped) and record whether the skill is invoked. Tune wording against train only; validation is the ship gate.",
   "evals": [
     {
@@ -63,14 +63,14 @@
       { "id": "A-N4", "prompt": "add a CI build workflow for .NET", "expected": "no-trigger" },
       { "id": "A-N6", "prompt": "review this PR", "expected": "no-trigger" },
       { "id": "A-N8", "prompt": "squash my local commits", "expected": "no-trigger" },
-      { "id": "A-N9", "prompt": "open a PR with a conventional commit title", "expected": "no-trigger", "note": "belongs to pr-conventional-commits" }
+      { "id": "A-N9", "prompt": "open a PR with a conventional commit title", "expected": "no-trigger", "note": "belongs to write-pr-title" }
     ],
     "validation": [
       { "id": "A-T3", "prompt": "protect main so the PR title becomes the commit message", "expected": "trigger" },
       { "id": "A-T5", "prompt": "configure this new .NET repo for conventional commits", "expected": "trigger" },
       { "id": "A-T7", "prompt": "add a PR title check", "expected": "trigger" },
       { "id": "A-T10", "prompt": "require pull requests and a conventional title check before anything lands on main", "expected": "trigger" },
-      { "id": "A-N2", "prompt": "fix the failing PR title check on my PR", "expected": "no-trigger", "note": "belongs to pr-conventional-commits" },
+      { "id": "A-N2", "prompt": "fix the failing PR title check on my PR", "expected": "no-trigger", "note": "belongs to write-pr-title" },
       { "id": "A-N5", "prompt": "rebase my branch onto main", "expected": "no-trigger" },
       { "id": "A-N7", "prompt": "what does the ruleset on main do?", "expected": "no-trigger", "note": "read-only question, not setup" },
       { "id": "A-N10", "prompt": "what are conventional commits and why would I use them?", "expected": "no-trigger", "note": "informational; no repo mutation asked for" }

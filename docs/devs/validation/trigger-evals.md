@@ -1,5 +1,13 @@
 # Trigger-eval validation gate record (plan todo #9)
 
+> **Superseded 2026-09-19.** This record covers the names
+> `setup-conventional-commits` and `pr-conventional-commits` on
+> `claude-fable-5`. Both skills were renamed, and the current gate
+> is [rename-trigger-gate.md](rename-trigger-gate.md). This record
+> stands as evidence of what was true when it was taken; its
+> procedure section also no longer describes working containment,
+> for which see [testing.md](../testing.md).
+
 Status: COMPLETE (2026-07-29). GATE PASS for both skills on the
 frozen (post-todo-#8) names/descriptions -- 16/16 validation-split
 prompts dispatched correctly. No name/description adjustment
