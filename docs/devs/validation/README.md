@@ -35,39 +35,10 @@ Where a record mentions a path, translate:
 | [todo8-degraded-idempotency.md](todo8-degraded-idempotency.md) | S2 private-plan degrade, S3 idempotent no-op, S4 reconcile, P5 unscaffolded |
 | [s5-non-admin.md](s5-non-admin.md) | Non-admin invoker fails before mutating; one known untested branch |
 | [trigger-evals.md](trigger-evals.md) | The dispatch ship gate: 16/16 correct on frozen descriptions |
-| [traces/](traces/) | Raw session transcripts behind the records above |
 
-## Findings worth remembering
-
-Three results here changed the skills rather than just confirming
-them:
-
-**Free-plan private repositories refuse ruleset creation outright.**
-Every ruleset endpoint returns 403, including the create. The
-earlier reading of the documentation had assumed the ruleset would
-be created but left unenforced. The skill's degrade path is built
-around the confirmed behavior, not the assumed one.
-
-**`GET /user` omits the plan without the `user` scope**, which gh's
-default auth does not request. An empty result means unknown, not
-free -- so the preflight 403 is the definitive detector and the plan
-read is only corroboration.
-
-**Skill B's value in a configured repository is process, not
-titles.** The baseline produced comparable titles because it could
-read the convention off the workflow file.
-
-## Known gap
-
-The missing-`workflow`-scope fail-fast branch is untested.
-Exercising it needs a purpose-made token with `repo` but not
-`workflow`, and `gh auth refresh` can only add scopes, never remove
-them. Recorded in [s5-non-admin.md](s5-non-admin.md) rather than
-worked around.
-
-## A note on encoding
-
-Two files under `traces/` contain non-ASCII bytes. The structural
-lint covers `skills/` only, so this does not fail CI, and it is
-deliberate: normalizing the bytes of a captured transcript makes it
-a less faithful record.
+[traces/](traces/) holds the session transcripts behind those five
+records. They are kept so that a disputed verdict can be checked
+rather than taken on trust: each campaign trace carries a
+dev-session verification block of independent read-backs, separate
+from what the runner reported about its own work. Nothing outside
+this directory depends on them.

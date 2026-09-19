@@ -18,26 +18,17 @@ split was consulted during earlier tuning, and no tuning turned
 out to be needed).
 
 Each of the 16 `validation`-split prompts (8 per skill, from
-`dev/evals/<skill>/evals.json`) ran as a FRESH headless session:
+`dev/evals/<skill>/evals.json`) ran as a FRESH headless session,
+on Claude Code CLI 2.1.220, model `claude-fable-5` (confirmed in
+every session's init message).
 
-- Harness: `claude -p "<prompt>" --output-format stream-json
-  --verbose --max-turns 4 --allowedTools "Skill,Read,Glob,Grep"`,
-  Claude Code CLI 2.1.220, model `claude-fable-5` (confirmed in
-  every session's init message).
-- cwd: a throwaway local git repo (README + one commit, no
-  remote) with BOTH skills installed repo-scoped at
-  `.claude/skills/` -- both installed so that near-miss prompts
-  belonging to the sibling can dispatch to it (correct dispatch,
-  per the eval notes).
-- Containment: only Skill and read-only tools were allowlisted
-  and turns were capped, so sessions could dispatch but not
-  mutate anything (Bash/PowerShell attempts were auto-denied;
-  several sessions ended `error_max_turns`, which is the cap
-  working as intended -- the dispatch decision is recorded
-  either way).
-- Scoring: a case counts as a trigger of skill X iff a
-  `Skill(X)` tool_use appears in the transcript. One run per
-  prompt; rates are over the 4 prompts per bucket.
+> **Editorial note, 2026-09-18.** The mechanics that were here --
+> harness invocation, cwd recipe, containment, and the scoring
+> predicate -- were the only surviving description of how to run
+> a trigger eval, and they were filed where the reader is told
+> not to look for instructions. They now live in
+> [testing.md](../testing.md) under "Tier 2: trigger evals". No
+> result, verdict, or claim in this record was changed.
 
 Runner/scorer scripts and raw stream-json transcripts lived in
 the session scratchpad (`trigger-eval/{runner,score}.ps1`,
