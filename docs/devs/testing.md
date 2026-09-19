@@ -214,11 +214,20 @@ of its instructions.
 
 ### How to run it
 
-The runner and scorer scripts were not kept, so this is a
-procedure rather than a command to re-invoke. It is what produced
-the gate record in
-[validation/trigger-evals.md](validation/trigger-evals.md), lifted
-out of that record so it can be run again.
+```
+bash tests/evals/run-trigger-evals.sh train <outdir>
+bash tests/evals/run-trigger-evals.sh validation <outdir>
+```
+
+It builds the fixture, runs every prompt in the split, scores
+dispatch, and writes `results.json` next to the transcripts.
+Budget roughly two minutes per prompt -- 24 for `train`, 16 for
+`validation`.
+
+The 2026-07-29 campaign discarded its runner and left only prose,
+which cost the next person the entire procedure. The script exists
+so that does not happen twice; what it does is below, so the
+procedure survives the script too.
 
 Each prompt is a fresh headless session:
 
