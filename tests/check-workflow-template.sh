@@ -172,5 +172,25 @@ else
     err "permissions.pull-requests must be 'read' (found: '$PERM_PR')"
 fi
 
+# The same literals must appear in the behavior spec. The spec is the
+# contract these constants implement, and A-R4 is coupled to A-R5 by
+# one string: the ruleset requires the status check BY NAME, so a job
+# renamed in only one place leaves both objects present, apparently
+# healthy, and enforcing nothing. Asserting the strings in both files
+# keeps that couple from drifting half-way.
+SPEC="docs/devs/behavior-spec.md"
+if [ ! -f "$SPEC" ]; then
+    err "missing $SPEC (the contract this template implements)"
+else
+    for literal in "$REQUIRED_JOB_NAME" "$REQUIRED_ACTION" "$REQUIRED_TYPES" "conventional-commits-main"; do
+        if grep -qF "$literal" "$SPEC"; then
+            ok "spec states: $literal"
+        else
+            err "$SPEC must state: $literal"
+            err "  template and contract have drifted apart"
+        fi
+    done
+fi
+
 printf '\n%d failed\n' "$errors"
 [ "$errors" -eq 0 ] || exit 1

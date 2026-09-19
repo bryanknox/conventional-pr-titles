@@ -1,0 +1,86 @@
+# Findings register
+
+**What this is for:** everything a real run found, what it changed, and
+whether it is settled.
+**Read it** before re-investigating something that looks broken -- it
+may already be a known, fixed, or deliberately-unfixed finding.
+**Write to it** at the end of every tier-2 campaign, appending to the
+existing numbering.
+
+Findings are numbered per skill and the numbering continues across
+campaigns. The records use bare `F1`, `F2`, ...; this register prefixes
+them `A-F*` and `B-F*` because both skills have an `F1`. The
+`Requirement` column names what in
+[behavior-spec.md](behavior-spec.md) the finding bears on, where it
+bears on one.
+
+Types: **defect** (the skill was wrong), **friction** (it worked but
+the runner had to guess), **ceremony** (it did something correct and
+unnecessary), **gap** (behavior was unstated), **thrift** (cost or
+robustness).
+
+## enforce-conventional-commits
+
+| Id | Type | Date | Requirement | What it found | What changed | Status |
+|---|---|---|---|---|---|---|
+| A-F1 | defect | 2026-07-28 | A-R11 | Plan detection could never work as written. `gh api user` with gh's default scopes returns no `plan` key at all -- GitHub includes it only with the `user` scope -- so `--jq .plan.name` yields empty on a normal install and the free-plan gap could never be detected proactively. | Preflight reads empty as UNKNOWN, not `free`; the plan read became best-effort; the Level 2 read-back named as the definitive detector; eval A-CE2 expectation 1 updated. | FIXED |
+| A-F2 | friction | 2026-07-28 | -- | Step 3's checklist location was ambiguous ("session's working area"); the runner had to decide not to drop it in the repo. | Body now says a scratch area OUTSIDE the repo working tree. | FIXED |
+| A-F3 | friction | 2026-07-28 | -- | `gh api` exits nonzero on EXPECTED preflight outcomes (404 for an absent workflow, an empty `--jq` plan read), breaking `&&` chains and `set -e`. | Body now says to run preflight reads as independent commands. | FIXED |
+| A-F4 | friction | 2026-07-28 | -- | The Step 7 `<<'JSON'` heredoc is POSIX-only; on the Windows host it required the Bash tool. | Body names the POSIX-shell requirement and the `--input <temp file>` alternative. | FIXED |
+| A-F5 | defect | 2026-07-28 | A-R11 | **Overturned the documented prediction.** Free-plan private personal repos block ruleset creation outright: list, create, AND effective-rules all return HTTP 403 "Upgrade to GitHub Pro or make this repository public". There is no create-then-unenforced state, which is what the plan had guessed from the docs. | Step 1 documents the 403 as the definitive plan-gate detector; Step 4's checkpoint bullet changed from "created but inactive" to "blocked: cannot be created"; Step 7 skips the POST when the gate is confirmed; Step 8 gained a third Level-2 state; eval A-CE2 expectations 3-4 rewritten (the old ones were unachievable); `test-repos.md` S2 and the checkpoint list corrected. | FIXED |
+| A-F6 | defect | 2026-07-28 | A-R9, A-R10 | Step 2 compared server-populated ruleset defaults as if they were conflicts. | Compare only skill-specified fields; a level can be `conflict` AND `apply` at once. | FIXED |
+| A-F7 | defect | 2026-07-28 | A-R3 | Target state for Level 1 omitted `squash_merge_commit_message=BLANK`; it appeared only in Step 5. | Added to the Level 1 target state. | FIXED |
+| A-F8 | friction | 2026-07-28 | A-R9 | The no-op path did not say what to report. | The no-op diff doubles as the final report; optional read-only action-version check noted. | FIXED |
+| A-F9 | defect | 2026-07-28 | -- | Live collision: a stale checklist from a concurrent S2 run was picked up by the S4 run. | Checklist filename is now repo-scoped, `cc-setup-checklist-{repo}.md`. | FIXED |
+| A-F10 | gap | 2026-07-28 | A-R10 | Behavior against a pre-existing stray ruleset was unstated. | Explicit COEXIST default: union semantics, the old bypass applies only to its own rules, delete or modify requires explicit approval. | FIXED |
+| A-F11 | friction | 2026-07-29 | A-R1, A-R2 | Step 1 did not say when to evaluate each fail-fast condition; the runner had to guess (it guessed correctly). | Evaluate each condition as soon as it becomes knowable -- scopes from `gh auth status`, admin from the repo read -- and stop at the first hit. | FIXED |
+| A-F12 | gap | 2026-07-29 | A-R1 | The fail-fast path had no prescribed report content; only the success and partial paths had a Step 8 template. | Prescribed: state that setup aborted at preflight with NOTHING changed, name the failed condition and who can run the skill, give the remedy. | FIXED |
+| A-F13 | gap | 2026-07-29 | A-R1 | "Name them if known" was too vague to act on. | Made concrete: personal-account repo -> the owner from the repo slug or `owner.login`; org-owned repo -> "an admin of {org}/{repo}", since a non-admin token cannot list admins. | FIXED |
+
+Observed, no action: the ruleset POST response carries server-populated
+fields beyond the request (`pull_request.allowed_merge_methods`,
+`do_not_enforce_on_create`), which is harmless because verification uses
+the effective-rules endpoint rather than a JSON diff.
+
+## write-pr-title
+
+| Id | Type | Date | Requirement | What it found | What changed | Status |
+|---|---|---|---|---|---|---|
+| B-F1 | defect | 2026-07-28 | B-R12 | Found by lint before any run. Step 4 branches on the repo's squash MESSAGE setting and eval B-CE2 asserts on it, but Step 2 fetched only `squash_merge_commit_title` -- the skill never read `squash_merge_commit_message`. | Field added to the Step 2 read. Fixed before the real runs, so P1-P4 exercised the corrected body. | FIXED |
+| B-F2 | friction | 2026-07-28 | B-R9 | Step 7 was silent about unrelated checks. Every runner inferred title-check-only scope but flagged the ambiguity, and P3 used `gh pr checks --watch`, which waits on ALL checks -- it only worked because the title check finished first. | The title check is the only gate; ignore other checks; avoid `--watch` and re-poll the plain command. | FIXED |
+| B-F3 | friction | 2026-07-28 | -- | The Step 8 report template had no PR URL slot; runners appended one ad hoc. | `PR: {url}` line added. | FIXED |
+| B-F4 | ceremony | 2026-07-28 | B-R7 | The Step 5 checkpoint fired even though the user had explicitly asked to retitle that exact PR -- the request already was the approval. | Explicit retitle-this-PR requests skip the checkpoint; the report shows old -> new instead. | FIXED |
+| B-F5 | gap | 2026-07-28 | B-R4 | Edit-path body handling was unstated (the runner had to decide to replace the placeholder body "wip"), and footer-vs-trailer ordering was unspecified (the P2 runner reasoned it out correctly). | Step 4 now says to refresh the body on edits, keep meaningful content, and keep the `BREAKING CHANGE:` footer as the LAST paragraph with trailers above it. | FIXED |
+| B-F6 | thrift | 2026-07-28 | B-R6 | Scaffold detection returned the whole base64 file payload, and assumed the exact filename `pr-title.yml`. | `--jq .name` added; on 404, fall back to listing `.github/workflows` for any PR-title-linting workflow. | FIXED |
+| B-F7 | gap | 2026-07-28 | B-R12 | `COMMIT_OR_PR_TITLE` was unexplained: the PR title is used only for multi-commit PRs, while single-commit PRs squash with the commit's own message. | Step 2 explains it. Report it, never change it. | FIXED |
+| B-F8 | defect | 2026-07-28 | -- | The `gh pr create` snippet did not name a base branch. | `--base {default_branch}` added. | FIXED |
+
+Not fixed, cosmetic, recorded only: the Step 8 template has no head or
+base fields; `gh pr create` warns about the untracked installed skill
+directory (an artifact of the test install method, not shipped
+behavior); `git log {default_branch}..HEAD` and `origin/main` were used
+interchangeably by runners, harmlessly.
+
+## Tooling and procedure
+
+Findings against the test procedures and the eval harness rather than
+against either skill. These matter because two of them made a check or
+a measurement report the wrong answer.
+
+| Id | Type | Date | What it found | What changed | Status |
+|---|---|---|---|---|---|
+| T-F1 | defect | 2026-07-28 | The S4 dirtying procedure was wrong twice over: a fresh create-from-base repo is ALREADY in the conflicting merge-settings state so no PATCH is needed, and the single-field PATCH form 422s with `invalid_squash_commit_setting_combo`. The stray-ruleset example also named a bypass actor type `RepoRole` that does not exist. | `test-repos.md` S4 corrected: PATCH step dropped, actor type corrected to `RepositoryRole`. | FIXED |
+| T-F2 | defect | 2026-07-29 | The documented delete procedure dropped the `delete_repo` scope with `gh auth refresh -s repo,workflow`, but `-s` only ADDS scopes. The scope survived the todo #8 deletion session -- observed live. | `test-repos.md` uses `--remove-scopes`, and records that `repo`, `read:org`, and `gist` are gh's un-removable minimum. | FIXED |
+| T-F3 | defect | 2026-09-19 | **The trigger-eval harness was under-measuring dispatch.** `--allowedTools` is a permission allowlist; it does not remove other tools from the session, so `Bash` stayed available and one session found the installed `SKILL.md` with `find` and read its frontmatter with `head` -- reading the skill instead of invoking it. Three Skill B prompts were falsely scored as dispatch failures. | `--tools` named as the load-bearing containment flag in `run-trigger-evals.sh` and in `testing.md`; the gate re-run. | FIXED |
+
+T-F3 is the dangerous shape of defect for this repository, and the
+reason the harness comment exists. A harness that under-measures
+dispatch is indistinguishable from a skill whose description stopped
+working -- and the documented remedy for the latter is to edit the
+description, which would have turned a measurement error into a real
+regression.
+
+## What is still open
+
+Nothing in this register is open. What has never been proven at all is
+a different question, and it is [known-gaps.md](known-gaps.md).

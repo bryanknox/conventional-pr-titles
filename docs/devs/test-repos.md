@@ -5,6 +5,11 @@ conventional-commits skills. The eval `setup` fields in
 `tests/evals/*/evals.json` reference the scenarios defined here by id
 (S1-S5, P1-P5).
 
+Each scenario names the requirements it covers, as a `Covers:` line.
+Those ids are defined in [behavior-spec.md](behavior-spec.md), and
+`tests/check-requirement-ids.sh` fails if one stops resolving. Which
+requirements no scenario covers is [known-gaps.md](known-gaps.md).
+
 Why real repos: Skill A's footprint (merge settings, rulesets,
 required checks) and Skill B's check-polling are server-side GitHub
 state; they cannot be faked locally. GitHub workflow development
@@ -101,6 +106,7 @@ active enforcement. Expected values per scenario live in the eval
 
 - **S1 fresh public repo (happy path).** Create-from-base, public.
   No further setup. Run Skill A; assert the full 3-level scaffold.
+  Covers: INV1, INV2, INV4, A-R3, A-R4, A-R5, A-R6, A-R7, A-R8, A-R12.
 - **S2 private repo, free plan (graceful degrade).** Create-from-base
   with `--private` on the free-plan personal account. Run Skill A;
   assert Levels 1+3 applied and Level 2 reported as BLOCKED by
@@ -111,10 +117,12 @@ active enforcement. Expected values per scenario live in the eval
   (403, NOT 201-then-unenforced as the plan's step 5 finding (b)
   originally guessed from docs). There is no ruleset to eyeball in
   the UI; the former banner checkpoint does not apply.
+  Covers: INV3, INV5, A-R3, A-R4, A-R11.
 - **S3 already-configured repo (idempotent no-op).** Run Skill A a
   SECOND time on the repo S1 just configured (`k0x-test-cc-s1`).
   Expect a no-op diff declared at the checkpoint and no mutations.
   Run S3 immediately after S1 passes, before deleting that repo.
+  Covers: A-R9.
 - **S4 partially/conflictingly configured repo (reconcile).**
   Create-from-base, then dirty it before the run. Observed
   2026-07-28: a fresh create-from-base repo is ALREADY in the
@@ -136,6 +144,7 @@ active enforcement. Expected values per scenario live in the eval
   assert the checkpoint shows a correct reconcile diff (merge
   methods corrected, stray ruleset surfaced, overwrite/coexist
   decision made explicit) rather than a blind re-apply.
+  Covers: A-R10.
 - **S5 non-admin invoker (fail fast).** Needs HUMAN ADMIN
   participation. DECIDED 2026-07-29: use the second gh account
   already on this machine (`bryanknoxbits`, keyring; its token has
@@ -162,12 +171,12 @@ active enforcement. Expected values per scenario live in the eval
   mutation and names the missing permission and who can run the
   skill (the repo owner). Then
   `gh auth switch -h github.com -u bryanknox` and verify no
-  settings changed via the same read-backs. KNOWN GAP: the
-  missing-`workflow`-scope fail-fast branch stays untested --
-  `gh auth refresh` can only ADD scopes, so only a purpose-made
-  classic PAT (`repo` without `workflow`) could exercise it;
-  record the gap in the S5 validation record rather than minting
-  one.
+  settings changed via the same read-backs.
+  Covers: INV3, A-R1. The adjacent A-R2 branch -- missing the
+  `workflow` scope -- stays untested, because `gh auth refresh` can
+  only ADD scopes and only a purpose-made classic PAT could exercise
+  it. Recorded in [known-gaps.md](known-gaps.md) rather than worked
+  around.
 
 ## Skill B repo: scaffold once, reset between runs
 
@@ -210,10 +219,13 @@ Expected titles and check behavior live in the eval `expectations`
 
 - **P1 single bug-fix branch.** One small defect-fix commit ahead of
   `main`; no existing PR. Expect `fix: ...`, check green.
+  Covers: INV1, INV2, B-R1, B-R2, B-R3, B-R5, B-R6, B-R8, B-R9, B-R12.
 - **P2 breaking API change.** Branch removes or renames a public
   API surface in one area. Expect `feat(scope)!: ...` plus a
   `BREAKING CHANGE:` footer in the body, check green.
+  Covers: B-R4, B-R9, B-R12.
 - **P3 docs-only change.** Markdown-only edits. Expect `docs: ...`.
+  Covers: B-R1, B-R2, B-R3.
 - **P4 existing PR with a bad title.** Reset, branch, then
   pre-create the PR badly:
 
@@ -221,13 +233,15 @@ Expected titles and check behavior live in the eval `expectations`
 
   Run Skill B against that PR; expect the title fixed and the
   pr-title check to go red -> green (exercises the bounded retry /
-  re-poll path).
+  re-poll path). Covers: B-R7, B-R8, B-R9. Note that every composed
+  title has so far passed on the first poll, so the retry itself
+  remains unexercised -- see [known-gaps.md](known-gaps.md).
 - **P5 unscaffolded repo.** Uses `k0x-test-cc-p5`: create-from-base,
   Skill A NEVER run (GitHub defaults, no workflow). Branch with a
   small change, run Skill B. Expect a conventional title still
   composed and applied, check-polling skipped, and a report of the
   gap recommending enforce-conventional-commits -- with NO attempt
-  to scaffold.
+  to scaffold. Covers: INV5, B-R1, B-R6, B-R10, B-R13.
 
 Integration property: P1-P4 deliberately run inside a repo
 scaffolded by Skill A; P5 deliberately runs outside one.

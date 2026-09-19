@@ -153,12 +153,13 @@ by breaking the thing it guards.
 
 The lint runs against `skills/` only, since that is the only thing
 distributed. Documentation and validation records are not linted --
-apart from their links, and the two plugin manifests.
+apart from their links, the two plugin manifests, and the
+requirement-id citations that `check-requirement-ids.sh` resolves.
 
-Two raw trace captures under `validation/traces/` contain non-ASCII
-bytes. That is left alone on purpose -- they are recorded output,
-and normalizing the bytes of a record makes it less faithful, not
-more.
+Nothing checks that a requirement in
+[behavior-spec.md](behavior-spec.md) is actually *implemented* by the
+SKILL.md that claims it. That is what tier 2 is for; tier 1 can only
+confirm the citation resolves.
 
 ## Tier 2: content evals
 
@@ -281,10 +282,37 @@ repository*, not for testing.
 
 ## What has been run
 
-[validation/](validation/) holds the records: the step-8 validation
-of both skills, the degraded-path and idempotency campaign, the
-non-admin fail-fast scenario, the trigger-eval gate, and the raw
-transcripts behind each.
+[evidence.md](evidence.md) is the index: every requirement, the run
+that exercised it, and the independent read-back behind each verdict.
+Start there rather than in the records -- it answers "has this ever
+been run, and when?" directly, and it is maintained.
 
-They are dated records rather than living documents. Read them for
-evidence of what was verified and when, not as current instructions.
+[known-gaps.md](known-gaps.md) is the other half of the same question:
+six requirements have never been exercised, and three configurations
+have never been tried at all. Read it before claiming coverage.
+
+[validation/](validation/) holds the dated records themselves: the
+step-8 validation of both skills, the degraded-path and idempotency
+campaign, the non-admin fail-fast scenario, and the two trigger-eval
+gates. They are evidence rather than living documents -- read them for
+what was verified and when, not as current instructions.
+
+## Finishing a campaign
+
+A tier-2 campaign is not done when it produces a verdict. It is done
+when the verdict has been absorbed:
+
+1. Append every finding to [findings.md](findings.md), continuing the
+   existing per-skill numbering, and say what changed as a result.
+2. Add or update the run's rows in [evidence.md](evidence.md),
+   including the independent read-back -- the read-back is the part
+   that makes the verdict checkable later.
+3. Settle or add rows in [known-gaps.md](known-gaps.md). A gap the
+   campaign closed moves to `evidence.md`; a gap it revealed stays.
+4. If the campaign changed what the skills must do, update
+   [behavior-spec.md](behavior-spec.md) and the `requirements` arrays
+   in the eval files.
+
+Skipping step 3 is the easy one to skip and the expensive one to
+skip: an untested branch and a tested one look identical in the
+source, so a gap nobody wrote down is a gap nobody will find.

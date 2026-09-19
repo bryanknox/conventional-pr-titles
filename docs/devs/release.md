@@ -8,9 +8,9 @@ A skill change is not done because it reads well. The gates, in the
 order they get cheaper to run:
 
 **1. Structural checks.** Frontmatter, naming, ASCII, wrapping,
-self-containment, and the plugin manifests. Enforced by CI on every
-pull request; run the same checks locally with the commands in
-[testing.md](testing.md).
+self-containment, the plugin manifests, and the requirement-id
+citations. Enforced by CI on every pull request; run the same five
+checks locally with the commands in [testing.md](testing.md).
 
 **2. Trigger checks, if the description changed.** Any edit to a
 `description` can change which prompts invoke the skill without
@@ -27,6 +27,14 @@ the change is not earning its place.
 
 Wording-only edits need 1. Description edits need 1 and 2. Behavior
 changes need all four.
+
+A behavior change is one that moves what
+[behavior-spec.md](behavior-spec.md) says must be true. That is the
+test for whether gates 3 and 4 apply, and it is also the test for
+semver: the user-visible contract lives in the spec and in
+`docs/users/`, not in the wording of a SKILL.md. Absorbing the run
+afterwards is part of gate 3 -- see "Finishing a campaign" in
+[testing.md](testing.md).
 
 ## How users get it
 

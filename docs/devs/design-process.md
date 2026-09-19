@@ -49,8 +49,14 @@ That is a pass, not a failure -- note it in the eval so nobody
 scores it wrong later.
 
 The procedure is in [testing.md](testing.md); the results for the
-current skills are in
-[validation/trigger-evals.md](validation/trigger-evals.md).
+current skills are in [evidence.md](evidence.md), under "Trigger
+gates". The record behind the current numbers is
+[validation/rename-trigger-gate.md](validation/rename-trigger-gate.md),
+and it is worth reading for one reason beyond its result: the harness
+was under-measuring dispatch, and a harness that under-measures is
+indistinguishable from a description that stopped working. The
+documented remedy for the latter is to edit the description, which
+would have turned a measurement error into a real regression.
 
 ## Design the process spine before the prose
 
