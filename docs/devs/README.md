@@ -4,7 +4,11 @@ This repository develops, publishes, and supports two agent skills
 for enforcing Conventional Commits through pull request titles.
 
 If you want to *use* the skills, you want
-[the user documentation](../users/) instead.
+[the user documentation](../users/README.md) instead.
+
+Contributors should also read [the user documentation](../users/README.md)
+to learn the what the agent skills under development do and how they are
+intended to be used.
 
 ## Repository map
 
