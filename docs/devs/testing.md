@@ -212,6 +212,41 @@ Any edit to a `description` invalidates these results. That is the
 one change that can alter a skill's behavior without altering a word
 of its instructions.
 
+### How to run it
+
+The runner and scorer scripts were not kept, so this is a
+procedure rather than a command to re-invoke. It is what produced
+the gate record in
+[validation/trigger-evals.md](validation/trigger-evals.md), lifted
+out of that record so it can be run again.
+
+Each prompt is a fresh headless session:
+
+```
+claude -p "<prompt>" --output-format stream-json --verbose --max-turns 4 --allowedTools "Skill,Read,Glob,Grep"
+```
+
+**cwd.** A throwaway local git repository -- a README and one
+commit, no remote -- with **both** skills installed repo-scoped at
+`.claude/skills/`. Both, deliberately: a near-miss prompt that
+belongs to the sibling has to be able to dispatch to it, because
+that is a pass, and it cannot be observed if the sibling is not
+installed.
+
+**Containment.** Allowlist `Skill` plus read-only tools and cap
+the turns. Sessions can then dispatch but not mutate anything;
+Bash and PowerShell attempts are auto-denied. Some sessions end
+`error_max_turns`, which is the cap working as intended -- the
+dispatch decision was already made and recorded by then.
+
+**Scoring.** A case counts as a trigger of skill X if and only if
+a `Skill(X)` tool_use appears in the transcript. One run per
+prompt; the rate is over the prompts in that bucket.
+
+Record the CLI version and the model alongside the results.
+Dispatch is a model behavior, so a score is comparable only to
+another score taken on the same model.
+
 ## Installing a skill under test
 
 Copy the folder into the test repository's `.claude/skills/`, as
