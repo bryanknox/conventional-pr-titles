@@ -2,8 +2,10 @@
 
 **What this is for:** answering "has this ever actually been run, and
 when?" without reading six dated records.
+
 **Read it** before claiming a behavior is proven, and before designing
 a campaign -- it shows what is already covered.
+
 **Write to it** at the end of every tier-2 campaign.
 
 Every requirement in [behavior-spec.md](behavior-spec.md) appears in

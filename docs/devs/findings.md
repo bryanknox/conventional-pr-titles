@@ -2,8 +2,10 @@
 
 **What this is for:** everything a real run found, what it changed, and
 whether it is settled.
+
 **Read it** before re-investigating something that looks broken -- it
 may already be a known, fixed, or deliberately-unfixed finding.
+
 **Write to it** at the end of every tier-2 campaign, appending to the
 existing numbering.
 

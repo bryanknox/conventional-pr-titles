@@ -2,8 +2,10 @@
 
 **What this is for:** what is deliberately unproven, and what it would
 take to prove it.
+
 **Read it** before designing a tier-2 campaign, and before claiming
 coverage in a release.
+
 **Write to it** whenever a run establishes a new gap, and remove a row
 when a run closes one -- moving the result to
 [evidence.md](evidence.md).

@@ -2,8 +2,10 @@
 
 **What this is for:** the single statement of what the two skills must
 do, as numbered requirements other files can cite.
+
 **Read it** before changing behavior, and when you need to know whether
 something is contractual or incidental.
+
 **Write to it** when the contract itself moves -- which is a behavior
 change, so see [testing.md](testing.md) for what that costs.
 
