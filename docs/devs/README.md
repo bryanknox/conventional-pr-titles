@@ -11,6 +11,7 @@ If you want to *use* the skills, you want
 | Path | What it holds |
 |---|---|
 | `skills/` | The skills themselves. The only thing that ships. |
+| `.claude/skills/` | Maintainer-only `dev-*` skills. Never ship. See [decision 0014](decisions/0014-dev-skills-outside-skills-dir.md) |
 | `.claude-plugin/` | The plugin manifest and the marketplace catalog |
 | `CLAUDE.md` | Instructions for Claude Code working in this repo |
 | `docs/users/` | Documentation for people using the skills |
@@ -75,6 +76,7 @@ The four cheapest things to get wrong, in order:
 | Check whether something was ever proven | [evidence.md](evidence.md) | -- | -- |
 | Find what still needs proving | [known-gaps.md](known-gaps.md) | -- | -- |
 | Set up or reset a test repository | [test-repos.md](test-repos.md) | -- | -- |
+| Absorb a campaign that produced a verdict | [testing.md](testing.md), "Finishing a campaign" | `dev-absorb-campaign`, then tier 1 | [findings.md](findings.md), [evidence.md](evidence.md), [known-gaps.md](known-gaps.md), and the spec if the contract moved |
 | Cut a release | [release.md](release.md) | all four gates | the version in both manifests |
 
 ## Start here
@@ -130,8 +132,14 @@ claude --plugin-dir .
 Claude Code expects from a plugin, so both skills load as
 `conventional-pr-titles:enforce-conventional-commits` and
 `conventional-pr-titles:write-pr-title`. Do **not** mirror `skills/`
-into `.claude/skills/` -- that path is gitignored precisely so no
+into `.claude/skills/` -- such a mirror is gitignored precisely so no
 second copy can drift from the first.
+
+`.claude/skills/` is not empty, though. It holds the maintainer-only
+`dev-*` skills, which are committed and never ship; see
+[decision 0014](decisions/0014-dev-skills-outside-skills-dir.md) for
+why they cannot live in `skills/`, and "Maintainer-only dev skills"
+in [CLAUDE.md](../../CLAUDE.md) for the rules that keep them there.
 
 This loads the working tree, not an installed copy, which is what
 you want while editing. It is the same plugin users install from
@@ -147,13 +155,15 @@ cosmetic.
 
 ```
 bash tests/lint-skills.sh
+bash tests/lint-skills.sh .claude/skills 'dev-*'
 bash tests/check-links.sh
 bash tests/check-workflow-template.sh
 bash tests/check-plugin-manifests.sh
 bash tests/check-requirement-ids.sh
+bash tests/check-skill-inventory.sh
 ```
 
-CI runs the same five. See [testing.md](testing.md) for what each
+CI runs the same seven. See [testing.md](testing.md) for what each
 one covers and its one prerequisite.
 
 **Driving any of this from a Claude Code session** is covered next

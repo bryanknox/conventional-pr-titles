@@ -29,8 +29,9 @@ claude --plugin-dir .
 
 `skills/<name>/SKILL.md` is already the plugin layout, so both
 load as `conventional-pr-titles:<name>` with no second copy. Do
-**not** mirror `skills/` into `.claude/skills/`; that path is
-gitignored precisely so nothing can drift.
+**not** mirror `skills/` into `.claude/skills/`; a mirror there is
+gitignored precisely so nothing can drift. That directory is not
+empty, though -- see below.
 
 `--plugin-dir` is for working *here*. It is wrong for evals,
 because the `conventional-pr-titles:` namespace changes the
@@ -61,6 +62,46 @@ folder into a test repository instead.
 
 Reasoning for each of these is in
 [docs/devs/authoring.md](docs/devs/authoring.md).
+
+## Maintainer-only dev skills
+
+Repetitive maintainer procedures are packaged as agent skills too,
+and they live in `.claude/skills/` with a `dev-` prefix. Today that
+is `dev-absorb-campaign`, which absorbs a tier-2 campaign into the
+registers. Cutting a release and the test-repo lifecycle are named
+as candidates in [decision
+0014](docs/devs/decisions/0014-dev-skills-outside-skills-dir.md) and
+are not built.
+
+**They never go in `skills/`**, for two independent reasons, and the
+second fails silently:
+
+- Everything in `skills/` ships. Neither manifest names a path, so a
+  folder added there reaches every installer with no further step.
+- `tests/evals/run-trigger-evals.sh` copies every `skills/*/` into
+  its fixture, so a third skill silently joins the dispatch surface
+  the trigger evals measure, and the score moves for a reason nobody
+  would look for.
+
+`tests/check-skill-inventory.sh` now enforces both directories:
+`skills/` is an **exact** set, so an extra directory there is a
+failure; `.claude/skills/` is a **required** set, so a missing dev
+skill is a failure while an unlisted directory is only reported --
+third-party installs such as `genesis` live there legitimately and
+are never committed. Adding a dev skill means adding it to
+`DEV_SKILLS` in that script.
+
+The `dev-` prefix is load-bearing rather than decorative: `.gitignore`
+ignores everything under `.claude/skills/` except `dev-*`, so a dev
+skill misnamed without the prefix is silently ignored by git and
+vanishes on the next clone.
+
+Dev skills are held to the same lint as the shipped ones, which is
+why tier 1 runs it twice. They carry no requirement ids, no
+`behavior-spec.md` entry, and no evals -- accepted deliberately in
+0014 on the grounds that they are internal tooling with a human
+reading every result. If a dev skill ever starts being trusted
+rather than read, that reasoning has expired.
 
 ## Where the contract lives
 
@@ -101,20 +142,23 @@ Easy to erode by a well-meaning edit:
 
 ## Testing is two tiers, and they are not interchangeable
 
-**Tier 1** is free and deterministic. Run all five before opening
-a pull request; CI runs the same five.
+**Tier 1** is free and deterministic. Run all seven before opening
+a pull request; CI runs the same seven.
 
 ```
 bash tests/lint-skills.sh
+bash tests/lint-skills.sh .claude/skills 'dev-*'
 bash tests/check-links.sh
 bash tests/check-workflow-template.sh
 bash tests/check-plugin-manifests.sh
 bash tests/check-requirement-ids.sh
+bash tests/check-skill-inventory.sh
 ```
 
 `check-workflow-template.sh` needs PyYAML (`python -m pip install
-pyyaml`). A green tier 1 says a skill is well-formed. It says
-nothing about whether it works.
+pyyaml`). The `dev-*` glob on the second command is load-bearing --
+see "Maintainer-only dev skills" below. A green tier 1 says a skill
+is well-formed. It says nothing about whether it works.
 
 **Tier 2** -- content and trigger evals in `tests/evals/` -- costs
 model calls, needs real GitHub repositories, and has human
