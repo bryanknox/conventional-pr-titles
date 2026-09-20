@@ -156,6 +156,14 @@ bash tests/check-requirement-ids.sh
 CI runs the same five. See [testing.md](testing.md) for what each
 one covers and its one prerequisite.
 
+**Driving any of this from a Claude Code session** is covered next
+to the procedure it applies to, rather than on a page of its own:
+tier 1 and both kinds of eval in [testing.md](testing.md), the
+release in [release.md](release.md), the test repositories and their
+human checkpoints in [test-repos.md](test-repos.md), and editing a
+`SKILL.md` in [authoring.md](authoring.md). Each says what to hand a
+session, what to keep, and the mistake a session makes at that step.
+
 **Changing behavior** -- as opposed to wording -- means the change
 needs a real run against a real GitHub repository before it is
 believable. Repository settings, rulesets, and status checks are
@@ -181,3 +189,65 @@ be created: ruleset endpoints are plan-gated on a private
 free-plan repository. So the check is advisory, direct pushes to
 `main` are still possible, and using PRs here is a choice rather
 than enforcement.
+
+With `claude --plugin-dir .`, the repository's own
+`write-pr-title` will title a pull request here -- the skill applied
+to the repository that develops it. Worth doing, with one caveat
+that follows from the paragraph above: because the check is
+advisory, a red one blocks nothing. Nobody is stopped by a bad
+title here, so somebody has to look.
+
+## Checking an enforced repository
+
+Whether a repository that `enforce-conventional-commits` once
+configured is still configured. All four reads are read-only and
+need no admin rights, and they are the endpoints the skill itself
+verifies through -- so this runbook cannot drift from what the skill
+checks.
+
+| Read | Proves |
+|---|---|
+| `gh api repos/{owner}/{repo}` | Level 1: `allow_squash_merge` true, the other two false, `squash_merge_commit_title=PR_TITLE` |
+| `gh api repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml` | Level 3: the workflow is there. 404 means absent |
+| `gh api repos/{owner}/{repo}/rulesets` | the ruleset object exists |
+| `gh api repos/{owner}/{repo}/rules/branches/{default_branch}` | Level 2: it is actually *enforced* |
+
+Run them as separate commands rather than `&&`-chained or under
+`set -e`. `gh api` exits non-zero on outcomes that are expected here
+-- a 404 for an absent workflow, a 403 for a plan gate -- and
+chaining throws away the reads that come after the first one.
+
+**Why the last two rows are both there.** The `rulesets` endpoint
+answers whether the object exists. The effective-rules endpoint
+returns only rules that are actively enforced, which is a different
+question. An empty result from the second after a successful create
+means the ruleset exists and is doing nothing -- the failure this
+pair is here to separate, and the only one of the three levels that
+can be present and inert at the same time.
+
+**Worked example, this repository**, read back 2026-09-19. Level 1
+and Level 3 are clean: squash-only, `squash_merge_commit_title` is
+`PR_TITLE`, and `pr-title.yml` is present. Two settings differ from
+the skill's defaults, deliberately:
+`squash_merge_commit_message` is `PR_BODY` rather than `BLANK`, and
+`delete_branch_on_merge` is on. The skill offers both on request, so
+neither is drift.
+
+Level 2 cannot be read at all. *Both* ruleset endpoints answer
+`403 Upgrade to GitHub Pro or make this repository public`, not
+just the listing one, so on a free-plan private repository the
+exists-versus-enforced distinction above is not observable -- there
+is nothing to be ambiguous about, because no ruleset could be
+created. That is the expected reading here rather than a
+regression; see
+[decision 0009](decisions/0009-stay-private-for-now.md).
+
+When a read-back disagrees with what you expect, re-running
+`enforce-conventional-commits` is the fix -- it is idempotent, and
+a second run on a configured repository declares a no-op rather
+than reapplying. It needs admin. `write-pr-title` will not do it
+for you even though it detects the same gaps, which is
+[decision 0004](decisions/0004-skill-b-never-scaffolds.md).
+
+Doing this by hand is what the deferred verify path in
+[release.md](release.md)'s "Notes for later" would replace.

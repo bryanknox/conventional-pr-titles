@@ -21,15 +21,16 @@ whether it works.
 
 ## Tier 1: the checks CI runs
 
-Four scripts, all exiting non-zero on any violation. Run them
+Five scripts, all exiting non-zero on any violation. Run them
 before opening a pull request; `.github/workflows/ci.yml` runs the
-same four on every pull request and every push to `main`.
+same five on every pull request and every push to `main`.
 
 ```
 bash tests/lint-skills.sh
 bash tests/check-links.sh
 bash tests/check-workflow-template.sh
 bash tests/check-plugin-manifests.sh
+bash tests/check-requirement-ids.sh
 ```
 
 One prerequisite: `check-workflow-template.sh` needs PyYAML.
@@ -40,6 +41,29 @@ python -m pip install pyyaml
 
 It is a required dependency rather than an optional extra -- the
 script says so and stops, rather than skipping the check.
+
+### Running tier 1 from a session
+
+Ask for all five. They take seconds each, and a partial run is the
+expensive kind of green.
+
+On Windows they go through Git Bash as `bash tests/...`. Do not
+accept a PowerShell rewrite: `CLAUDE.md` rules one out, and these
+scripts lean on `iconv`, `grep -U`, and a Python probe that runs
+each candidate rather than trusting `PATH`.
+
+**Read the summary line yourself.** Every script ends in
+`N checks passed, N failed` or `N failed`. A session that reports
+"all green" without those lines in its output has not shown you a
+run. The checks are built to fail loudly; a summary line is what
+that construction produces, so its absence is the signal.
+
+The failure mode worth naming: a lint failure fixed by editing the
+check rather than the thing the check guards -- widening
+`ALLOWED_KEYS`, relaxing `MAX_COL`. Both are one-line edits that
+turn the output green and delete the guarantee. The reasoning that
+makes them refusable is in [authoring.md](authoring.md); a session
+that has not read it will find the accommodating fix first.
 
 ### lint-skills.sh
 
@@ -124,6 +148,28 @@ the Claude Code CLI, so a warning added in a future release would
 turn this repository red without anyone changing a file here. What
 runs in CI is offline and covers the couplings this repository owns.
 
+### check-requirement-ids.sh
+
+Traceability for the `INV*`, `A-R*`, and `B-R*` ids. A requirement is
+*defined* by a row in [behavior-spec.md](behavior-spec.md) whose first
+cell is the bare id; everything else only cites. Three rules:
+
+- No id is defined twice.
+- Every id cited anywhere -- the spec, the three registers,
+  [test-repos.md](test-repos.md), both eval files -- resolves to a
+  definition.
+- Every defined id appears somewhere in [evidence.md](evidence.md).
+  A requirement with no evidence row has to say NOT PROVEN rather
+  than say nothing.
+
+That last rule is the one with teeth. It makes silence about a
+requirement impossible: the register either records a run or records
+that there has not been one.
+
+It also resolves the `docs/`, `tests/`, and `skills/` paths cited
+from inside the eval JSON. `check-links.sh` cannot see those -- it
+reads markdown links, and these are string values in a JSON file.
+
 ### The checks are written to fail loudly
 
 A missing tool is an error, not a skip. This is deliberate: an
@@ -132,9 +178,10 @@ earlier ad-hoc version of these checks reported a clean pass because
 ran. A lint that can silently do nothing is worse than no lint,
 because it is trusted.
 
-The same principle applies to *finding* tools. Three of the scripts
-resolve a Python interpreter by running each candidate, not by
-checking that the name exists on `PATH`. Windows ships a `python3`
+The same principle applies to *finding* tools. Four of the five
+checks resolve a Python interpreter by running each candidate, not by
+checking that the name exists on `PATH`; the eval runner does the
+same. Windows ships a `python3`
 that resolves fine, prints an advert for the Microsoft Store, and
 exits 49; probing by name picks that stub and fails on a working
 machine.
@@ -189,6 +236,16 @@ These need **real** GitHub repositories. Merge settings, rulesets,
 and status checks are server-side state that cannot be faked
 locally. Lifecycle, reset procedures, and the human checkpoints are
 in [test-repos.md](test-repos.md).
+
+A session can carry out a content eval run, with one structural
+caveat: the with-skill and without-skill runs are two **fresh**
+sessions in the test repo clone, not one session doing both. A
+session that has already run the skill has seen it, and the second
+half of the pair stops being a baseline.
+
+Grading stays with you. Whether two transcripts are
+indistinguishable is a judgement about the session under test, and
+it is not one that session can make about itself.
 
 ## Tier 2: trigger evals
 
@@ -271,6 +328,23 @@ Record the CLI version and the model alongside the results.
 Dispatch is a model behavior, so a score is comparable only to
 another score taken on the same model.
 
+### Driving the evals from a session
+
+Invoke the runner. Do not let a session improvise a `claude -p`
+loop of its own: `--tools` is the load-bearing flag described
+above, a reinvented loop drops it, and what comes back is a set of
+dispatch failures that are not dispatch failures. The measured
+result above is exactly that mistake, found the expensive way.
+
+The runner spawns its own fresh sessions, so running it from inside
+a session is fine -- the outer session is acting as a shell, not as
+the thing being measured.
+
+A session is well suited to reading `results.json` afterwards and
+drafting the [evidence.md](evidence.md) rows from it. Record the
+CLI version and the model with them. The verdict against the gate
+is yours.
+
 ## Installing a skill under test
 
 Copy the folder into the test repository's `.claude/skills/`, as
@@ -327,3 +401,25 @@ when the verdict has been absorbed:
 Skipping step 3 is the easy one to skip and the expensive one to
 skip: an untested branch and a tested one look identical in the
 source, so a gap nobody wrote down is a gap nobody will find.
+
+### Absorbing a campaign with a session
+
+This is the best of the delegable tasks here. It is a mechanical
+fan-out across [findings.md](findings.md), [evidence.md](evidence.md),
+[known-gaps.md](known-gaps.md), [behavior-spec.md](behavior-spec.md)
+and the `requirements` arrays in the eval files, and
+`check-requirement-ids.sh` is a real backstop rather than a
+formality -- it fails on a citation that stops resolving and on a
+requirement the evidence register has gone quiet about.
+
+One part does not delegate. The independent read-back in
+`evidence.md` has to be actual command output. A session that has
+just watched a run will write a read-back from the transcript
+instead, because the transcript says what happened and saying it
+again reads as confirmation. It is not: the read-back exists to be
+a *second* source, and substituting the first one for it produces a
+register that looks complete and proves nothing. Nothing downstream
+can detect the substitution afterwards.
+
+Step 3 remains the one that gets skipped, for the same reason as
+ever -- nothing breaks when it is.

@@ -106,6 +106,33 @@ claude plugin tag . --push
 That creates `conventional-pr-titles--v{version}`, after checking
 that the manifests agree and the tree is clean.
 
+### Cutting a release from a session
+
+The bump size is the part to decide yourself. It is a judgement
+against the table below, not a lookup, and the row a session will
+not infer is that a *narrowed* description is a **major** -- nothing
+about the behavior changed, so nothing in the diff looks breaking.
+State the bump in the prompt rather than asking for one.
+
+Both commands above are the Claude Code CLI, invoked from a Claude
+Code session. That works, and it is worth knowing that is what is
+happening.
+
+Two things do not survive being summarised, and both are places a
+session will report success accurately and still mislead you:
+
+- **Name the plugin manifest explicitly.** `claude plugin validate .`
+  validates the *marketplace* manifest and passes. "Validation
+  passed" is then a true sentence about a command that never looked
+  at `plugin.json`.
+- **Read the warning list, not the verdict.** Exactly one warning is
+  expected on the first command. A second one is the signal, and it
+  is precisely the detail that a summary drops on the way to
+  reporting a pass.
+
+`claude plugin tag . --push` is the one-way step. Run that one
+yourself.
+
 ## Versioning the skills
 
 Semantic versioning against the *user-visible contract*, which for a
@@ -143,6 +170,17 @@ Deferred deliberately, recorded so the reasoning is not lost:
   distribution is Claude Code specific. `.agents/skills/` covers
   Cursor, Codex, and Copilot, so it is a two-directory install
   rather than four.
+- **A verify path in `enforce-conventional-commits`.** "Is this
+  repository still configured?" is the skill's own step-1 preflight
+  and its step 5-7 read-backs, run without the mutations in
+  between. Every command already exists in the skill; what is
+  missing is a way to ask for them alone. Done by hand today, in
+  "Checking an enforced repository" in
+  [README.md](README.md). Deferred rather than built because it
+  moves what [behavior-spec.md](behavior-spec.md) says must be true
+  -- a spec change, a real run, and a minor bump -- and because it
+  should be designed against that runbook once the runbook has been
+  used a few times, not ahead of it.
 - **Going public.** Currently private, which blocks this repository
   from getting its own ruleset and limits installation to accounts
   that can already read it. The reasoning, and the ordered steps

@@ -21,6 +21,38 @@ All helpers below are documented `gh` one-liners, run from a
 POSIX shell (the Bash tool; `--jq`/`xargs` forms assume it).
 Promote them to `tests/scripts/` only if the rule of three fires.
 
+## Driving these procedures from a session
+
+The `gh` one-liners below are Bash-tool work, and a session runs
+them well. Hand it the scenario id -- S1-S5, P1-P5 -- and let it use
+the commands as written rather than improvising equivalents. Several
+of them carry a correction that a reinvented command re-breaks:
+`--remove-scopes` rather than `-s` for dropping a scope, the
+`origin`/`base` remote rename, sending both squash fields in one
+PATCH to avoid `invalid_squash_commit_setting_combo`. Each of those
+is in the text because the obvious version of the command was tried
+first and failed.
+
+**Never script a loop over `gh repo delete`.** It is said again
+under the delete procedure, and it belongs here too, because "clean
+up the test repos" is a reasonable-sounding request and a loop is
+the first shape anyone reaches for. Deletion is one confirmed
+command per repository.
+
+The account switches and the `delete_repo` grant-and-drop pair are
+operator actions. A session can tell you the command and can read
+back the result; you run it.
+
+**A permission rule is not a checkpoint.**
+`.claude/settings.local.json` already allows `Bash(gh repo create:*)`.
+That removes a permission *prompt*. It does not remove checkpoint 1
+below. The checkpoint is a decision about whether a repository
+should exist in the personal account, which no permission setting
+can answer -- and since the rule was added there is no longer a
+prompt to remind anyone the question exists. That is the point worth
+carrying into every one of these procedures: the checkpoints are
+answered by a human deciding, not by tooling being allowed.
+
 ## Base repo (READ-ONLY)
 
 `bryanknox/k0x-workbench` -- https://github.com/bryanknox/k0x-workbench
@@ -270,6 +302,10 @@ long-lived across the P1-P4 campaign -- delete it only when Skill B
 validation (plan todo #7) is done.
 
 ## Human checkpoints (consolidated)
+
+Every one of these is answered by the operator at the moment it comes
+up. None of them is satisfied by a permission allow-rule, which
+grants a tool and decides nothing.
 
 1. Every `gh repo create` in the personal account (each scenario's
    create-from-base step).
