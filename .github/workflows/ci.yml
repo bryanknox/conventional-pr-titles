@@ -52,6 +52,13 @@ jobs:
       - name: Check workflow template
         run: bash tests/check-workflow-template.sh
 
+      # Guards the requirement-id citations between behavior-spec.md,
+      # the eval files, and the three registers. Also resolves doc
+      # paths cited from inside the eval JSON, which check-links.sh
+      # cannot see because it reads markdown only.
+      - name: Check requirement ids
+        run: bash tests/check-requirement-ids.sh
+
       # Offline check only on purpose. We don't use `claude plugin
       # validate` here because that richer check needs the Claude Code
       # CLI, which CI would install at its latest version on every

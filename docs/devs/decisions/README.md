@@ -22,3 +22,6 @@ obvious from the code.
 | [0009](0009-stay-private-for-now.md) | Stay private for now, and what going public would take |
 | [0010](0010-declare-a-plugin-version.md) | Declare a plugin version, and bump it every release |
 | [0011](0011-name-skills-for-the-job.md) | Name the skills for the job, not the convention |
+| [0012](0012-harvest-records-into-durable-artifacts.md) | Harvest the validation records into durable artifacts |
+| [0013](0013-archive-the-validation-records.md) | Archive the validation records rather than maintain them |
+| [0014](0014-dev-skills-outside-skills-dir.md) | Internal dev skills live outside `skills/` |

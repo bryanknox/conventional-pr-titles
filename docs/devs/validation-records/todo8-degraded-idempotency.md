@@ -1,5 +1,12 @@
 # Step 8 validation record: todo #8 campaign (S2, S3, S4, P5)
 
+> **Archived record.** Frozen evidence from 2026-07-28, not
+> instructions and not a to-do list. Skill names and paths are
+> pre-rename -- see [README.md](README.md) for the translation.
+> For what is currently true, read
+> [evidence.md](../evidence.md) and
+> [known-gaps.md](../known-gaps.md).
+
 Status: COMPLETE (2026-07-28). Four unattended real runs -- S3
 idempotency, S2 private-repo degrade, S4 reconcile (all Skill A),
 and P5 unscaffolded repo (Skill B, folded in from todo #7) -- ALL
@@ -96,14 +103,9 @@ this feature." The todo #8 residual (201 vs 403) is resolved:
 
 ## Disposition and follow-ups
 
-- Test repos now existing, ALL awaiting operator deletion decision
-  (delete procedure = human checkpoint, `delete_repo` scope):
-  `k0x-test-cc-s1` (recommend KEEP until todo #9 trigger evals --
-  its clone is a ready scaffolded environment), `k0x-test-cc-s1b`,
-  `k0x-test-cc-s2`, `k0x-test-cc-s4`, `k0x-test-cc-p5` (PR #2
-  left open by design).
-- S5 (non-admin invoker) remains the one unexecuted Skill A
-  scenario; it needs human admin participation (second account or
-  scoped-down token) and was never part of todo #8.
-- Remaining plan todo: #9 trigger-eval validation gate on the
-  final descriptions (descriptions unchanged by this campaign).
+Removed 2026-09-19: test-repo lifecycle and plan-todo sequencing, all
+long since resolved. See
+[decision 0013](../decisions/0013-archive-the-validation-records.md).
+The original is still in git:
+
+    git show 671d6bd:docs/devs/validation/todo8-degraded-idempotency.md

@@ -1,5 +1,12 @@
 # Step 8 validation record: S5 non-admin invoker (Skill A)
 
+> **Archived record.** Frozen evidence from 2026-07-29, not
+> instructions and not a to-do list. Skill names and paths are
+> pre-rename -- see [README.md](README.md) for the translation.
+> For what is currently true, read
+> [evidence.md](../evidence.md) and
+> [known-gaps.md](../known-gaps.md).
+
 Status: COMPLETE (2026-07-29). One real run of
 setup-conventional-commits as a non-admin push collaborator
 (`bryanknoxbits`) on `bryanknox/k0x-test-cc-s5`: PASS -- the skill
@@ -93,11 +100,9 @@ Post-fix lint: ASCII-only PASS; SKILL.md grew 336 -> 346 lines.
 
 ## Disposition and follow-ups
 
-- `k0x-test-cc-s5` now awaits operator deletion (delete procedure
-  = human checkpoint). Its collaborator grant needs no separate
-  teardown; deleting the repo removes it.
-- `bryanknoxbits` remains a collaborator until deletion; harmless
-  (test repo only).
-- Remaining plan todo: #9 trigger-eval validation gate
-  (descriptions unchanged by this run; F11-F13 touched only the
-  Step 1 body).
+Removed 2026-09-19: test-repo lifecycle and plan-todo sequencing, all
+long since resolved. See
+[decision 0013](../decisions/0013-archive-the-validation-records.md).
+The original is still in git:
+
+    git show 671d6bd:docs/devs/validation/s5-non-admin.md

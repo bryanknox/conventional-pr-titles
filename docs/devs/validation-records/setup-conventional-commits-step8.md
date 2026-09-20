@@ -1,5 +1,12 @@
 # Step 8 validation record: setup-conventional-commits (plan todo #6)
 
+> **Archived record.** Frozen evidence from 2026-07-28, not
+> instructions and not a to-do list. Skill names and paths are
+> pre-rename -- see [README.md](README.md) for the translation.
+> For what is currently true, read
+> [evidence.md](../evidence.md) and
+> [known-gaps.md](../known-gaps.md).
+
 Status: COMPLETE (2026-07-28). Structural lint PASSED; real run
 on scenario S1 PASSED 8/8 A-CE1 expectations with independent
 read-back verification; without-skill baseline showed a clear
@@ -129,12 +136,9 @@ checkpoint discipline + scope restraint, not raw competence.
 
 ## Disposition and follow-ups
 
-- `k0x-test-cc-s1` KEPT: S3 (idempotent re-run) runs against it
-  in plan todo #8, per test-repos.md.
-- `k0x-test-cc-s1b` no longer needed: operator deletion per the
-  delete procedure (human checkpoint) whenever convenient.
-- gh active account restored to `bryanknoxbits` after the
-  campaign; switch to `bryanknox` again for todos #7/#8 (note
-  added to dev/test-repos.md).
-- Residuals unchanged: S2 live POST status (todo #8); trigger-eval
-  validation gate (todo #9).
+Removed 2026-09-19: test-repo lifecycle and plan-todo sequencing, all
+long since resolved. See
+[decision 0013](../decisions/0013-archive-the-validation-records.md).
+The original is still in git:
+
+    git show 671d6bd:docs/devs/validation/setup-conventional-commits-step8.md

@@ -1,6 +1,6 @@
 # write-pr-title
 
-Creates or updates a GitHub pull request so its **title** is a valid
+The `write-pr-title` skill creates or updates a GitHub pull request so its **title** is a valid
 Conventional Commits message, composed from what the branch actually
 changed.
 

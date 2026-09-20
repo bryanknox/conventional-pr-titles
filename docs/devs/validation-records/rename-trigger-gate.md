@@ -1,5 +1,9 @@
 # Trigger-eval gate record for the 2026-09-19 rename
 
+> **Record of the current trigger gate** (2026-09-19). Names and
+> paths are current; no translation needed. The aggregate is in
+> [evidence.md](../evidence.md) under "Trigger gates".
+
 Status: COMPLETE (2026-09-19). GATE PASS for both skills on the
 renamed `enforce-conventional-commits` / `write-pr-title` -- 15/16
 validation-split prompts dispatched correctly.
@@ -15,11 +19,11 @@ Claude Code CLI 2.1.220, model `claude-opus-5[1m]`. Run with
 
 ## Why a control run came first
 
-The previous gate ([trigger-evals.md](trigger-evals.md), 16/16) was
-taken on `claude-fable-5`. Scoring new names against a record taken
-on a different model cannot distinguish a naming regression from a
-model change, so the old names were re-scored on the train split
-first, on the current model.
+The previous gate (the 2026-07-29 record, 16/16) was taken on
+`claude-fable-5`. Scoring new names against a record taken on a
+different model cannot distinguish a naming regression from a model
+change, so the old names were re-scored on the train split first, on
+the current model.
 
 | Run | Split | Names | Result |
 |---|---|---|---|

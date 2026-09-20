@@ -156,6 +156,38 @@ asks repeatedly trains people to approve without reading.
 do what remains possible, then say exactly what did not happen and
 what would unblock it.
 
+## Editing a SKILL.md with Claude Code
+
+Most of this page is a list of rules with a reason attached, which
+is what a session needs, because several of the rules look arbitrary
+from inside the file and are not.
+
+**The frontmatter allowlist is the one to state up front.** It is
+the rule a session will most reliably try to be helpful about.
+`allowed-tools` and `model` are valid Claude Code keys; there is
+nothing in a `SKILL.md` to suggest they are refused here on purpose,
+so adding one looks like an improvement. `lint-skills.sh` catches
+it. What stops the *fix* from being "widen `ALLOWED_KEYS`" is
+knowing why the list is narrow -- the portability argument at the
+top of this page.
+
+**Say when an edit is to the `description`.** That ends the task in
+tier 2, not tier 1. Left unsaid, a session will reasonably report
+done on a green lint, having changed which prompts reach the skill
+and having measured nothing.
+
+**Self-containment does not fail locally.** A `../` reference
+resolves perfectly in this working tree and breaks on install,
+which means neither the session nor the reviewer sees anything
+wrong. A skill reads nothing outside its own folder, and nothing
+from its sibling; duplicate instead, as
+[decision 0005](decisions/0005-duplicate-the-type-list.md) did.
+
+What delegates cleanly is the mechanical half: rewrapping prose to
+72 columns, replacing a smart quote that arrived with a paste,
+keeping the type list identical across both skills and the user
+guide. Tedious, exactly specified, and linted afterwards.
+
 ## Current sizes
 
 Not limits, but the numbers to notice a jump from. Every line of a

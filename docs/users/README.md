@@ -27,9 +27,11 @@ correct.
 | Run | Once per repository | Every pull request |
 
 If you are joining a repository someone else already configured, you
-only need **write-pr-title**. Installing the plugin brings
-both; the one you do not need costs you nothing, because a skill
-that is never triggered is never read.
+only need **write-pr-title**. Installing the plugin brings both. The
+one you do not need costs you almost nothing: only its short
+description stays in context, and the skill itself is never read
+unless it is triggered. If you would rather not carry it at all,
+[removing a skill](install.md#removing-a-skill) is one command.
 
 If you are setting up your own repository, run
 **enforce-conventional-commits** once, then use
@@ -39,7 +41,9 @@ If you are setting up your own repository, run
 
 1. [Install](install.md) -- one plugin, currently Claude Code
    only. Copying a single skill folder also works.
-2. Read the page for the skill you need (linked in the table above).
+2. Read the page for the skill you need:
+   - [enforce-conventional-commits](enforce-conventional-commits.md)
+   - [write-pr-title](write-pr-title.md)
 3. Ask for what you want in plain language. Both skills are triggered
    by description matching, not by a command you have to memorize:
    "set this repo up for conventional commits", "open a PR for this

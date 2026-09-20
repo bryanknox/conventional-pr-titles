@@ -1,6 +1,6 @@
 # enforce-conventional-commits
 
-Configures an existing GitHub repository so the only route to the
+The `enforce-conventional-commits` skill configures an existing GitHub repository so the only route to the
 default branch is a squash-merged pull request whose title is a valid
 Conventional Commits message.
 
@@ -22,37 +22,84 @@ Run it once per repository. Re-running is a no-op.
 It works on the repository your current directory points at. If there
 is no `origin` remote it will ask which repository you mean.
 
+The skill also answers to broader phrasings -- "protect main",
+"prevent direct pushes to main". That is deliberate, but it means a
+request for plain branch protection can reach a skill that does
+rather more than that. Nothing is lost when it does. The skill reads
+your repository, shows you the whole three-level diff, and waits:
+there is exactly one approval point, and nothing changes before it.
+If what you wanted was required reviews rather than conventional
+commits, decline and the repository is untouched. It also stops
+before that point, changing nothing, if you lack `admin` or the
+`workflow` scope.
+
 ## What it changes
 
-Three things, applied in this order:
+Two kinds of change: one file added to your repository, and two
+GitHub settings areas configured. Nothing else.
 
-**1. Merge settings.** Squash becomes the only merge method; merge
-commits and rebase merging are turned off. The default squash commit
-message is set to the pull request title.
+### Repository content it adds
 
-**2. A PR-title lint workflow** at `.github/workflows/pr-title.yml`,
-using `amannn/action-semantic-pull-request`, pinned to `v6`. It runs
-on pull request open, edit, synchronize, and reopen -- the *edit*
-trigger is what makes a corrected title re-check immediately instead
-of leaving a stale failure. The allowed commit types are written out
-in the file (`feat`, `fix`, `docs`, `style`, `refactor`, `perf`,
-`test`, `build`, `ci`, `chore`) rather than left to the action's
-defaults, so your repository states which types it accepts. Edit that
-list whenever you like -- it is an ordinary file in your repository
-after the skill hands it over.
+One file, committed directly to the default branch:
 
-**3. A ruleset on the default branch** requiring a pull request,
-requiring that title check to pass, blocking force pushes and
-deletions, with an empty bypass list. Nobody gets an exception,
-including you.
+| Path | What it is |
+|---|---|
+| `.github/workflows/pr-title.yml` | A GitHub Actions workflow that checks every pull request title against Conventional Commits |
 
-The workflow lands before the ruleset on purpose: once the ruleset
-requires pull requests, committing the workflow file directly would
-be blocked.
+That is the whole content footprint. No other file in your
+repository is added, edited, or deleted: no git hooks, no
+commit-message tooling, no dependencies added to your project, no
+edits to existing files. If a `pr-title.yml` is already there and
+differs from what the skill would write, overwriting it takes your
+explicit approval.
 
-There is no fourth level. No git hooks, no commit-message tooling, no
-dependencies added to your project. Commits on branches are
-deliberately left alone.
+The workflow uses `amannn/action-semantic-pull-request`, pinned to
+`v6`. It runs on pull request open, edit, synchronize, and reopen
+-- the *edit* trigger is what makes a corrected title re-check
+immediately instead of leaving a stale failure. The allowed commit
+types are written out in the file (`feat`, `fix`, `docs`, `style`,
+`refactor`, `perf`, `test`, `build`, `ci`, `chore`) rather than
+left to the action's defaults, so your repository states which
+types it accepts. Edit that list whenever you like -- it is an
+ordinary file in your repository after the skill hands it over.
+
+**The workflow is deterministic.** It is plain GitHub Actions
+running a pinned action that matches the title against the fixed
+list of types in the file. No model, no judgment call, no
+variance: the same title produces the same pass or fail every
+time, and the rule being applied is readable in the file itself.
+
+### GitHub repository settings it configures
+
+Neither of these lives in your repository -- both are repository
+settings on GitHub, changed through the API.
+
+**Settings -> General -> Pull Requests** (merge settings):
+
+| Setting | Set to |
+|---|---|
+| Allow merge commits | off |
+| Allow rebase merging | off |
+| Allow squash merging | **on** -- the only remaining method |
+| Default squash commit message: title | the pull request title |
+| Default squash commit message: body | blank (optional: the PR body) |
+| Automatically delete head branches | optional, only if you ask |
+
+**Settings -> Rules -> Rulesets:** one new ruleset named
+`conventional-commits-main`, active, targeting the default branch.
+It requires a pull request, requires that title check to pass, and
+blocks force pushes and branch deletion. The bypass list is empty
+-- nobody gets an exception, including you.
+
+### The order, and why
+
+The workflow file is committed *before* the ruleset is created, on
+purpose: once the ruleset requires pull requests, committing the
+workflow file directly to the default branch would be blocked.
+
+There is no third kind of change. Commits on branches are
+deliberately left alone -- the pull request title at merge time is
+the only gate.
 
 ## What it does not do
 
@@ -65,14 +112,15 @@ deliberately left alone.
 
 ## What you will be asked
 
-One approval, before anything changes. You get the whole three-part
-change as a single diff -- current state to target state, per level,
-plus anything unusual it found. Nothing is modified until you approve
+One approval, before anything changes. You get the whole change as a
+single diff -- current state to target state for the workflow file,
+the merge settings and the ruleset alike, plus anything unusual it
+found. Nothing is modified until you approve
 it.
 
 After that it runs to completion, reading every change back from
 GitHub to confirm it took effect, and finishes with a report showing
-before and after for each level.
+before and after for each of the three.
 
 ## Known gaps
 

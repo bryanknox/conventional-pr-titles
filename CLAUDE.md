@@ -62,6 +62,25 @@ folder into a test repository instead.
 Reasoning for each of these is in
 [docs/devs/authoring.md](docs/devs/authoring.md).
 
+## Where the contract lives
+
+[docs/devs/behavior-spec.md](docs/devs/behavior-spec.md) states what
+the two skills must do, as numbered requirements (`INV*`, `A-R*`,
+`B-R*`). SKILL.md is the instruction set that achieves it. Where the
+two disagree, one of them is wrong and the evals decide which -- do
+not reconcile them by editing the spec.
+
+Three registers are keyed by those ids and are maintained, not
+historical: [evidence.md](docs/devs/evidence.md) (what has been run),
+[findings.md](docs/devs/findings.md) (what running it found), and
+[known-gaps.md](docs/devs/known-gaps.md) (what has never been
+proven). `tests/check-requirement-ids.sh` fails if a citation stops
+resolving, or if a requirement exists that `evidence.md` says nothing
+about.
+
+[docs/devs/README.md](docs/devs/README.md) has the development flow
+and a table routing each kind of task to the files it touches.
+
 ## Rules the skills themselves obey
 
 Easy to erode by a well-meaning edit:
@@ -82,14 +101,15 @@ Easy to erode by a well-meaning edit:
 
 ## Testing is two tiers, and they are not interchangeable
 
-**Tier 1** is free and deterministic. Run all four before opening
-a pull request; CI runs the same four.
+**Tier 1** is free and deterministic. Run all five before opening
+a pull request; CI runs the same five.
 
 ```
 bash tests/lint-skills.sh
 bash tests/check-links.sh
 bash tests/check-workflow-template.sh
 bash tests/check-plugin-manifests.sh
+bash tests/check-requirement-ids.sh
 ```
 
 `check-workflow-template.sh` needs PyYAML (`python -m pip install

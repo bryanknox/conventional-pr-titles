@@ -37,8 +37,8 @@ agreement to check.
 Both skills passed their ship gates before this was ever published:
 scenarios S1-S5 and P1-P5 against real repositories, plus the
 trigger-eval gate on frozen descriptions, all recorded in
-[validation/](../validation/). The user-visible contract is not a
-draft.
+[validation-records/](../validation-records/). The user-visible
+contract is not a draft.
 
 `0.x` would also have made the semver table decorative, since a
 breaking change below 1.0 has no agreed encoding.
