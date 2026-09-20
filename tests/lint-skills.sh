@@ -18,6 +18,12 @@ set -uo pipefail
 
 SKILLS_DIR="${1:-skills}"
 
+# Optional name glob, so a directory that also holds third-party
+# installs can be linted for only the skills this repository
+# owns:  bash tests/lint-skills.sh .claude/skills 'dev-*'
+# Unquoted where it is used below, because it has to expand.
+SKILLS_GLOB="${2:-*}"
+
 # Description ceiling. Conservative shared limit across harnesses;
 # both current descriptions sit near 640 characters.
 MAX_DESC=1024
@@ -241,7 +247,7 @@ check_self_contained() {
 
 # ---------------------------------------------------------------- #
 
-printf 'Linting skills in %s/\n\n' "$SKILLS_DIR"
+printf 'Linting skills in %s/%s/\n\n' "$SKILLS_DIR" "$SKILLS_GLOB"
 
 if [ ! -d "$SKILLS_DIR" ]; then
     err "no such directory: $SKILLS_DIR"
@@ -249,7 +255,7 @@ if [ ! -d "$SKILLS_DIR" ]; then
 fi
 
 found=0
-for skilldir in "$SKILLS_DIR"/*/; do
+for skilldir in "$SKILLS_DIR"/$SKILLS_GLOB/; do
     [ -d "$skilldir" ] || continue
     found=$((found + 1))
     skilldir="${skilldir%/}"
@@ -279,7 +285,7 @@ for skilldir in "$SKILLS_DIR"/*/; do
 done
 
 if [ "$found" -eq 0 ]; then
-    err "no skill directories found under $SKILLS_DIR/"
+    err "no skill directories found under $SKILLS_DIR/$SKILLS_GLOB/"
 fi
 
 # Eval files must at least parse.

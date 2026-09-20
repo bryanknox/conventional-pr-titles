@@ -46,6 +46,15 @@ jobs:
       - name: Lint skills
         run: bash tests/lint-skills.sh
 
+      # The maintainer-only dev skills under .claude/skills/ are held
+      # to the same rules. The 'dev-*' glob is load-bearing: that
+      # directory is also where a third-party skill installed for
+      # development would land, and linting one of those would fail
+      # on rules it was never written against. See
+      # docs/devs/decisions/0014-dev-skills-outside-skills-dir.md.
+      - name: Lint dev skills
+        run: bash tests/lint-skills.sh .claude/skills 'dev-*'
+
       - name: Check documentation links
         run: bash tests/check-links.sh
 
@@ -69,3 +78,11 @@ jobs:
       # deliberately against a known CLI version.
       - name: Check plugin manifests
         run: bash tests/check-plugin-manifests.sh
+
+      # Which skills exist, and where. skills/ is an exact set
+      # because an extra directory there ships and silently joins the
+      # dispatch surface the trigger evals measure; .claude/skills/
+      # is a required set because third-party installs live beside
+      # the dev skills and are never committed.
+      - name: Check skill inventory
+        run: bash tests/check-skill-inventory.sh

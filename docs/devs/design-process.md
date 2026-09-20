@@ -114,7 +114,12 @@ npx skills add danielmeppiel/genesis
 
 That places it at `.agents/skills/genesis/` and mirrors it to
 `.claude/skills/genesis/`. Both paths are gitignored, so it cannot
-be committed by accident. The copy this repository used was verified
+be committed by accident. `.claude/skills/` is only *mostly* ignored
+now -- the maintainer-only `dev-*` skills are committed from there --
+but genesis stays ignored because it does not carry that prefix.
+Keep third-party installs unprefixed and nothing changes.
+
+The copy this repository used was verified
 identical to upstream commit
 `18e73c35e5cefaf431fbe4e080e8f125ebfece33`.
 

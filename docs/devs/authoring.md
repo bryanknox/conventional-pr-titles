@@ -216,3 +216,26 @@ text that was never meant to be a trigger.
 
 See
 [decision 0008](decisions/0008-maintainer-material-outside-skill-folders.md).
+
+**Nor does a maintainer-only skill.** A skill that automates a
+development procedure is maintainer material too, and it lives in
+`.claude/skills/` with a `dev-*` name. Putting one in `skills/` would
+ship it and would silently add it to the dispatch surface the trigger
+evals measure. `tests/check-skill-inventory.sh` fails on it, and
+[decision 0014](decisions/0014-dev-skills-outside-skills-dir.md) has
+the reasoning.
+
+Every rule on this page applies to them unchanged, which is why
+`tests/lint-skills.sh` takes a directory and an optional name glob:
+
+```
+bash tests/lint-skills.sh .claude/skills 'dev-*'
+```
+
+Two of the rules bite harder there than they do in `skills/`. A dev
+skill cannot link out to the page it implements, because the
+self-containment check rejects a reference that escapes the folder --
+name the path in backticks instead, and state which of the two is the
+authority. And it must not transcribe a requirement id, because
+`check-requirement-ids.sh` does not scan `.claude/skills/`, so the
+citation would resolve to nothing and no check would say so.

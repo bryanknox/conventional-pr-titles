@@ -21,17 +21,26 @@ whether it works.
 
 ## Tier 1: the checks CI runs
 
-Five scripts, all exiting non-zero on any violation. Run them
-before opening a pull request; `.github/workflows/ci.yml` runs the
-same five on every pull request and every push to `main`.
+Six scripts and seven commands, all exiting non-zero on any
+violation. Run them before opening a pull request;
+`.github/workflows/ci.yml` runs the same seven on every pull request
+and every push to `main`.
 
 ```
 bash tests/lint-skills.sh
+bash tests/lint-skills.sh .claude/skills 'dev-*'
 bash tests/check-links.sh
 bash tests/check-workflow-template.sh
 bash tests/check-plugin-manifests.sh
 bash tests/check-requirement-ids.sh
+bash tests/check-skill-inventory.sh
 ```
+
+The lint runs twice because the maintainer-only `dev-*` skills under
+`.claude/skills/` are held to the same rules as the shipped ones.
+The glob is not decoration: that directory is also where a
+third-party skill installed for development lands, and linting one
+of those fails on rules it was never written against.
 
 One prerequisite: `check-workflow-template.sh` needs PyYAML.
 
@@ -170,6 +179,39 @@ It also resolves the `docs/`, `tests/`, and `skills/` paths cited
 from inside the eval JSON. `check-links.sh` cannot see those -- it
 reads markdown links, and these are string values in a JSON file.
 
+It does not scan `.claude/skills/`, which is why a `dev-*` skill
+must not transcribe a requirement id: it would be a citation nothing
+resolves.
+
+### check-skill-inventory.sh
+
+Which skills exist, and where. Two directories, two different rules,
+both declared as lists at the top of the script.
+
+| Directory | Rule | A missing skill | An unlisted directory |
+|---|---|---|---|
+| `skills/` | exact | fails | fails |
+| `.claude/skills/` | required | fails | reported only |
+
+`skills/` is exact because an extra directory there is both
+invisible and expensive. Everything in it ships, and
+`run-trigger-evals.sh` copies every `skills/*/` into its fixture --
+so a third skill silently joins the dispatch surface the trigger
+evals measure, and a near-miss prompt could be claimed by a skill
+that has no business in the measurement. Nothing else catches it:
+`lint-skills.sh` would lint the new skill and pass it, and
+`check-plugin-manifests.sh` asserts only that `skills/` holds at
+least one `<name>/SKILL.md`. This is the gap
+[decision 0014](decisions/0014-dev-skills-outside-skills-dir.md)
+named and left open until a dev skill existed.
+
+`.claude/skills/` is a required list rather than an exact one because
+third-party skills installed for development live there legitimately
+and are never committed. Reporting them rather than failing on them
+is what keeps the check green on a machine where `genesis` is
+installed, while still surfacing a `dev-*` skill that was never added
+to `DEV_SKILLS`.
+
 ### The checks are written to fail loudly
 
 A missing tool is an error, not a skip. This is deliberate: an
@@ -178,7 +220,7 @@ earlier ad-hoc version of these checks reported a clean pass because
 ran. A lint that can silently do nothing is worse than no lint,
 because it is trusted.
 
-The same principle applies to *finding* tools. Four of the five
+The same principle applies to *finding* tools. Four of the six
 checks resolve a Python interpreter by running each candidate, not by
 checking that the name exists on `PATH`; the eval runner does the
 same. Windows ships a `python3`
@@ -411,6 +453,14 @@ and the `requirements` arrays in the eval files, and
 `check-requirement-ids.sh` is a real backstop rather than a
 formality -- it fails on a citation that stops resolving and on a
 requirement the evidence register has gone quiet about.
+
+It is packaged as the `dev-absorb-campaign` skill, in
+`.claude/skills/`. **This page stays the authority**; the skill is
+the enforcement, and where the two disagree this page wins. The skill
+is maintainer tooling and carries no requirement ids and no evals, so
+it is read rather than trusted -- see
+[decision 0014](decisions/0014-dev-skills-outside-skills-dir.md) for
+why that trade was accepted and when it expires.
 
 One part does not delegate. The independent read-back in
 `evidence.md` has to be actual command output. A session that has

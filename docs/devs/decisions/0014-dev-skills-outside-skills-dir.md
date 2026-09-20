@@ -4,10 +4,14 @@
 campaign, cutting a release, the test-repo lifecycle -- are worth
 packaging as agent skills, and those skills never live in `skills/`.
 Their home is `.claude/skills/`, with `.gitignore` narrowed to let
-them be committed. Nothing is built yet; this records where they go
-and why, before the question comes up again with a keyboard in hand.
+them be committed.
 
-**Status:** accepted 2026-09-19.
+**Status:** accepted 2026-09-19. First built 2026-09-20:
+`dev-absorb-campaign`, the campaign one. The release and test-repo
+skills remain unbuilt, in that order. The three consequences below
+were all acted on at the same time -- the ignore was narrowed by the
+`dev-` prefix, the tier-1 lint gained a second invocation, and the
+expected-set gap was closed by `tests/check-skill-inventory.sh`.
 
 ## Context
 
@@ -42,11 +46,13 @@ claimed by a maintainer skill that has no business in the
 measurement, and the score would move for a reason nobody would look
 for.
 
-Nothing catches this today. `lint-skills.sh` would lint the new
-skill and pass it. `check-plugin-manifests.sh` asserts that `skills/`
-holds *at least one* `<name>/SKILL.md`, so a third satisfies it.
-Asserting the expected set of skill directories there is what would
-close the gap, and is worth doing if a dev skill is ever built.
+Nothing caught this when this decision was written. `lint-skills.sh`
+would lint the new skill and pass it. `check-plugin-manifests.sh`
+asserts that `skills/` holds *at least one* `<name>/SKILL.md`, so a
+third satisfies it. Asserting the expected set of skill directories
+there is what closes the gap, and
+`tests/check-skill-inventory.sh` now does it: `skills/` is an exact
+set and an extra directory in it fails.
 
 [Decision 0008](0008-maintainer-material-outside-skill-folders.md)
 already answers this with its own test: does the skill read this at
@@ -85,10 +91,17 @@ than the helper saves. If a dev skill ever starts being trusted
 rather than read, that reasoning has expired.
 
 **Tier-1 hygiene is nearly free.** `lint-skills.sh` already takes a
-directory argument, so `bash tests/lint-skills.sh .claude/skills`
-lints them for frontmatter, ASCII, wrapping and self-containment
-without a new script. Worth wiring into the tier-1 sequence once
-something is there to lint.
+directory argument, so it lints them for frontmatter, ASCII, wrapping
+and self-containment without a new script. Now wired into the tier-1
+sequence.
+
+One correction to that estimate, found while wiring it: the script
+globs every subdirectory of whatever it is given, so pointing it at
+`.claude/skills` also lints any third-party skill installed there --
+which fails on rules it was never written against. It takes an
+optional name glob for that reason, and the sequence runs
+`bash tests/lint-skills.sh .claude/skills 'dev-*'`. Free, but only
+with the glob.
 
 **Three procedures, not seven.** Tier 1 is five commands and needs no
 skill. The trigger evals already have their automation in
