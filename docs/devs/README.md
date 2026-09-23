@@ -77,12 +77,16 @@ The four cheapest things to get wrong, in order:
 | Find what still needs proving | [known-gaps.md](known-gaps.md) | -- | -- |
 | Set up or reset a test repository | [test-repos.md](test-repos.md) | -- | -- |
 | Absorb a campaign that produced a verdict | [testing.md](testing.md), "Finishing a campaign" | `dev-absorb-campaign`, then tier 1 | [findings.md](findings.md), [evidence.md](evidence.md), [known-gaps.md](known-gaps.md), and the spec if the contract moved |
+| Pick up work rather than bring it | [next-steps.md](next-steps.md) | -- | delete the row when it is done |
 | Cut a release | [release.md](release.md) | all four gates | the version in both manifests |
 
 ## Start here
 
 **Orientation**
 
+- [next-steps.md](next-steps.md) -- where the last session left off,
+  if you are picking work rather than bringing your own. Pointers
+  only; the registers below hold the substance.
 - [The user documentation](../users/README.md) -- you need to know
   what the skills do and how they are used before you can change them.
 - [architecture.md](architecture.md) -- what the two skills are, why
