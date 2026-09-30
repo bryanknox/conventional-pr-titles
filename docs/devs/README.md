@@ -84,6 +84,8 @@ The four cheapest things to get wrong, in order:
 
 **Orientation**
 
+- [concepts.md](concepts.md) -- the vocabulary the rest of these
+  pages assume: campaigns, registers, tiers, and the id schemes.
 - [next-steps.md](next-steps.md) -- where the last session left off,
   if you are picking work rather than bringing your own. Pointers
   only; the registers below hold the substance.

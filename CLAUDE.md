@@ -121,6 +121,9 @@ about.
 
 [docs/devs/README.md](docs/devs/README.md) has the development flow
 and a table routing each kind of task to the files it touches.
+[docs/devs/concepts.md](docs/devs/concepts.md) defines the terms
+those pages assume -- campaign, register, read-back, gate -- and
+every id scheme.
 
 ## Rules the skills themselves obey
 

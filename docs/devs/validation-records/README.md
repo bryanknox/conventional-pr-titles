@@ -6,6 +6,9 @@ instructions** -- read [testing.md](../testing.md) for how to run
 things now. Nothing in here is a to-do list, and nothing in here is
 outstanding work.
 
+If *campaign*, *register*, or ids like A-F5 and S2 are unfamiliar,
+start with [concepts.md](../concepts.md).
+
 They are kept because they cost real repositories, real API calls,
 and real money to produce, and because several of them record
 findings that contradict what documentation implied.
