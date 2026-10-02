@@ -77,7 +77,7 @@ and one more run might have falsified a different one.
 **The PR-title check here is advisory, not required.** Ruleset
 endpoints are plan-gated on a private free-plan repository, which is
 finding A-F5 applied to this repo itself. `enforce-conventional-commits`
-has been run here and Levels 1 and 3 are in place, but Level 2 is
+has been run here and Levels 1 and 2 are in place, but Level 3 is
 blocked, so direct pushes to `main` remain possible and using pull
 requests is a choice rather than enforcement. Making the repository
 public and re-running the skill adds only the ruleset. See

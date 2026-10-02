@@ -67,7 +67,7 @@ title request into repository administration for the rest.
 
 ## The three levels
 
-Skill A's whole footprint, in the order it applies them:
+Skill A's whole footprint, numbered in the order it applies them:
 
 1. **Merge settings** -- squash only; squash message is the PR
    title.
@@ -75,10 +75,12 @@ Skill A's whole footprint, in the order it applies them:
 3. **A default-branch ruleset** -- require a pull request, require
    the title check, empty bypass list.
 
-Level 3 lands before Level 2 deliberately: once the ruleset requires
-pull requests, committing the workflow directly to the default
-branch would be blocked by the ruleset the skill just created. See
-[decision 0006](decisions/0006-apply-order-workflow-before-ruleset.md).
+The ruleset goes last deliberately: once it requires pull requests,
+committing the workflow directly to the default branch would be
+blocked by the ruleset the skill just created. See
+[decision 0006](decisions/0006-apply-order-workflow-before-ruleset.md);
+the numbering itself is
+[decision 0015](decisions/0015-number-levels-in-apply-order.md).
 
 There is no Level 4. No hooks, no commit-message tooling, nothing
 installed locally. Its absence is a decision, not an omission --
@@ -104,7 +106,7 @@ that the intended thing happened.
 
 **Skill A:** preflight reads -> compute the diff and write a
 checklist -> one approval checkpoint -> apply and verify Level 1 ->
-apply and verify Level 3 -> apply and verify Level 2 -> report.
+apply and verify Level 2 -> apply and verify Level 3 -> report.
 
 Two properties matter. It **fails before mutating** if permissions
 are insufficient. And re-running on a configured repository produces

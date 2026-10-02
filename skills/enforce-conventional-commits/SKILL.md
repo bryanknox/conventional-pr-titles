@@ -17,17 +17,18 @@ description: >-
 
 Configure an EXISTING GitHub repository so that the only path to
 the default branch is a squash-merged PR whose title is a valid
-Conventional Commits message. The whole footprint is three levels:
+Conventional Commits message. The whole footprint is three levels,
+applied in this order:
 
 - Level 1 - repo merge settings: squash-only; default squash
   message = PR title.
-- Level 2 - a default-branch ruleset: require a PR, require the
-  PR-title status check, block force pushes and deletions, empty
-  bypass list.
-- Level 3 - a PR-title lint workflow
+- Level 2 - a PR-title lint workflow
   (`assets/pr-title-workflow.yml`, using
   amannn/action-semantic-pull-request), pinning the allowed commit
   types to the Conventional Commits de-facto set.
+- Level 3 - a default-branch ruleset: require a PR, require the
+  PR-title status check, block force pushes and deletions, empty
+  bypass list.
 
 There is no Level 4: no local git hooks, no commit tooling.
 Branch commits stay unconstrained by design; the PR title at merge
@@ -110,13 +111,13 @@ created at all. That preflight 403 is the DEFINITIVE detector; the
 plan read is only best-effort corroboration (`GET /user` includes
 `plan` only when the token has the `user` scope, which gh's
 default auth does not -- an empty result means UNKNOWN, not
-`free`). Do not abort: Levels 1 and 3 work on any plan. Carry the
-confirmed gate (403) -- Level 2 BLOCKED -- or, on a private repo
+`free`). Do not abort: Levels 1 and 2 work on any plan. Carry the
+confirmed gate (403) -- Level 3 BLOCKED -- or, on a private repo
 whose rulesets read succeeded, the remaining plan uncertainty,
 into the checkpoint. When the gate is confirmed, plan to skip
-Step 7's POST and report Level 2 as blocked with the remedy:
+Step 7's POST and report Level 3 as blocked with the remedy:
 upgrade to Pro or make the repo public, then re-run this skill
-(the re-run will be a Levels 1+3 no-op and add only the ruleset).
+(the re-run will be a Levels 1+2 no-op and add only the ruleset).
 
 ### Step 2 - Compute the diff
 
@@ -158,13 +159,13 @@ constraints so they survive a long session.
 Goal: only path to {default_branch} is a squash-merged PR whose
 title is a valid Conventional Commits message.
 Constraints: empty bypass list; no branch-commit enforcement;
-apply order Level 1 -> Level 3 -> Level 2.
+apply order Level 1 -> Level 2 -> Level 3.
 
 | Step | Target | Current | Action | Status |
 |---|---|---|---|---|
 | L1 merge settings | squash-only, title=PR_TITLE | {found} | {apply/no-op} | pending |
-| L3 pr-title workflow | present, action @v6, types pinned | {found} | {apply/no-op} | pending |
-| L2 ruleset on {default_branch} | active; PR + check required | {found} | {apply/no-op} | pending |
+| L2 pr-title workflow | present, action @v6, types pinned | {found} | {apply/no-op} | pending |
+| L3 ruleset on {default_branch} | active; PR + check required | {found} | {apply/no-op} | pending |
 | Read-back verification | all three levels green | - | - | pending |
 
 Gaps: {none | private free-plan repo: ruleset will be created but
@@ -181,12 +182,12 @@ acknowledgment, never silent action:
 - Overwriting an existing ruleset or an existing pr-title.yml that
   differs from the template.
 - Proceeding on a private repo with the plan gate confirmed
-  (Level 2 blocked: the ruleset cannot be created until the plan
+  (Level 3 blocked: the ruleset cannot be created until the plan
   is upgraded or the repo goes public) or with the plan unknown.
 
 State the allowed commit types the workflow will pin (feat, fix,
 docs, style, refactor, perf, test, build, ci, chore) as part of
-the Level 3 diff, and offer the list as customizable -- one line,
+the Level 2 diff, and offer the list as customizable -- one line,
 not a prompt to answer. The de-facto ten is the default; take a
 different list only if the user gives one.
 
@@ -216,11 +217,12 @@ commit body; lets `BREAKING CHANGE:` footers ride along), and
 Verify: re-read `gh api repos/{owner}/{repo}` and confirm each
 field patched above. Update the checklist.
 
-### Step 6 - Level 3: PR-title lint workflow
+### Step 6 - Level 2: PR-title lint workflow
 
-Level 3 lands BEFORE Level 2 so the workflow file can be committed
-directly to the default branch without being blocked by the
-ruleset this skill is about to create.
+The workflow lands BEFORE the ruleset (Level 3) so the file can be
+committed directly to the default branch without being blocked by
+the ruleset this skill is about to create. Never swap Steps 6 and
+7.
 
 First check the action's current major version against the pin in
 the template:
@@ -258,11 +260,11 @@ Verify: GET the same contents path, decode, and confirm it matches
 the template (plus any type-list edit the user asked for). Update
 the checklist.
 
-### Step 7 - Level 2: ruleset on the default branch
+### Step 7 - Level 3: ruleset on the default branch
 
 If preflight confirmed the plan gate (403 on the rulesets read),
 SKIP the create -- it would be refused with the same 403. Record
-Level 2 as `blocked by plan` in the checklist and go to Step 8.
+Level 3 as `blocked by plan` in the checklist and go to Step 8.
 
 Otherwise create the ruleset. The required status check is
 referenced by the workflow's job name string; no prior workflow
@@ -309,7 +311,7 @@ makes squash the only option. If the API returns 422, re-verify
 the request shape against the live GitHub REST docs for repository
 rulesets; do not adjust field names from recall. If it returns 403
 "Upgrade to GitHub Pro...", that is the plan gate surfacing here
-first: record Level 2 as blocked, do not retry, do not abort the
+first: record Level 3 as blocked, do not retry, do not abort the
 run.
 
 Verify with the effective-rules endpoint, which returns only
@@ -338,8 +340,8 @@ report:
 | Level | Before | After | Verified |
 |---|---|---|---|
 | 1 merge settings | {before} | squash-only, title=PR_TITLE | yes/no |
-| 3 pr-title workflow | {before} | .github/workflows/pr-title.yml @v6, types {de-facto ten | customized: ...} | yes/no |
-| 2 ruleset | {before} | {active | blocked by plan (403, not created) | created but NOT enforced} | yes/no |
+| 2 pr-title workflow | {before} | .github/workflows/pr-title.yml @v6, types {de-facto ten | customized: ...} | yes/no |
+| 3 ruleset | {before} | {active | blocked by plan (403, not created) | created but NOT enforced} | yes/no |
 
 Gaps: {none | plan gap details | action version lag}
 Residual soft spot: the PR merge box lets the merger hand-edit the
@@ -354,11 +356,7 @@ Next: open PRs with the companion skill write-pr-title.
   `allow_rebase_merge=false`, `squash_merge_commit_title=PR_TITLE`,
   `squash_merge_commit_message=BLANK`. Optional per user: squash
   message = PR_BODY instead of BLANK; auto-delete head branches.
-- Level 2: one ruleset targeting the default branch, enforcement
-  `active`, empty bypass list, rules: deletion, non_fast_forward,
-  pull_request (0 required approvals), required_status_checks with
-  context `Validate conventional PR title`.
-- Level 3: `.github/workflows/pr-title.yml` matching
+- Level 2: `.github/workflows/pr-title.yml` matching
   `assets/pr-title-workflow.yml`. The job name is the status-check
   context the ruleset requires; renaming one without the other
   breaks enforcement. The template pins the allowed types to the
@@ -368,3 +366,7 @@ Next: open PRs with the companion skill write-pr-title.
   from the action's defaults. The user may edit that list; if they
   ask, apply their list at Step 6 and record the deviation in the
   final report.
+- Level 3: one ruleset targeting the default branch, enforcement
+  `active`, empty bypass list, rules: deletion, non_fast_forward,
+  pull_request (0 required approvals), required_status_checks with
+  context `Validate conventional PR title` (the Level 2 job name).

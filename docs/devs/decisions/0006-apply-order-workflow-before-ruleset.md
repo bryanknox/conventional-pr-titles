@@ -1,8 +1,7 @@
 # 0006 - Apply the workflow before the ruleset
 
-**Decision:** Skill A applies its three levels in the order 1, 3, 2
--- merge settings, then the PR-title workflow, then the
-default-branch ruleset. Not in numerical order.
+**Decision:** Skill A applies merge settings, then the PR-title
+workflow, then the default-branch ruleset -- Levels 1, 2, 3.
 
 ## Why
 
@@ -19,17 +18,13 @@ into something messy and hard to make idempotent.
 Committing the workflow first avoids the deadlock entirely, and the
 whole setup stays one pass.
 
-## Why the levels are still numbered 1, 2, 3
+## How the levels are numbered
 
-The numbering follows the *conceptual* layering used throughout the
-documentation -- settings, then protection, then the check -- which
-is how people think about the footprint. The apply order is an
-implementation constraint.
-
-Renumbering to match execution order would make the documentation
-and the manual setup guide disagree with each other for no benefit.
-The order is instead stated explicitly wherever it matters, and the
-constraint is written down so it is not mistaken for an oversight.
+This decision originally kept a conceptual numbering -- 2 the
+ruleset, 3 the workflow -- and applied the levels in the order 1,
+3, 2. [Decision 0015](0015-number-levels-in-apply-order.md)
+renumbered them to match the apply order. The order itself did not
+change.
 
 ## Do not reorder
 

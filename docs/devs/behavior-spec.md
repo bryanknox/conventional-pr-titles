@@ -62,8 +62,8 @@ The complete footprint. There are three levels and no fourth.
 | Id | Requirement |
 |---|---|
 | A-R3 | **Level 1, merge settings:** `allow_squash_merge=true`, `allow_merge_commit=false`, `allow_rebase_merge=false`, `squash_merge_commit_title=PR_TITLE`, `squash_merge_commit_message=BLANK`. `PR_BODY` instead of `BLANK`, and auto-delete head branches, are permitted user options. |
-| A-R4 | **Level 3, workflow:** `.github/workflows/pr-title.yml` matching `assets/pr-title-workflow.yml`. Job name exactly `Validate conventional PR title`; `pull_request` trigger including the `edited` type; `amannn/action-semantic-pull-request@v6` pinned; `with: types:` stating `feat,fix,docs,style,refactor,perf,test,build,ci,chore`; `permissions.pull-requests: read`. A user-supplied type list is permitted, and the deviation is recorded in the final report. |
-| A-R5 | **Level 2, ruleset:** one ruleset named `conventional-commits-main` targeting the default branch, enforcement `active`, **empty** bypass list, rules `deletion`, `non_fast_forward`, `pull_request` (0 required approvals), and `required_status_checks` whose context equals the Level 3 job name exactly. |
+| A-R4 | **Level 2, workflow:** `.github/workflows/pr-title.yml` matching `assets/pr-title-workflow.yml`. Job name exactly `Validate conventional PR title`; `pull_request` trigger including the `edited` type; `amannn/action-semantic-pull-request@v6` pinned; `with: types:` stating `feat,fix,docs,style,refactor,perf,test,build,ci,chore`; `permissions.pull-requests: read`. A user-supplied type list is permitted, and the deviation is recorded in the final report. |
+| A-R5 | **Level 3, ruleset:** one ruleset named `conventional-commits-main` targeting the default branch, enforcement `active`, **empty** bypass list, rules `deletion`, `non_fast_forward`, `pull_request` (0 required approvals), and `required_status_checks` whose context equals the Level 2 job name exactly. |
 | A-R6 | There is no Level 4. No git hooks, no local commit tooling, nothing installed in a clone. Branch commits stay unconstrained. |
 
 A-R4 and A-R5 are coupled through one string. The ruleset requires the
@@ -76,11 +76,11 @@ asserts that string in the template and in this file.
 
 | Id | Requirement |
 |---|---|
-| A-R7 | Apply order is Level 1, then Level 3, then Level 2. Level 2 last because a ruleset requiring pull requests would block the direct commit of the Level 3 workflow to the default branch. |
+| A-R7 | Apply order is Level 1, then Level 2, then Level 3. Level 3 last because a ruleset requiring pull requests would block the direct commit of the Level 2 workflow to the default branch. |
 | A-R8 | Exactly one checkpoint, presenting the full three-level diff, and no mutation before it is approved. |
 | A-R9 | A re-run against an already-configured repository is a no-op: the diff comes back empty, the skill says so at the checkpoint, and it changes nothing. |
 | A-R10 | A partially or conflictingly configured repository produces a reconcile diff at the checkpoint -- corrected merge methods, stray rulesets surfaced, the overwrite-or-coexist decision made explicit -- rather than a blind re-apply. |
-| A-R11 | Where ruleset endpoints are plan-gated (free-plan private personal repos answer HTTP 403 on list, create, and effective-rules), detect it at preflight, state it at the checkpoint before mutating, apply and verify Levels 1 and 3 normally, and report Level 2 as BLOCKED with the remedy. No retry loop, nothing deleted, no abort. |
+| A-R11 | Where ruleset endpoints are plan-gated (free-plan private personal repos answer HTTP 403 on list, create, and effective-rules), detect it at preflight, state it at the checkpoint before mutating, apply and verify Levels 1 and 2 normally, and report Level 3 as BLOCKED with the remedy. No retry loop, nothing deleted, no abort. |
 | A-R12 | The final report shows before/after per level with a verified column, names any deviation, and names the residual soft spot: the merge box lets the merger hand-edit the squash message and nothing validates that edit. |
 
 ### Boundaries

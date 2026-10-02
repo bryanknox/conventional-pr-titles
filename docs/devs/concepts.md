@@ -95,12 +95,12 @@ maintainer pays for again. The procedure is in
 
 | Term | Meaning | Owned by |
 |---|---|---|
-| Level 1 / 2 / 3 | Skill A's footprint. Level 1: merge settings. Level 2: the default-branch ruleset. Level 3: the PR-title workflow. Applied in the order 1, 3, 2, so the workflow is committed before the ruleset would block the commit. | `skills/enforce-conventional-commits/SKILL.md`; [architecture.md](architecture.md) |
+| Level 1 / 2 / 3 | Skill A's footprint, numbered in apply order. Level 1: merge settings. Level 2: the PR-title workflow. Level 3: the default-branch ruleset, last so it cannot block the workflow commit. Archived records dated before 2026-10-02 use the old numbering, where 2 was the ruleset and 3 the workflow. | `skills/enforce-conventional-commits/SKILL.md`; [architecture.md](architecture.md); [decision 0015](decisions/0015-number-levels-in-apply-order.md) |
 | preflight | Skill A's opening reads: permissions, plan, and current state, all taken before anything changes. | [architecture.md](architecture.md), "Process spines" |
 | fail before mutating | A failure lands before any change or after all of them, never partway through. A missing permission is caught in preflight. | [behavior-spec.md](behavior-spec.md), INV3 |
 | one approval | A single checkpoint covering the whole change, never one per level. | [behavior-spec.md](behavior-spec.md), INV4; [decision 0007](decisions/0007-one-approval-not-three.md) |
 | degrade | Do what remains possible, then report exactly what did not happen and what would unblock it. | [behavior-spec.md](behavior-spec.md), INV5 |
-| plan gate | GitHub refusing every ruleset endpoint with HTTP 403 on a free-plan private repository, so Level 2 cannot exist there. | [findings.md](findings.md), A-F5 |
+| plan gate | GitHub refusing every ruleset endpoint with HTTP 403 on a free-plan private repository, so Level 3 cannot exist there. | [findings.md](findings.md), A-F5 |
 | no-op | A second Skill A run on a configured repository: the diff is empty, it says so, and nothing changes. | [architecture.md](architecture.md), "Process spines" |
 
 ### Repository structure

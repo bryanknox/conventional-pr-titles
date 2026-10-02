@@ -141,7 +141,7 @@ active enforcement. Expected values per scenario live in the eval
   Covers: INV1, INV2, INV4, A-R3, A-R4, A-R5, A-R6, A-R7, A-R8, A-R12.
 - **S2 private repo, free plan (graceful degrade).** Create-from-base
   with `--private` on the free-plan personal account. Run Skill A;
-  assert Levels 1+3 applied and Level 2 reported as BLOCKED by
+  assert Levels 1+2 applied and Level 3 reported as BLOCKED by
   plan. RESOLVED LIVE 2026-07-28: on free-plan private personal
   repos ALL ruleset endpoints (list, create, effective-rules) are
   plan-gated with HTTP 403 "Upgrade to GitHub Pro or make this
