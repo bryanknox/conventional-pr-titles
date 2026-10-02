@@ -8,12 +8,12 @@
       "prompt": "Set up this repo to use conventional commits with squash merges.",
       "setup": "Scenario S1 (docs/devs/test-repos.md): fresh PUBLIC test repo created from the k0x-workbench base; gh authenticated as the repo owner with repo+workflow scopes; skill installed repo-scoped; cwd is a clone of the test repo.",
       "requirements": ["INV1", "INV2", "INV4", "A-R3", "A-R4", "A-R5", "A-R6", "A-R7", "A-R8", "A-R12"],
-      "expected_output": "All three levels applied in the documented order (Level 1 merge settings, Level 3 workflow, Level 2 ruleset), one human checkpoint before any mutation, read-back verification after every mutation, and a final verification report with the residual-soft-spot note.",
+      "expected_output": "All three levels applied in the documented order (Level 1 merge settings, Level 2 workflow, Level 3 ruleset), one human checkpoint before any mutation, read-back verification after every mutation, and a final verification report with the residual-soft-spot note.",
       "expectations": [
         "Preflight reads (gh auth status, repo settings, owner plan, rulesets, workflow file) all happen BEFORE any mutation",
         "Exactly one human checkpoint presents the full three-level diff, and no mutation happens before it is approved",
         "Merge settings are patched to allow_squash_merge=true, allow_merge_commit=false, allow_rebase_merge=false, squash_merge_commit_title=PR_TITLE",
-        "The workflow is committed to .github/workflows/pr-title.yml BEFORE the ruleset is created (Level 3 before Level 2)",
+        "The workflow is committed to .github/workflows/pr-title.yml BEFORE the ruleset is created (Level 2 before Level 3)",
         "The committed workflow includes 'edited' in the pull_request trigger types, job name 'Validate conventional PR title', and pins amannn/action-semantic-pull-request@v6",
         "The ruleset targets the default branch with enforcement 'active', an EMPTY bypass_actors list, and rules deletion, non_fast_forward, pull_request, and required_status_checks with context 'Validate conventional PR title'",
         "Every mutation is followed by a read-back verification (repo settings GET, workflow contents GET + decode, rules/branches/{default_branch})",
@@ -32,11 +32,11 @@
       "prompt": "Set up this repo to use conventional commits with squash merges.",
       "setup": "Scenario S2 (docs/devs/test-repos.md): PRIVATE test repo on a free-plan personal account, otherwise as S1.",
       "requirements": ["INV3", "INV5", "A-R3", "A-R4", "A-R11", "A-R12"],
-      "expected_output": "Levels 1 and 3 applied and verified normally; the plan gate detected at preflight (HTTP 403 on the rulesets read) and surfaced at the checkpoint; Level 2 reported as blocked by plan (the create POST is refused with 403 on free-plan private personal repos -- verified live 2026-07-28); no crash.",
+      "expected_output": "Levels 1 and 2 applied and verified normally; the plan gate detected at preflight (HTTP 403 on the rulesets read) and surfaced at the checkpoint; Level 3 reported as blocked by plan (the create POST is refused with 403 on free-plan private personal repos -- verified live 2026-07-28); no crash.",
       "expectations": [
         "The plan gate is detected at preflight (403 'Upgrade to GitHub Pro...' on the rulesets read is the definitive signal; the plan read may be UNKNOWN without the user scope) and stated at the checkpoint BEFORE any mutation, not discovered after the fact",
-        "Levels 1 and 3 are applied and read-back verified exactly as in the public-repo case",
-        "Level 2 is reported as BLOCKED by plan: either the POST is skipped with the confirmed 403 gate as the stated reason, or a single attempted POST's 403 refusal is reported -- no retry loop, nothing deleted, no abort of the run",
+        "Levels 1 and 2 are applied and read-back verified exactly as in the public-repo case",
+        "Level 3 is reported as BLOCKED by plan: either the POST is skipped with the confirmed 403 gate as the stated reason, or a single attempted POST's 403 refusal is reported -- no retry loop, nothing deleted, no abort of the run",
         "The final report names the gap and the remedy (upgrade to Pro or make the repo public, then re-run the skill to add the ruleset); the run completes without error"
       ],
       "baseline_failure_modes": [

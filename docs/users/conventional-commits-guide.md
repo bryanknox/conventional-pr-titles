@@ -28,8 +28,8 @@ automatically, and requires no local setup from anyone.
 
 ## Setting up a repository by hand
 
-Three levels. Apply 1 and 3 before 2, or the ruleset will block you
-from committing the workflow file.
+Three levels, applied in order. The ruleset comes last, or it will
+block you from committing the workflow file.
 
 ### Level 1: repository settings
 
@@ -47,33 +47,7 @@ PR body to become the commit body. That is what lets a
 This alone makes squash the only possible merge, on any plan.
 Optionally also enable *Automatically delete head branches*.
 
-### Level 2: a ruleset on the default branch
-
-**Settings -> Rules -> Rulesets**
-
-Create a ruleset targeting the default branch with:
-
-- *Restrict deletions* and *Block force pushes*
-- *Require a pull request before merging* -- this is what prevents
-  direct pushes. Required approvals can be 0; the pull request just
-  has to exist.
-- *Require status checks to pass*, and add the PR-title check from
-  Level 3 by its job name. It appears in the picker once it has run
-  at least once.
-- **Bypass list: empty.** Do not add yourself. If you ever need an
-  escape hatch, set the ruleset to *Evaluate* temporarily rather than
-  granting a permanent exception.
-
-You can skip the ruleset's merge-method rule. With only squash
-enabled at Level 1 it is redundant.
-
-**Plan limits.** This works free on **public** personal
-repositories. A **private** personal repository needs GitHub Pro --
-and the gate is absolute, not partial: every ruleset endpoint returns
-403 until you upgrade or make the repository public. Levels 1 and 3
-work regardless.
-
-### Level 3: the PR-title workflow
+### Level 2: the PR-title workflow
 
 One file, `.github/workflows/pr-title.yml`:
 
@@ -111,7 +85,7 @@ Three details matter:
 - The `edited` trigger. Without it, fixing a bad title leaves the
   old failure sitting there until something else re-runs the check.
 - The job **name** (`Validate conventional PR title`) is what the
-  Level 2 ruleset requires by string. Renaming the job silently
+  Level 3 ruleset requires by string. Renaming the job silently
   breaks enforcement.
 - The `types:` list. The action's defaults already match the ten
   below, but they are written out anyway so the types your
@@ -124,6 +98,32 @@ use, or add your own -- `revert` is the common addition. Keep
 release tooling reads to decide a version bump. Whatever you keep
 is exactly what the check accepts, so narrowing the list makes the
 check stricter, not looser.
+
+### Level 3: a ruleset on the default branch
+
+**Settings -> Rules -> Rulesets**
+
+Create a ruleset targeting the default branch with:
+
+- *Restrict deletions* and *Block force pushes*
+- *Require a pull request before merging* -- this is what prevents
+  direct pushes. Required approvals can be 0; the pull request just
+  has to exist.
+- *Require status checks to pass*, and add the PR-title check from
+  Level 2 by its job name. It appears in the picker once it has run
+  at least once.
+- **Bypass list: empty.** Do not add yourself. If you ever need an
+  escape hatch, set the ruleset to *Evaluate* temporarily rather than
+  granting a permanent exception.
+
+You can skip the ruleset's merge-method rule. With only squash
+enabled at Level 1 it is redundant.
+
+**Plan limits.** This works free on **public** personal
+repositories. A **private** personal repository needs GitHub Pro --
+and the gate is absolute, not partial: every ruleset endpoint returns
+403 until you upgrade or make the repository public. Levels 1 and 2
+work regardless.
 
 ### Level 4: nothing
 

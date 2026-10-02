@@ -37,7 +37,7 @@ next session is free to disagree with.
 | 4 | Automate the repo-state half of the content evals | [known-gaps.md](known-gaps.md), "Method gaps" |
 | 5 | Build the release dev skill, then the test-repo one | [decision 0014](decisions/0014-dev-skills-outside-skills-dir.md) |
 | 6 | Close B-R9, B-R11, A-R2, and the org-repo gap | [known-gaps.md](known-gaps.md), "Untested requirements" |
-| 7 | Decide whether to go public and re-run for Level 2 | [decision 0009](decisions/0009-stay-private-for-now.md) |
+| 7 | Decide whether to go public and re-run for Level 3 | [decision 0009](decisions/0009-stay-private-for-now.md) |
 
 Cheapest first, roughly. Items 2 and 3 cost one session each; item 4
 is the one that makes every later tier-2 run cheaper; item 6 needs

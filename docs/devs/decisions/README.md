@@ -25,3 +25,4 @@ obvious from the code.
 | [0012](0012-harvest-records-into-durable-artifacts.md) | Harvest the validation records into durable artifacts |
 | [0013](0013-archive-the-validation-records.md) | Archive the validation records rather than maintain them |
 | [0014](0014-dev-skills-outside-skills-dir.md) | Internal dev skills live outside `skills/` |
+| [0015](0015-number-levels-in-apply-order.md) | Number the levels in the order they are applied |

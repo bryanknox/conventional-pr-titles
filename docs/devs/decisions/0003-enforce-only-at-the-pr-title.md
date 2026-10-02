@@ -77,7 +77,7 @@ they are easy to assume away:
 
 - The body reaching the merge box is the pull request body **as of
   merge**, not as of the check. Editing the body does re-run the
-  Level 3 workflow -- `edited` fires for body edits too -- but that
+  Level 2 workflow -- `edited` fires for body edits too -- but that
   workflow lints the title. The body is validated by nothing, under
   either setting.
 - A `BREAKING CHANGE:` footer is therefore advisory. The `!` in the
@@ -86,7 +86,7 @@ they are easy to assume away:
   relying on the footer alone.
 
 Two fixes were considered and rejected. A title/body consistency
-check in the Level 3 workflow is straightforward to write, but it
+check in the Level 2 workflow is straightforward to write, but it
 narrows the gap rather than closing it: the merge-box edit happens
 after every check has reported. Ruleset commit-metadata
 restrictions do not help either -- they are gated to GitHub

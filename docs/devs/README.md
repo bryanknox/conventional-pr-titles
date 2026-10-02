@@ -224,9 +224,9 @@ checks.
 | Read | Proves |
 |---|---|
 | `gh api repos/{owner}/{repo}` | Level 1: `allow_squash_merge` true, the other two false, `squash_merge_commit_title=PR_TITLE` |
-| `gh api repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml` | Level 3: the workflow is there. 404 means absent |
+| `gh api repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml` | Level 2: the workflow is there. 404 means absent |
 | `gh api repos/{owner}/{repo}/rulesets` | the ruleset object exists |
-| `gh api repos/{owner}/{repo}/rules/branches/{default_branch}` | Level 2: it is actually *enforced* |
+| `gh api repos/{owner}/{repo}/rules/branches/{default_branch}` | Level 3: it is actually *enforced* |
 
 Run them as separate commands rather than `&&`-chained or under
 `set -e`. `gh api` exits non-zero on outcomes that are expected here
@@ -242,14 +242,14 @@ pair is here to separate, and the only one of the three levels that
 can be present and inert at the same time.
 
 **Worked example, this repository**, read back 2026-09-19. Level 1
-and Level 3 are clean: squash-only, `squash_merge_commit_title` is
+and Level 2 are clean: squash-only, `squash_merge_commit_title` is
 `PR_TITLE`, and `pr-title.yml` is present. Two settings differ from
 the skill's defaults, deliberately:
 `squash_merge_commit_message` is `PR_BODY` rather than `BLANK`, and
 `delete_branch_on_merge` is on. The skill offers both on request, so
 neither is drift.
 
-Level 2 cannot be read at all. *Both* ruleset endpoints answer
+Level 3 cannot be read at all. *Both* ruleset endpoints answer
 `403 Upgrade to GitHub Pro or make this repository public`, not
 just the listing one, so on a free-plan private repository the
 exists-versus-enforced distinction above is not observable -- there

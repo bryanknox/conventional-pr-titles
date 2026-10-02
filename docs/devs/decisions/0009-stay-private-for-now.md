@@ -1,7 +1,7 @@
 # 0009 - Stay private for now
 
 **Decision:** this repository stays private, accepting that the
-Level 2 ruleset cannot exist here and that the PR-title check is
+Level 3 ruleset cannot exist here and that the PR-title check is
 therefore advisory rather than required.
 
 ## Why
@@ -12,7 +12,7 @@ the repository that develops them is visible.
 
 ## What it costs
 
-**Level 2 is not merely unset, it is impossible.** On a private
+**Level 3 is not merely unset, it is impossible.** On a private
 repository under a free personal plan, every ruleset endpoint is
 plan-gated. The ruleset cannot be created, so nothing mechanically
 forces a change through a pull request: direct pushes to `main`
@@ -62,7 +62,7 @@ unpublished. Assume anything that ships public has been read.
 **2. Flip visibility to public.**
 
 **3. Re-run `enforce-conventional-commits` against this repository.**
-The re-run is idempotent by design: Levels 1 and 3 come back as
+The re-run is idempotent by design: Levels 1 and 2 come back as
 no-ops and it adds only the ruleset. Verify with the
 effective-rules endpoint, which returns only actively enforced
 rules:
