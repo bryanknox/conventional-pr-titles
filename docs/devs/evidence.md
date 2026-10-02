@@ -40,7 +40,7 @@ B-CE1/2/3) in `tests/evals/<skill>/evals.json`.
 | A-R11 | A-CE2/S2 | [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
 | A-R12 | A-CE1/S1 expectation 8 | [S1](validation-records/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
 | A-R13 | -- | -- | -- | **NOT PROVEN** -- see [known-gaps.md](known-gaps.md) |
-| A-R14 | Dispatch only (trigger case A-N9) | [rename gate](validation-records/rename-trigger-gate.md) | 2026-09-19 | **PARTIAL** -- see [known-gaps.md](known-gaps.md) |
+| A-R14 | Dispatch only (trigger case A-N9, last scored under the current names on 2026-10-02) | [rename gate](validation-records/rename-trigger-gate.md), [trigger gates](#trigger-gates) | 2026-10-02 | **PARTIAL** -- see [known-gaps.md](known-gaps.md) |
 | B-R1 | P1-P5 | [P1-P4](validation-records/pr-conventional-commits-step8.md), [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
 | B-R2 | P1-P5; classification came from the diff in every run, with deliberately vague commit messages as decoys | [P1-P4](validation-records/pr-conventional-commits-step8.md), [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
 | B-R3 | P1-P5; P5's title independently measured at 45 chars, no trailing period, no invented scope | [P1-P4](validation-records/pr-conventional-commits-step8.md), [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
@@ -102,6 +102,7 @@ prediction is a result.
 | 2026-07-29 gate -- **superseded**; record removed, see [decision 0013](decisions/0013-archive-the-validation-records.md) | validation (16) | old | `claude-fable-5` | 16/16; both skills 4/4 should-trigger, 0/4 near-miss |
 | [2026-09-19 control](validation-records/rename-trigger-gate.md) | train (24) | old | `claude-opus-5[1m]` | 24/24; both skills 1.00 / 0.00 |
 | [2026-09-19 gate](validation-records/rename-trigger-gate.md) | validation (16) | new | `claude-opus-5[1m]` | 15/16 PASS; enforce 4/4 and 0/4, write 4/4 and 1/4 |
+| 2026-10-02 A-N1 re-score -- no record; this row and the last paragraph below are it | train (24) | new | `claude-opus-5[1m]` | 24/24; both skills 1.00 / 0.00; A-N1 invoked nothing |
 
 The control exists because scoring new names against a record taken on
 a different model cannot distinguish a naming regression from a model
@@ -113,3 +114,16 @@ commits", which now pulls `write-pr-title` because the new name leads
 with the same verb the prompt does. It was deliberately not tuned
 against: it is a validation-split prompt, and tuning there spends the
 split.
+
+The 2026-10-02 re-score answers the case B-N2 left open. A-N1, "write
+a conventional commit message for these changes", has the same shape
+and sits in train, where it may be consulted. Under the current names
+it invoked no skill: the `write` verb did not pull it. The model was
+pinned to the control's through `ANTHROPIC_MODEL` and the CLI was the
+same 2.1.220, so the comparison isolates the names. Containment held:
+every session's `init` listed only `Glob`, `Grep`, `Read`, and
+`Skill`, and A-N1's first call -- a `git diff` through `Bash` -- was
+rejected as no such tool. Read back from `results.json` and from the
+A-N1 transcript, which holds no `Skill` tool_use. One draw, like every
+row above: evidence that B-N2's pull does not extend to every prompt
+of that shape, not proof that it cannot.
