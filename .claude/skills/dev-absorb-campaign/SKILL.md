@@ -53,7 +53,7 @@ says, and target 4 is the only one that re-arms release gates.
 | 1 | `docs/devs/findings.md` | append | one row per finding, continuing the per-skill numbering |
 | 2 | `docs/devs/evidence.md` | edit and append | the coverage row for every requirement exercised, plus one runs row |
 | 3 | `docs/devs/known-gaps.md` | settle or add | a closed gap MOVES to evidence.md; a revealed gap stays |
-| 4 | `docs/devs/behavior-spec.md` and both `evals.json` | only if the contract moved | a spec row, and the `requirements` arrays |
+| 4 | `docs/devs/behavior-spec.md` and both `evals.json` | if the contract moved, or a prediction was falsified | a spec row and the `requirements` arrays; or a `baseline_failure_modes_measured` entry |
 
 ## Process
 
@@ -129,6 +129,20 @@ account was switched, the run happened elsewhere -- write
 NOT INDEPENDENTLY VERIFIED and the reason in the cell, and carry it
 into the report. That is a worse register and an honest one.
 
+A claim about behavior that leaves no server state -- a request the
+skill declined, a question it asked -- has no second source at all.
+Mark it NOT INDEPENDENTLY VERIFIED for that reason. Do not restate
+the transcript and call it confirmed.
+
+If a read-back CONTRADICTS the transcript -- the runner reported one
+value and the live read returns another -- the cell asserts the live
+value and names the runner's value beside it. Do not change the
+verdict, and do not decide the cause: the runner may be wrong, or the
+state may have changed since the run. Both are judgements about the
+session under test. The mismatch goes to the checkpoint as an item
+that needs acknowledgment, and whether it becomes a finding is the
+maintainer's call.
+
 **Scope this refusal.** The `Cost` column is tokens, tool uses, and
 wall time. It legitimately comes from the run itself, there is no
 second source for it, and none is needed. Do not mark cost cells
@@ -153,9 +167,12 @@ Two things ALWAYS require explicit acknowledgment, never silent
 action:
 
 - Any independent-verification cell marked NOT INDEPENDENTLY
-  VERIFIED.
-- Any change under target 4. Moving the contract re-arms release
-  gates 3 and 4 and is a semver event.
+  VERIFIED, and any read-back that contradicts the transcript.
+- Any change under target 4, stating which kind it is. A change to
+  `behavior-spec.md` or to a `requirements` array moves the contract:
+  it re-arms release gates 3 and 4 and is a semver event. A
+  `baseline_failure_modes_measured` entry on its own does not move
+  the contract. Say so, so the reader does not have to work it out.
 
 ### Step 5 - Target 1 of 4: findings.md
 
@@ -181,6 +198,11 @@ If nothing has changed yet the status is OPEN, and since the register
 closes by saying nothing in it is open, an OPEN row is a claim being
 made on purpose. Append only: never renumber, never reuse an id, and
 never edit an existing row except its status.
+
+The register's closing section, "What is still open", lists what is
+open. Edit it in the same change whenever that set changes -- an
+OPEN row added, or the last OPEN row closed -- because otherwise the
+last paragraph of the register contradicts its tables.
 
 Verify: re-read the section and confirm the new ids are consecutive
 with what step 1 found.
@@ -231,6 +253,12 @@ have closed it becomes the exercised-by cell in the coverage row from
 step 6. Do not leave it in both -- a gap listed in both places is a
 register contradicting itself.
 
+A gap the campaign TOUCHED without closing keeps its row. Edit its
+"What is unproven" cell to say what was observed and why that does
+not close it. A method gap whose wording the campaign made
+inaccurate -- a count of runs, a list of baselines -- is edited the
+same way.
+
 A gap the campaign REVEALED gets a new row with every cell filled,
 and what would close it must be an executable sentence naming the
 scenario, account, or artifact it needs. Not "test it".
@@ -240,13 +268,34 @@ requirements". A whole configuration never tried goes under "Untested
 configurations". A limit on what any evidence can claim goes under
 "Method gaps".
 
+When a gap closes, grep `docs/devs/test-repos.md` for its id. That
+file mentions gaps in its prose, so closing one can leave a sentence
+there saying the behavior is untested. It is not a write target, so
+do not edit it: name each stale sentence in the step-10 report.
+
 Verify: no id appears both in a known-gaps row and as PROVEN in the
-step-6 coverage table.
+step-6 coverage table. Run it; do not check by eye:
+
+```
+ids=$(grep -oE '^\| (INV|A-R|B-R)[0-9]+ \|' docs/devs/known-gaps.md | tr -d '| ')
+echo "known-gaps requirement rows: $(echo $ids | wc -w)"
+for id in $ids; do
+  grep -E "^\| $id \|.*\| PROVEN[^|]*\|$" docs/devs/evidence.md >/dev/null && echo "CONFLICT: $id"
+done
+```
+
+Any CONFLICT line is a failure. So is a row count that does not
+match the number of rows in "Untested requirements": that means the
+pattern stopped matching, and a loop over zero ids would print
+nothing and look clean.
 
 ### Step 8 - Target 4 of 4: behavior-spec.md and the eval requirements
 
-Only if the contract MOVED -- if what must be true changed, not if
-the wording did.
+This target has two independent triggers. The spec and the
+`requirements` arrays change only if the contract MOVED -- if what
+must be true changed, not if the wording did. A falsified prediction
+is recorded whether or not the contract moved; see the end of this
+step.
 
 Requirement ids are stable. Add a new id, or mark an existing one
 withdrawn. Never renumber and never reuse: `evidence.md`,
@@ -310,9 +359,13 @@ for {ids} -- {why}}
 
     {per requirement: the command, then its output verbatim}
 
+Read-back contradictions: {none | per field: runner said X, live
+read returned Y}
+
 Backstop: check-requirement-ids.sh -> {verbatim summary line}
 Falsified predictions: {none | eval {id}, recorded as
 baseline_failure_modes_measured}
+Stale outside the targets: {none | file: the sentence and why}
 Release impact: {none | the contract moved -- gates 3 and 4 re-arm,
 and the next release is at least a {minor | major}}
 ```
