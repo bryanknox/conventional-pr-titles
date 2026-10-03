@@ -31,7 +31,7 @@ next session is free to disagree with.
 
 | # | Next step | Owned by |
 |---|---|---|
-| 1 | Build the release dev skill, then the test-repo one | [decision 0014](decisions/0014-dev-skills-outside-skills-dir.md) |
+| 1 | Build the test-repo dev skill | [decision 0014](decisions/0014-dev-skills-outside-skills-dir.md) |
 | 2 | Close B-R9, B-R11, A-R2, and the org-repo gap | [known-gaps.md](known-gaps.md), "Untested requirements" |
 | 3 | Decide whether to go public and re-run for Level 3 | [decision 0009](decisions/0009-stay-private-for-now.md) |
 | 4 | Load both skills once in Cursor and in Codex | [known-gaps.md](known-gaps.md), "Untested configurations" |
@@ -43,7 +43,17 @@ Not ranked, because it waits on an event rather than a turn: absorb
 the next real tier-2 campaign with `dev-absorb-campaign`, whenever
 one produces a verdict. See below.
 
-## The one item no register owns
+## What no register owns
+
+**Exercising `dev-cut-release` on a real release.** It has never
+run on one. One is already due:
+`skills/enforce-conventional-commits/SKILL.md` has changed since
+`conventional-pr-titles--v2.0.0` (#25), and nothing has bumped the
+version since. Whether that change is worth releasing yet is the
+maintainer's call. The skill does not make it. When it runs, the
+things to watch are the two places release.md says a session misleads
+by summarising: the manifest named on validate, and the warning list
+copied rather than reduced to a verdict.
 
 **Exercising `dev-absorb-campaign` on a real campaign.** It has been
 run once, on a synthetic, discardable campaign: a fictional brief

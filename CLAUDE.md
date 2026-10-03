@@ -66,12 +66,13 @@ Reasoning for each of these is in
 ## Maintainer-only dev skills
 
 Repetitive maintainer procedures are packaged as agent skills too,
-and they live in `.claude/skills/` with a `dev-` prefix. Today that
-is `dev-absorb-campaign`, which absorbs a tier-2 campaign into the
-registers. Cutting a release and the test-repo lifecycle are named
-as candidates in [decision
+and they live in `.claude/skills/` with a `dev-` prefix. Today there
+are two: `dev-absorb-campaign`, which absorbs a tier-2 campaign into
+the registers, and `dev-cut-release`, which bumps the version, opens
+the release PR, and reads the tag back. The test-repo lifecycle is
+named as a candidate in [decision
 0014](docs/devs/decisions/0014-dev-skills-outside-skills-dir.md) and
-are not built.
+is not built.
 
 **They never go in `skills/`**, for two independent reasons, and the
 second fails silently:
@@ -184,6 +185,8 @@ installed copies cached, silently.
 know that a changed skill needed a bump. The full sequence, and
 why `claude plugin validate` is a release step rather than a CI
 step, is in [docs/devs/release.md](docs/devs/release.md).
+`dev-cut-release` packages that sequence. It never chooses the bump
+size and never runs `claude plugin tag`.
 
 ## Platform
 
