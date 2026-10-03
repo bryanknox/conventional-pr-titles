@@ -19,7 +19,10 @@ muddy development repos.
 
 All helpers below are documented `gh` one-liners, run from a
 POSIX shell (the Bash tool; `--jq`/`xargs` forms assume it).
-Promote them to `tests/scripts/` only if the rule of three fires.
+The read-backs that grade a run have been promoted to
+`tests/evals/check-repo-state.sh` -- see [testing.md](testing.md),
+"Checking repo state". The setup, reset, and mutation one-liners stay
+here as prose. Promote those only if the rule of three fires.
 
 ## Driving these procedures from a session
 
@@ -128,13 +131,25 @@ For without-skill baseline runs, remove the folder first:
 
 ## Skill A scenarios (recreate per scenario)
 
-Assert outcomes via `gh api` read-backs (the same endpoints the
-skill itself uses): `repos/{o}/{r}` for merge settings,
+Assert outcomes with the repo-state checker, after the run:
+
+    bash tests/evals/check-repo-state.sh check <S1|S2> bryanknox/k0x-test-cc-<suffix> <outdir>
+
+S3, S4, and S5 compare against the state before the run, so take a
+snapshot first, then pass it to the check after the run with
+`--pre <pre-dir>`:
+
+    bash tests/evals/check-repo-state.sh snapshot bryanknox/k0x-test-cc-<suffix> <pre-dir>
+
+It reads the same endpoints the skill itself uses: `repos/{o}/{r}`
+for merge settings,
 `repos/{o}/{r}/contents/.github/workflows/pr-title.yml` for the
-workflow, `repos/{o}/{r}/rulesets` and
-`repos/{o}/{r}/rules/branches/<default>` for ruleset existence vs
-active enforcement. Expected values per scenario live in the eval
-`expectations` (`tests/evals/enforce-conventional-commits/evals.json`).
+workflow, and `repos/{o}/{r}/rulesets` and
+`repos/{o}/{r}/rules/branches/<default>` to tell ruleset existence
+apart from active enforcement. The expectations it settles are cited
+from the eval `expectations`
+(`tests/evals/enforce-conventional-commits/evals.json`). It lists the
+ones it leaves to the grader.
 
 - **S1 fresh public repo (happy path).** Create-from-base, public.
   No further setup. Run Skill A; assert the full 3-level scaffold.
@@ -247,7 +262,10 @@ repo and scaffold again.
 Each P scenario = reset, then create a branch with the described
 change (ad hoc edits to the base repo's files), then run Skill B.
 Expected titles and check behavior live in the eval `expectations`
-(`tests/evals/write-pr-title/evals.json`).
+(`tests/evals/write-pr-title/evals.json`). After the run, check the
+PR's state against them:
+
+    bash tests/evals/check-repo-state.sh check <P1-P5> bryanknox/k0x-test-cc-<pr|p5> <outdir> --pr <N> --expect-title "<title from the transcript>"
 
 - **P1 single bug-fix branch.** One small defect-fix commit ahead of
   `main`; no existing PR. Expect `fix: ...`, check green.
