@@ -31,15 +31,14 @@ next session is free to disagree with.
 
 | # | Next step | Owned by |
 |---|---|---|
-| 1 | Load both skills once in Cursor and in Codex | [known-gaps.md](known-gaps.md), "Untested configurations" |
-| 2 | Automate the repo-state half of the content evals | [known-gaps.md](known-gaps.md), "Method gaps" |
-| 3 | Build the release dev skill, then the test-repo one | [decision 0014](decisions/0014-dev-skills-outside-skills-dir.md) |
-| 4 | Close B-R9, B-R11, A-R2, and the org-repo gap | [known-gaps.md](known-gaps.md), "Untested requirements" |
-| 5 | Decide whether to go public and re-run for Level 3 | [decision 0009](decisions/0009-stay-private-for-now.md) |
+| 1 | Automate the repo-state half of the content evals | [known-gaps.md](known-gaps.md), "Method gaps" |
+| 2 | Build the release dev skill, then the test-repo one | [decision 0014](decisions/0014-dev-skills-outside-skills-dir.md) |
+| 3 | Close B-R9, B-R11, A-R2, and the org-repo gap | [known-gaps.md](known-gaps.md), "Untested requirements" |
+| 4 | Decide whether to go public and re-run for Level 3 | [decision 0009](decisions/0009-stay-private-for-now.md) |
+| 5 | Load both skills once in Cursor and in Codex | [known-gaps.md](known-gaps.md), "Untested configurations" |
 
-Cheapest first, roughly. Item 1 costs one session; item 2 is the one
-that makes every later tier-2 run cheaper; item 4 needs setup before
-it needs a session.
+Item 1 is the one that makes every later tier-2 run cheaper; item 3
+needs setup before it needs a session; item 5 costs one session.
 
 Not ranked, because it waits on an event rather than a turn: absorb
 the next real tier-2 campaign with `dev-absorb-campaign`, whenever
