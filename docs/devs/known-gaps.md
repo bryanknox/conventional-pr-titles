@@ -41,14 +41,18 @@ that [evidence.md](evidence.md) marks NOT PROVEN or PARTIAL.
 
 These limit what any of the evidence can claim.
 
-**Content evals have no runner.** `tests/evals/<skill>/evals.json`
-holds `expectations` arrays that only a human grades against a
-transcript and the resulting repo state. `run-trigger-evals.sh` reads
-only `trigger_evals`. So tier 2's content half is entirely manual, and
-its cost is why it is not run casually. Automating even the
-repo-state half of the assertions -- the `gh api` read-backs are
-already scripted in `test-repos.md` -- would make re-validation
-substantially cheaper.
+**Content evals have no runner for the transcript half.** The
+repo-state half is now `tests/evals/check-repo-state.sh`. It reads
+back server state for S1-S5 and P1-P5, asserts the expected values,
+and saves the raw reads as citable read-backs -- see
+[testing.md](testing.md), "Checking repo state". What it cannot see
+is still graded by hand against the transcript: one checkpoint before
+any mutation, a read-back after every mutation, the content of the
+final report, imperative mood in a title, and the with-skill against
+without-skill comparison. Driving the sessions themselves is manual
+too. The checker has been proven read-only against this repository,
+which is in the S2 end state, and has not yet been used in a real
+campaign.
 
 **Trigger results are single-run point estimates.** Each prompt was
 presented once per gate. Dispatch is sampled behavior, not

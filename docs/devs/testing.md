@@ -287,7 +287,76 @@ half of the pair stops being a baseline.
 
 Grading stays with you. Whether two transcripts are
 indistinguishable is a judgement about the session under test, and
-it is not one that session can make about itself.
+it is not one that session can make about itself. The repo-state
+half of the expectations is the exception: a script settles it,
+below. The transcript half and the verdict stay yours.
+
+### Checking repo state
+
+`tests/evals/check-repo-state.sh` reads back the server state a
+scenario is graded on, saves the reads, and asserts the scenario's
+expected state against them. It covers S1-S5 and P1-P5.
+
+```
+bash tests/evals/check-repo-state.sh check S1 bryanknox/k0x-test-cc-s1 <outdir>
+bash tests/evals/check-repo-state.sh check P1 bryanknox/k0x-test-cc-pr <outdir> --pr 7 --expect-title "<title from the transcript>"
+```
+
+**S3, S4 and S5 compare against the state before the run**, so take
+a snapshot first and pass it in:
+
+```
+bash tests/evals/check-repo-state.sh snapshot bryanknox/k0x-test-cc-s1 <pre-dir>
+# ... run the skill ...
+bash tests/evals/check-repo-state.sh check S3 bryanknox/k0x-test-cc-s1 <outdir> --pre <pre-dir>
+```
+
+The P scenarios need `--pr`. `--expect-title` is optional, and takes
+the title the transcript says was applied. The script compares it to
+the server's, which is the two-source version of B-R8's read-back.
+
+What it settles and what it does not:
+
+- **Each assertion cites the eval expectation it settles**, as
+  `A-CE1#3` -- expectation 3 of A-CE1. Before anything runs, every
+  cited ref is resolved against `evals.json`. A ref that no longer
+  resolves stops the run with exit 2, so editing an `expectations`
+  array cannot silently detach a check from what it was checking.
+- **The run ends with what is left to the grader.** These are the
+  eval's expectations that no assertion cited, plus the ones server
+  state can only half-settle -- "the check is polled and reported as
+  passing" shows as passed on the server, but only the transcript
+  shows that it was polled. Checkpoint ordering, a read-back after
+  every mutation, report content, and imperative mood are never
+  automated.
+- **The raw reads are saved under `<outdir>/raw/`**, one file per
+  `gh api` call, with its HTTP status beside it. They are real command
+  output taken by the dev session, which is what
+  [evidence.md](evidence.md) means by an independent read-back.
+- **It reads, it never writes.** Every call is a GET. Run it as
+  `bryanknox` even for S5: the switch back is part of that procedure.
+
+Exit status is 0 when every check passes, 1 when one fails, and 2
+when the check could not run. A 403 or 404 is data, not a failure to
+run -- S2 expects both. Like the trigger runner, it is not in CI. It
+reads live repositories that exist only during a campaign.
+
+It was proven read-only against this repository, which is in the S2
+end state, before any campaign used it. Its first real campaign has
+not happened yet.
+
+### Driving the repo-state check from a session
+
+Invoke the script rather than letting a session improvise `gh api`
+reads. An improvised check reads what the session thinks the
+expectation means, chains the reads so a 403 stops the rest, and
+leaves no raw output behind to cite. The script also takes the
+expected values from the shipped workflow template rather than from a
+session's memory of it.
+
+The session that ran the skill under test must not be the one that
+runs this. It has seen the run, which is the reason the read-back has
+to be a second source.
 
 ## Tier 2: trigger evals
 

@@ -18,7 +18,7 @@ If you want to *use* the skills, you want
 | `docs/devs/` | This. Documentation for people changing the skills. |
 | `docs/devs/decisions/` | Why things are the way they are |
 | `docs/devs/validation-records/` | Archived evidence: what was run against real repositories, and when |
-| `tests/` | The structural lint, and the eval definitions |
+| `tests/` | The structural lint, the eval definitions, and the eval runners |
 
 Nothing outside `skills/` is ever distributed. That boundary is
 deliberate and is enforced by review -- see
@@ -104,6 +104,8 @@ The four cheapest things to get wrong, in order:
   designed before anyone writes prose.
 - [testing.md](testing.md) -- the two testing tiers, what each
   catches, and how to run them.
+- [tech-stack.md](tech-stack.md) -- what has to be installed, which
+  tier needs it, and what to do when adding a tool.
 - [test-repos.md](test-repos.md) -- lifecycle procedures for the real
   GitHub repositories the skills are tested against.
 
@@ -170,7 +172,8 @@ bash tests/check-skill-inventory.sh
 ```
 
 CI runs the same seven. See [testing.md](testing.md) for what each
-one covers and its one prerequisite.
+one covers, and [tech-stack.md](tech-stack.md) for what has to be
+installed first.
 
 **Driving any of this from a Claude Code session** is covered next
 to the procedure it applies to, rather than on a page of its own:
