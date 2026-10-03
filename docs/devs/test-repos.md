@@ -83,10 +83,10 @@ Nothing in the procedures below targets it except `git clone`.
 
 All test repos: `k0x-test-cc-<suffix>`, in the `bryanknox`
 personal account -- except O1 and O5, which exist to test an
-organization and so live in `{org}`: a free organization owned by
-`bryanknox`, created for that purpose and holding nothing else.
-`{org}` is NOT YET CREATED; replace this sentence with its name once
-it exists.
+organization and so live in `test-bryanknox`
+(https://github.com/test-bryanknox): a free organization owned by
+`bryanknox`, created 2026-10-03 for that purpose and holding nothing
+else.
 
 | Repo | Scenarios | Lifecycle |
 |---|---|---|
@@ -95,8 +95,8 @@ it exists.
 | `k0x-test-cc-s4` | S4 (pre-dirtied) | recreate |
 | `k0x-test-cc-s5` | S5 (non-admin invoker) | recreate |
 | `k0x-test-cc-s6` | S6 (token missing `workflow`) | recreate |
-| `{org}/k0x-test-cc-o1` | O1 (S1 in an organization) | recreate |
-| `{org}/k0x-test-cc-o5` | O5 (S5 in an organization) | recreate |
+| `test-bryanknox/k0x-test-cc-o1` | O1 (S1 in an organization) | recreate |
+| `test-bryanknox/k0x-test-cc-o5` | O5 (S5 in an organization) | recreate |
 | `k0x-test-cc-pr` | P1-P4 (scaffolded once by Skill A) | reuse + reset |
 | `k0x-test-cc-p5` | P5 (never scaffolded) | recreate |
 | `k0x-test-cc-p6` | P6 (check rejects the first title) | recreate |
@@ -106,7 +106,7 @@ it exists.
 Find leftovers after a test session, in both owners:
 
     gh repo list bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
-    gh repo list {org} --json name --jq '.[].name' | grep '^k0x-test-cc-'
+    gh repo list test-bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
 
 ## Create-from-base procedure
 
@@ -125,8 +125,8 @@ confirm with the operator before each `gh repo create`.
     git remote rename origin base
     gh repo create bryanknox/k0x-test-cc-<suffix> --public --source . --push
 
-Use `--private` instead of `--public` for S2, and `{org}/` instead of
-`bryanknox/` for O1 and O5. The remote rename is
+Use `--private` instead of `--public` for S2, and `test-bryanknox/`
+instead of `bryanknox/` for O1 and O5. The remote rename is
 required: `gh repo create --source .` adds a remote named `origin`
 and fails if one exists. After this, `origin` is the test repo and
 `base` still points at the read-only base -- double-check any push
@@ -281,16 +281,17 @@ for nothing else, rather than any org that holds real repositories.
 Free orgs get rulesets on public repos, so O1 can reach Level 3.
 
 - **O1 org-owned public repo (happy path).** S1, with
-  `{org}/k0x-test-cc-o1` as the repo. Run Skill A as `bryanknox`,
-  the org owner. Graded as S1, against A-CE1. Covers: as S1.
+  `test-bryanknox/k0x-test-cc-o1` as the repo. Run Skill A as
+  `bryanknox`, the org owner. Graded as S1, against A-CE1.
+  Covers: as S1.
 - **O5 org-owned repo, non-admin invoker (fail fast).** S5, with
-  `{org}/k0x-test-cc-o5` and `bryanknoxbits` added as an outside
-  collaborator with push -- the same invite, switch, and accept
-  commands, with `{org}` in place of `bryanknox` in the repo path.
-  Snapshot BEFORE the switch. Assert it fails before any mutation,
-  names the missing admin permission, and says "an admin of
-  {org}/k0x-test-cc-o5" without presenting the org or anyone as that
-  admin. Covers: INV3, A-R1.
+  `test-bryanknox/k0x-test-cc-o5` and `bryanknoxbits` added as an
+  outside collaborator with push -- the same invite, switch, and
+  accept commands, with `test-bryanknox` in place of `bryanknox` in
+  the repo path. Snapshot BEFORE the switch. Assert it fails before
+  any mutation, names the missing admin permission, and says "an
+  admin of test-bryanknox/k0x-test-cc-o5" without presenting the org
+  or anyone as that admin. Covers: INV3, A-R1.
 
 ## Skill B repo: scaffold once, reset between runs
 
@@ -415,7 +416,7 @@ scope is not part of normal auth; the operator grants it
 explicitly, deletions happen, then the scope is dropped:
 
     gh auth refresh -h github.com -s delete_repo   # operator approves in browser
-    gh repo delete bryanknox/k0x-test-cc-<suffix> --yes   # {org}/ for O1, O5
+    gh repo delete bryanknox/k0x-test-cc-<suffix> --yes   # test-bryanknox/ for O1, O5
     gh auth refresh -h github.com --remove-scopes delete_repo
 
 CORRECTED 2026-07-29: the drop step formerly used
@@ -450,8 +451,9 @@ grants a tool and decides nothing.
 5. Skill A's own in-run approval gate (the B10 checkpoint before
    mutations) -- part of every A scenario run, answered by the
    operator, not pre-approved by test tooling.
-6. Creating `{org}`, once, in the browser. Deleting it, if that is
-   ever decided, is the same kind of decision as deleting a repo.
+6. Creating `test-bryanknox`, once, in the browser. Deleting it, if
+   that is ever decided, is the same kind of decision as deleting a
+   repo.
 7. S6: minting the `repo`-only classic PAT, and revoking it as soon
    as the run ends. Both are the operator's, in the browser; the PAT
    is never pasted into a dev session.

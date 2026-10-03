@@ -44,8 +44,8 @@ command, and the result is read back. It never mutates
 |---|---|
 | Intended user | The maintainer, working in this repository |
 | Runs how often | Before each content eval run, between P runs, and once at the end of a campaign |
-| Mutates | `bryanknox/k0x-test-cc-*` and `{org}/k0x-test-cc-*` repositories, and local clones under the parent directory the maintainer names |
-| Does not touch | `bryanknox/k0x-workbench`, the `{org}` organization itself, this repository's tracked files, gh auth state, any token, anything under `skills/` |
+| Mutates | `bryanknox/k0x-test-cc-*` and `test-bryanknox/k0x-test-cc-*` repositories, and local clones under the parent directory the maintainer names |
+| Does not touch | `bryanknox/k0x-workbench`, the `test-bryanknox` organization itself, this repository's tracked files, gh auth state, any token, anything under `skills/` |
 | On no parent directory stated | Stop and ask -- never pick one |
 
 ## The commands are corrections
@@ -74,7 +74,7 @@ Numbered as in test-repos.md, "Human checkpoints (consolidated)".
 | 2 | The `delete_repo` grant, and each deletion | The maintainer runs them | Hands over each command, one repository at a time, and reads back |
 | 4 | S5 and O5: the invite, the switch to `bryanknoxbits`, the switch back. P8: the two switches, no invite | The maintainer switches | Sends the invite after approval, hands over both switches |
 | 5 | Skill A's own approval gate in a run | The maintainer, in the run | Out of scope -- it never runs a skill under test |
-| 6 | Creating `{org}` | The maintainer, in the browser | Never creates or deletes it; a missing org stops O1 and O5 at step 1 |
+| 6 | Creating `test-bryanknox` | The maintainer, in the browser | Never creates or deletes it; a missing org stops O1 and O5 at step 1 |
 | 7 | S6: minting the `repo`-only PAT, and revoking it | The maintainer, in the browser | Never sees the token; hands over the launch line and the revoke |
 
 **A permission rule is not a checkpoint.**
@@ -101,8 +101,7 @@ ambiguous, ask.
 | teardown | Steps 1, 2, and the teardown |
 
 From the naming table in test-repos.md. `{owner}` is `bryanknox`
-except where the table says `{org}`, the test organization that
-test-repos.md names.
+except where the table says `test-bryanknox`, the test organization.
 
 | Scenario | Owner | Repository | Visibility | Lifecycle |
 |---|---|---|---|---|
@@ -112,8 +111,8 @@ test-repos.md names.
 | S4 | bryanknox | `k0x-test-cc-s4` | public | create |
 | S5 | bryanknox | `k0x-test-cc-s5` | public | create |
 | S6 | bryanknox | `k0x-test-cc-s6` | public | create |
-| O1 | `{org}` | `k0x-test-cc-o1` | public | create |
-| O5 | `{org}` | `k0x-test-cc-o5` | public | create |
+| O1 | `test-bryanknox` | `k0x-test-cc-o1` | public | create |
+| O5 | `test-bryanknox` | `k0x-test-cc-o5` | public | create |
 | P1-P4 | bryanknox | `k0x-test-cc-pr` | public | create and scaffold once, then reset per run |
 | P5 | bryanknox | `k0x-test-cc-p5` | public | create; never scaffold |
 | P6 | bryanknox | `k0x-test-cc-p6` | public | create; fixture workflow, never scaffold |
@@ -141,7 +140,7 @@ first.
 ```
 gh auth status
 gh repo list bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
-gh repo list {org} --json name --jq '.[].name' | grep '^k0x-test-cc-'
+gh repo list test-bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
 gh repo view {owner}/k0x-test-cc-{suffix} --json name,visibility
 ls -d {parent}/k0x-test-cc-{suffix}
 gh api repos/bryanknox/k0x-workbench --jq .pushed_at
@@ -152,9 +151,13 @@ Required:
 - `bryanknox` is the active account. If another account is active,
   hand over `gh auth switch -h github.com -u bryanknox` and wait.
   Do not run it.
-- For O1 and O5, `{org}` exists and `bryanknox` is an owner of it:
-  `gh api orgs/{org}/memberships/bryanknox --jq .role` reads `admin`.
-  A missing org is the maintainer's to create, never this skill's.
+- For O1 and O5, `test-bryanknox` exists and `bryanknox` is an
+  owner of it: the membership read below answers `admin`. A missing
+  org is the maintainer's to create, never this skill's.
+
+  ```
+  gh api orgs/test-bryanknox/memberships/bryanknox --jq .role
+  ```
 - For a create, the repository does not exist and the clone path
   does not exist. Either one present stops the run: a leftover is
   the maintainer's to inspect or delete, never to overwrite.
