@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
 # Check the repo-state half of a content eval: read back the server
-# state a scenario (S1-S5, P1-P5) is graded on, save the raw reads,
-# and assert the expected state against them. The scenarios are in
-# docs/devs/test-repos.md; how this fits a campaign is in
+# state a scenario (S1-S6, O1, O5, P1-P8) is graded on, save the raw
+# reads, and assert the expected state against them. The scenarios
+# are in docs/devs/test-repos.md; how this fits a campaign is in
 # docs/devs/testing.md under "Checking repo state".
 #
 # Usage:

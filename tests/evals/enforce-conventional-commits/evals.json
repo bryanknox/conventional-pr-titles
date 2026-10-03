@@ -44,6 +44,42 @@
         "Retrying the refused ruleset create or mutating other settings to compensate",
         "No mention of the plan limitation anywhere in the output"
       ]
+    },
+    {
+      "id": 3,
+      "name": "A-CE3 token missing the workflow scope, fail fast",
+      "prompt": "Set up this repo to use conventional commits with squash merges.",
+      "setup": "Scenario S6 (docs/devs/test-repos.md): fresh PUBLIC test repo as S1; the run session is started with GH_TOKEN set to a classic PAT of the repo owner that holds the repo scope but NOT workflow, so admin is satisfied and the missing scope is the only failing variable; pre-run snapshot taken from the keyring account.",
+      "requirements": ["INV3", "INV5", "A-R2"],
+      "expected_output": "Setup aborted at preflight with nothing changed; the report names the missing workflow scope and gives a remedy that works for a token supplied through GH_TOKEN.",
+      "expectations": [
+        "The run fails at preflight, BEFORE any mutation: no merge setting, workflow, ruleset, or default-branch commit changes",
+        "The missing scope is named as 'workflow', taken from the gh auth status read, and 'repo' is not reported missing",
+        "No checkpoint is presented and no apply step is entered; the fail-fast report states setup was aborted with NOTHING changed",
+        "The remedy works for the credential actually in use: gh auth refresh cannot change a token supplied through GH_TOKEN, so the remedy names a token with the workflow scope (or unsetting GH_TOKEN), not gh auth refresh alone"
+      ],
+      "baseline_failure_modes": [
+        "Merge settings patched before the workflow commit is refused, leaving the repo half-configured",
+        "The refused workflow push reported as a generic failure with no scope named"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "A-CE4 non-admin invoker on an org-owned repo, fail fast",
+      "prompt": "Set up this repo to use conventional commits with squash merges.",
+      "setup": "Scenario O5 (docs/devs/test-repos.md): fresh PUBLIC test repo in the maintainer's test organization; the invoker is the second gh account as an outside collaborator with push (not admin), with repo+workflow scopes; pre-run snapshot taken as the org owner.",
+      "requirements": ["INV3", "A-R1"],
+      "expected_output": "Setup aborted at preflight with nothing changed; the report names the missing admin permission and says that an admin of {org}/{repo} can run the skill, without claiming to know who that is.",
+      "expectations": [
+        "The run fails at preflight, BEFORE any mutation: no merge setting, workflow, ruleset, or default-branch commit changes",
+        "The missing permission is named as admin, from permissions.admin: false on the repo read",
+        "Who can run the skill is given as 'an admin of {org}/{repo}'; the report does not present the organization or any account as that admin, since a non-admin token cannot list them",
+        "No checkpoint is presented; the fail-fast report states setup was aborted with NOTHING changed and gives the remedy"
+      ],
+      "baseline_failure_modes": [
+        "Merge settings PATCH attempted and its refusal reported mid-run",
+        "The organization name reported as if it were the person who can run the setup"
+      ]
     }
   ],
   "trigger_evals": {

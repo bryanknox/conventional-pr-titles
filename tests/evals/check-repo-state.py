@@ -9,8 +9,8 @@ Driven by check-repo-state.sh. Two subcommands:
 `snapshot` reads the server state a scenario is graded on and saves
 it: the raw output of every read under <outdir>/raw/, and a digest
 in <outdir>/snapshot.json. `check` takes a fresh snapshot, then
-asserts the scenario's expected state against it. S3, S4 and S5 need
-a snapshot taken BEFORE the skill ran, passed as --pre.
+asserts the scenario's expected state against it. S3-S6, O5 and P6-P8
+need a snapshot taken BEFORE the skill ran, passed as --pre.
 
 This settles the repo-state half of the eval expectations only. The
 transcript half -- checkpoint ordering, read-back after each
@@ -66,11 +66,25 @@ CITES = {
     "P5_TITLE": ("B-CE3#1", True),
     "P5_NOPOLL": ("B-CE3#2", True),
     "P5_NOSCAFFOLD": ("B-CE3#4", True),
+    "S6_UNCHANGED": ("A-CE3#1", True),
+    "O5_UNCHANGED": ("A-CE4#1", True),
+    "P6_REJECTED": ("B-CE4#1", True),
+    "P6_GREEN": ("B-CE4#4", True),
+    "P6_NOSCAFFOLD": ("B-CE4#5", False),
+    "P7_CAP": ("B-CE5#1", True),
+    "P7_NOSCAFFOLD": ("B-CE5#3", False),
+    "P8_TITLE": ("B-CE6#2", True),
+    "P8_NOMUTATION": ("B-CE6#5", True),
 }
 
-SCENARIOS = ("S1", "S2", "S3", "S4", "S5", "P1", "P2", "P3", "P4", "P5")
-NEEDS_PRE = ("S3", "S4", "S5")
-NEEDS_PR = ("P1", "P2", "P3", "P4", "P5")
+SCENARIOS = ("S1", "S2", "S3", "S4", "S5", "S6", "O1", "O5",
+             "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8")
+NEEDS_PRE = ("S3", "S4", "S5", "S6", "O5", "P6", "P7", "P8")
+NEEDS_PR = ("P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8")
+
+# O1 is S1 in an organization. It has no eval entry of its own: the
+# expectations are A-CE1's, so the grader's list comes from S1's.
+EVAL_SCENARIO = {"O1": "S1"}
 
 
 class Fatal(Exception):
@@ -87,7 +101,7 @@ def load_evals():
             data = json.load(fh)
         for ev in data.get("evals", []):
             prefix = ev.get("name", "").split(" ")[0]
-            m = re.search(r"\bScenario (S\d+|P\d+)\b", ev.get("setup", ""))
+            m = re.search(r"\bScenario ([SOP]\d+)\b", ev.get("setup", ""))
             found[prefix] = (m.group(1) if m else None, ev.get("expectations", []))
     if not found:
         raise Fatal("no evals found under %s" % EVALS_GLOB)
@@ -404,7 +418,7 @@ def fingerprint(snap):
     )
 
 
-def assert_unchanged(rep, pre, post):
+def assert_unchanged(rep, pre, post, key=None):
     a, b = fingerprint(pre), fingerprint(post)
     for k in a:
         was, now = a[k], b[k]
@@ -412,7 +426,7 @@ def assert_unchanged(rep, pre, post):
             changed = sorted(f for f in was if was[f] != now.get(f))
             was = {f: was[f] for f in changed}
             now = {f: now.get(f) for f in changed}
-        rep.check(a[k] == b[k], None, "%s unchanged since the pre-run snapshot%s"
+        rep.check(a[k] == b[k], key, "%s unchanged since the pre-run snapshot%s"
                   % (k, "" if a[k] == b[k] else ": %s -> %s"
                      % (json.dumps(was), json.dumps(now))))
 
@@ -453,7 +467,7 @@ def assert_check_green(rep, snap, tpl, key):
 # --- scenarios -------------------------------------------------------------
 
 def run_scenario(name, rep, snap, pre, tpl, expect_title):
-    if name in ("S1", "S3"):
+    if name in ("S1", "S3", "O1"):
         assert_l1(rep, snap, "L1")
         assert_l2(rep, snap, tpl, "L2")
         assert_l3(rep, snap, tpl, "L3")
@@ -485,10 +499,11 @@ def run_scenario(name, rep, snap, pre, tpl, expect_title):
         union = {x.get("type") for r in snap["rulesets"]["items"]
                  if r["enforcement"] == "active" for x in r["rules"] or []}
         assert_effective(rep, snap, None, want=union)
-    elif name == "S5":
+    elif name in ("S5", "S6", "O5"):
         rep.info("pre-run snapshot taken as %s, post-run as %s"
                  % (pre["meta"]["login"], snap["meta"]["login"]))
-        assert_unchanged(rep, pre, snap)
+        assert_unchanged(rep, pre, snap, {"S6": "S6_UNCHANGED",
+                                          "O5": "O5_UNCHANGED"}.get(name))
     elif name == "P1":
         assert_title(rep, snap, tpl, "TITLE", want_type="fix", no_scope=True)
         assert_check_green(rep, snap, tpl, "CHECK")
@@ -528,6 +543,39 @@ def run_scenario(name, rep, snap, pre, tpl, expect_title):
         rep.check(snap["rulesets"]["status"] == 200 and not snap["rulesets"]["items"],
                   "P5_NOSCAFFOLD", "no rulesets (HTTP %d, %d found)"
                   % (snap["rulesets"]["status"], len(snap["rulesets"]["items"])))
+    elif name == "P6":
+        # The skill opened this PR, so every run is on a title it wrote.
+        # A failure before the green run is a rejection of its own title,
+        # which is the only thing that consumes a retry.
+        assert_title(rep, snap, tpl, None)
+        concl = [r["conclusion"] for r in snap["check_runs"]]
+        red = [i for i, c in enumerate(concl) if c == "failure"]
+        rep.check(red, "P6_REJECTED", "the check rejected at least one title the "
+                  "skill applied (runs: %s)" % ", ".join(map(str, concl)))
+        rep.check(len(concl) <= 3, "P6_REJECTED",
+                  "at most 3 runs: opened plus at most 2 retitles (found %d)" % len(concl))
+        assert_check_green(rep, snap, tpl, "P6_GREEN")
+        assert_unchanged(rep, pre, snap, "P6_NOSCAFFOLD")
+    elif name == "P7":
+        # The check here can never pass, so every run is a failure and
+        # the count bounds the retries: one run on open, one per retitle.
+        concl = [r["conclusion"] for r in snap["check_runs"]]
+        rep.check(concl and all(c == "failure" for c in concl), None,
+                  "every run failed, as the fixture guarantees (runs: %s)"
+                  % ", ".join(map(str, concl)))
+        rep.check(1 <= len(concl) <= 3, "P7_CAP",
+                  "at most 3 runs: opened plus at most 2 retitles (found %d)" % len(concl))
+        assert_unchanged(rep, pre, snap, "P7_NOSCAFFOLD")
+    if name in ("P6", "P7"):
+        rep.info("the 'edited' trigger also fires on a body-only edit, so a run "
+                 "count over 3 needs the transcript before it is called a fourth retry")
+    elif name == "P8":
+        rep.check(snap["pr"]["title"] == pre["pr"]["title"], "P8_TITLE",
+                  "title unchanged since the pre-run snapshot (%r)" % snap["pr"]["title"])
+        rep.check(len(snap["check_runs"]) == len(pre["check_runs"]), "P8_NOMUTATION",
+                  "no check runs added since the pre-run snapshot (%d -> %d)"
+                  % (len(pre["check_runs"]), len(snap["check_runs"])))
+        assert_unchanged(rep, pre, snap, "P8_NOMUTATION")
     if expect_title is not None and snap["pr"]:
         rep.check(snap["pr"]["title"] == expect_title, "READBACK",
                   "server title equals the transcript's exactly")
@@ -535,6 +583,7 @@ def run_scenario(name, rep, snap, pre, tpl, expect_title):
 
 def left_to_grader(name, evals, rep):
     rows = []
+    name = EVAL_SCENARIO.get(name, name)
     for prefix, (scenario, exps) in sorted(evals.items()):
         if scenario != name:
             continue

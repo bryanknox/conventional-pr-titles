@@ -3,7 +3,7 @@
 Lifecycle procedures for the REAL GitHub repos used to test the two
 conventional-commits skills. The eval `setup` fields in
 `tests/evals/*/evals.json` reference the scenarios defined here by id
-(S1-S5, P1-P5).
+(S1-S6, O1, O5, P1-P8).
 
 Each scenario names the requirements it covers, as a `Covers:` line.
 Those ids are defined in [behavior-spec.md](behavior-spec.md), and
@@ -27,9 +27,10 @@ here as prose. Promote those only if the rule of three fires.
 ## Driving these procedures from a session
 
 The `gh` one-liners below are Bash-tool work, and a session runs
-them well. Hand it the scenario id -- S1-S5, P1-P5 -- and let it use
-the commands as written rather than improvising equivalents. Several
-of them carry a correction that a reinvented command re-breaks:
+them well. Hand it the scenario id -- S1-S6, O1, O5, P1-P8 -- and let
+it use the commands as written rather than improvising equivalents.
+Several of them carry a correction that a reinvented command
+re-breaks:
 `--remove-scopes` rather than `-s` for dropping a scope, the
 `origin`/`base` remote rename, sending both squash fields in one
 PATCH to avoid `invalid_squash_commit_setting_combo`. Each of those
@@ -81,7 +82,11 @@ Nothing in the procedures below targets it except `git clone`.
 ## Naming convention
 
 All test repos: `k0x-test-cc-<suffix>`, in the `bryanknox`
-personal account.
+personal account -- except O1 and O5, which exist to test an
+organization and so live in `test-bryanknox`
+(https://github.com/test-bryanknox): a free organization owned by
+`bryanknox`, created 2026-10-03 for that purpose and holding nothing
+else.
 
 | Repo | Scenarios | Lifecycle |
 |---|---|---|
@@ -89,12 +94,19 @@ personal account.
 | `k0x-test-cc-s2` | S2 (private) | recreate |
 | `k0x-test-cc-s4` | S4 (pre-dirtied) | recreate |
 | `k0x-test-cc-s5` | S5 (non-admin invoker) | recreate |
+| `k0x-test-cc-s6` | S6 (token missing `workflow`) | recreate |
+| `test-bryanknox/k0x-test-cc-o1` | O1 (S1 in an organization) | recreate |
+| `test-bryanknox/k0x-test-cc-o5` | O5 (S5 in an organization) | recreate |
 | `k0x-test-cc-pr` | P1-P4 (scaffolded once by Skill A) | reuse + reset |
 | `k0x-test-cc-p5` | P5 (never scaffolded) | recreate |
+| `k0x-test-cc-p6` | P6 (check rejects the first title) | recreate |
+| `k0x-test-cc-p7` | P7 (check can never pass) | recreate |
+| `k0x-test-cc-p8` | P8 (invoker cannot retitle) | recreate |
 
-Find leftovers after a test session:
+Find leftovers after a test session, in both owners:
 
     gh repo list bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
+    gh repo list test-bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
 
 ## Create-from-base procedure
 
@@ -113,7 +125,8 @@ confirm with the operator before each `gh repo create`.
     git remote rename origin base
     gh repo create bryanknox/k0x-test-cc-<suffix> --public --source . --push
 
-Use `--private` instead of `--public` for S2. The remote rename is
+Use `--private` instead of `--public` for S2, and `test-bryanknox/`
+instead of `bryanknox/` for O1 and O5. The remote rename is
 required: `gh repo create --source .` adds a remote named `origin`
 and fails if one exists. After this, `origin` is the test repo and
 `base` still points at the read-only base -- double-check any push
@@ -234,10 +247,51 @@ ones it leaves to the grader.
   `gh auth switch -h github.com -u bryanknox` and verify no
   settings changed via the same read-backs.
   Covers: INV3, A-R1. The adjacent A-R2 branch -- missing the
-  `workflow` scope -- stays untested, because `gh auth refresh` can
-  only ADD scopes and only a purpose-made classic PAT could exercise
-  it. Recorded in [known-gaps.md](known-gaps.md) rather than worked
-  around.
+  `workflow` scope -- is S6.
+- **S6 token missing the `workflow` scope (fail fast).**
+  DECIDED 2026-10-03, reversing the 2026-07-29 choice to record this
+  gap rather than mint a credential: `gh auth refresh` can only ADD
+  scopes, so no keyring token on this machine can lack `workflow`,
+  and one short-lived token costs less than leaving A-R2 unproven.
+  Create-from-base, public, then snapshot as `bryanknox` from the
+  keyring. The operator mints a classic PAT for `bryanknox` with the
+  `repo` scope only, in the browser, and starts the run session from
+  a shell that sets it for that one process:
+
+      GH_TOKEN=<the PAT> claude
+
+  The PAT never goes in the keyring, never reaches the dev session,
+  and is revoked as soon as the run ends. Admin is satisfied, so the
+  missing scope is the ONLY failing variable -- the mirror image of
+  S5. Assert it fails BEFORE any mutation and names `workflow`.
+  Watch the remedy: the skill gives `gh auth refresh`, which cannot
+  change a token supplied through `GH_TOKEN`.
+  Covers: INV3, INV5, A-R2.
+
+## Organization scenarios (recreate per scenario)
+
+Every other scenario runs in a personal account, where the admin IS
+the owner. An org repo differs in the one place A-F13 changed: a
+non-admin token cannot list the org's admins, so Skill A must say
+"an admin of {org}/{repo}" rather than name anyone. Org repos also
+differ in ruleset and permission behavior.
+
+DECIDED 2026-10-03: a free organization owned by `bryanknox`, used
+for nothing else, rather than any org that holds real repositories.
+Free orgs get rulesets on public repos, so O1 can reach Level 3.
+
+- **O1 org-owned public repo (happy path).** S1, with
+  `test-bryanknox/k0x-test-cc-o1` as the repo. Run Skill A as
+  `bryanknox`, the org owner. Graded as S1, against A-CE1.
+  Covers: as S1.
+- **O5 org-owned repo, non-admin invoker (fail fast).** S5, with
+  `test-bryanknox/k0x-test-cc-o5` and `bryanknoxbits` added as an
+  outside collaborator with push -- the same invite, switch, and
+  accept commands, with `test-bryanknox` in place of `bryanknox` in
+  the repo path. Snapshot BEFORE the switch. Assert it fails before
+  any mutation, names the missing admin permission, and says "an
+  admin of test-bryanknox/k0x-test-cc-o5" without presenting the org
+  or anyone as that admin. Covers: INV3, A-R1.
 
 ## Skill B repo: scaffold once, reset between runs
 
@@ -279,7 +333,10 @@ Expected titles and check behavior live in the eval `expectations`
 (`tests/evals/write-pr-title/evals.json`). After the run, check the
 PR's state against them:
 
-    bash tests/evals/check-repo-state.sh check <P1-P5> bryanknox/k0x-test-cc-<pr|p5> <outdir> --pr <N> --expect-title "<title from the transcript>"
+    bash tests/evals/check-repo-state.sh check <P1-P8> bryanknox/k0x-test-cc-<pr|p5|p6|p7|p8> <outdir> --pr <N> --expect-title "<title from the transcript>"
+
+P6, P7, and P8 compare against the state before the run as well, so
+they also take `--pre <pre-dir>`, from a snapshot taken at staging.
 
 - **P1 single bug-fix branch.** One small defect-fix commit ahead of
   `main`; no existing PR. Expect `fix: ...`, check green.
@@ -298,8 +355,9 @@ PR's state against them:
   Run Skill B against that PR; expect the title fixed and the
   pr-title check to go red -> green (exercises the bounded retry /
   re-poll path). Covers: B-R7, B-R8, B-R9. Note that every composed
-  title has so far passed on the first poll, so the retry itself
-  remains unexercised -- see [known-gaps.md](known-gaps.md).
+  title has so far passed on the first poll, so P4 cannot exercise
+  the retry itself. P6 and P7 exist for that -- see
+  [known-gaps.md](known-gaps.md).
 - **P5 unscaffolded repo.** Uses `k0x-test-cc-p5`: create-from-base,
   Skill A NEVER run (GitHub defaults, no workflow). Branch with a
   small change, run Skill B. Expect a conventional title still
@@ -307,8 +365,49 @@ PR's state against them:
   gap recommending enforce-conventional-commits -- with NO attempt
   to scaffold. Covers: INV5, B-R1, B-R6, B-R10, B-R13.
 
+- **P6 the check rejects the composed title (retry succeeds).** The
+  only way to consume a retry is a check that rejects a title the
+  skill itself applied. A bad title put on the PR beforehand is P4,
+  and P4's red run came before the skill retitled. Uses
+  `k0x-test-cc-p6`: create-from-base, Skill A NEVER run. Instead,
+  commit a copy of the shipped template
+  (`skills/enforce-conventional-commits/assets/pr-title-workflow.yml`)
+  straight to `main` as `.github/workflows/pr-title.yml` -- there is
+  no ruleset to stop it -- with two settings added under `with:`:
+  `requireScope: true`, and a `scopes:` list holding one name the
+  diff gives no reason to pick. The skill omits a scope rather than
+  invent one, so its first title fails. Keep the job name unchanged:
+  Skill B finds the check by it, and so does the checker. Snapshot,
+  then branch with a small change, local, no PR. Expect a red run on
+  the skill's own title, a retitle from the failed log, and green
+  within two retries, with the workflow untouched.
+  Covers: INV2, B-R8, B-R9, B-R13.
+- **P7 the check can never pass (retries exhausted).** Uses
+  `k0x-test-cc-p7`, set up as P6 but with a `subjectPattern:` that no
+  subject can match, such as `^(?!)`. Expect at most two retries --
+  at most three runs: one on open, one per retitle -- then the
+  complaint quoted verbatim, and the workflow untouched.
+  Covers: INV5, B-R9, B-R13.
+- **P8 the invoker cannot retitle (degrade).** Uses
+  `k0x-test-cc-p8`: create-from-base, then commit the shipped
+  template unchanged to `main` as above. As `bryanknox`, push a
+  branch with a small change and
+  `gh pr create --title "stuff" --body "wip"`. Snapshot with
+  `--pr <N>`, then switch to `bryanknoxbits`, which is NOT invited:
+  the repo is public, so it can read everything and edit nothing it
+  did not open. Do not reuse S5's push invite. Write access includes
+  triage, which CAN retitle someone else's PR, and the degrade path
+  would never fire. Run Skill B naming the PR. Expect the title
+  composed, the edit refused, the composed title and who can apply
+  it reported, and nothing mutated. Watch how gh reports the
+  refusal: as a GraphQL permissions error, not the literal 403
+  SKILL.md names. Switch back to `bryanknox` afterward.
+  Covers: INV5, B-R5, B-R11.
+
 Integration property: P1-P4 deliberately run inside a repo
-scaffolded by Skill A; P5 deliberately runs outside one.
+scaffolded by Skill A; P5 deliberately runs outside one. P6-P8 run
+in a repo holding only the workflow -- the part Skill B detects -- so
+that no ruleset blocks the fixture commit to `main`.
 
 ## Delete procedure (HUMAN CHECKPOINT)
 
@@ -317,7 +416,7 @@ scope is not part of normal auth; the operator grants it
 explicitly, deletions happen, then the scope is dropped:
 
     gh auth refresh -h github.com -s delete_repo   # operator approves in browser
-    gh repo delete bryanknox/k0x-test-cc-<suffix> --yes
+    gh repo delete bryanknox/k0x-test-cc-<suffix> --yes   # test-bryanknox/ for O1, O5
     gh auth refresh -h github.com --remove-scopes delete_repo
 
 CORRECTED 2026-07-29: the drop step formerly used
@@ -346,9 +445,15 @@ grants a tool and decides nothing.
 3. S2: RESOLVED 2026-07-28 -- the live ruleset-create POST status
    was recorded (403 refusal; no ruleset exists, so there is no
    UI banner to eyeball). No longer an open checkpoint.
-4. S5: the collaborator invite to `bryanknoxbits`, the switch to
-   that account for the run, and the switch back to `bryanknox`
-   afterward.
+4. S5 and O5: the collaborator invite to `bryanknoxbits`, the switch
+   to that account for the run, and the switch back to `bryanknox`
+   afterward. P8: the same two switches, with no invite.
 5. Skill A's own in-run approval gate (the B10 checkpoint before
    mutations) -- part of every A scenario run, answered by the
    operator, not pre-approved by test tooling.
+6. Creating `test-bryanknox`, once, in the browser. Deleting it, if
+   that is ever decided, is the same kind of decision as deleting a
+   repo.
+7. S6: minting the `repo`-only classic PAT, and revoking it as soon
+   as the run ends. Both are the operator's, in the browser; the PAT
+   is never pasted into a dev session.

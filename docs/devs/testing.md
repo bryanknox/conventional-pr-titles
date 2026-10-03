@@ -295,15 +295,15 @@ below. The transcript half and the verdict stay yours.
 
 `tests/evals/check-repo-state.sh` reads back the server state a
 scenario is graded on, saves the reads, and asserts the scenario's
-expected state against them. It covers S1-S5 and P1-P5.
+expected state against them. It covers S1-S6, O1, O5, and P1-P8.
 
 ```
 bash tests/evals/check-repo-state.sh check S1 bryanknox/k0x-test-cc-s1 <outdir>
 bash tests/evals/check-repo-state.sh check P1 bryanknox/k0x-test-cc-pr <outdir> --pr 7 --expect-title "<title from the transcript>"
 ```
 
-**S3, S4 and S5 compare against the state before the run**, so take
-a snapshot first and pass it in:
+**S3-S6, O5, and P6-P8 compare against the state before the run**,
+so take a snapshot first and pass it in:
 
 ```
 bash tests/evals/check-repo-state.sh snapshot bryanknox/k0x-test-cc-s1 <pre-dir>
