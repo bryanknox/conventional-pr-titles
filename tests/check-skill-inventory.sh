@@ -42,7 +42,8 @@ write-pr-title"
 
 # Maintainer-only dev skills. These must exist; anything else under
 # DEV_SKILLS_DIR is a third-party install and is only reported.
-DEV_SKILLS="dev-absorb-campaign"
+DEV_SKILLS="dev-absorb-campaign
+dev-cut-release"
 
 errors=0
 checks=0

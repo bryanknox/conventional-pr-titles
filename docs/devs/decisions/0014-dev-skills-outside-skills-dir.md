@@ -7,8 +7,9 @@ Their home is `.claude/skills/`, with `.gitignore` narrowed to let
 them be committed.
 
 **Status:** accepted 2026-09-19. First built 2026-09-20:
-`dev-absorb-campaign`, the campaign one. The release and test-repo
-skills remain unbuilt, in that order. The three consequences below
+`dev-absorb-campaign`, the campaign one. The release one followed
+on 2026-10-03 as `dev-cut-release`. The test-repo skill remains
+unbuilt. The three consequences below
 were all acted on at the same time -- the ignore was narrowed by the
 `dev-` prefix, the tier-1 lint gained a second invocation, and the
 expected-set gap was closed by `tests/check-skill-inventory.sh`.

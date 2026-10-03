@@ -133,6 +133,17 @@ session will report success accurately and still mislead you:
 `claude plugin tag . --push` is the one-way step. Run that one
 yourself.
 
+This sequence is packaged as the `dev-cut-release` skill, in
+`.claude/skills/`. **This page stays the authority**; the skill is
+the enforcement, and where the two disagree this page wins. It
+refuses to choose the bump size, names each manifest when it
+validates, copies the warning list verbatim, and stops at the
+merged PR. It hands the tag command over and reads the tag back
+afterwards. The skill is maintainer tooling and carries no
+requirement ids and no evals, so it is read rather than trusted --
+see [decision 0014](decisions/0014-dev-skills-outside-skills-dir.md)
+for why that trade was accepted and when it expires.
+
 ## Versioning the skills
 
 Semantic versioning against the *user-visible contract*, which for a
