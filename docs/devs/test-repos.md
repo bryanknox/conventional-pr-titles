@@ -46,6 +46,20 @@ The account switches and the `delete_repo` grant-and-drop pair are
 operator actions. A session can tell you the command and can read
 back the result; you run it.
 
+These procedures are packaged as the `dev-test-repo-lifecycle`
+skill, in `.claude/skills/`. **This page stays the authority**; the
+skill is the enforcement, and where the two disagree this page wins.
+It stages one scenario per invocation, so each `gh repo create` is
+its own approval. It hands over every deletion, the `delete_repo`
+grant and drop, and every account switch, then reads the result
+back. It stops at "ready to run": the eval run is a fresh session,
+and the post-run `check-repo-state.sh check` is yours. You name the
+directory that holds the clones each time. The skill is maintainer
+tooling and carries no requirement ids and no evals, so it is read
+rather than trusted -- see
+[decision 0014](decisions/0014-dev-skills-outside-skills-dir.md)
+for why that trade was accepted and when it expires.
+
 **A permission rule is not a checkpoint.**
 `.claude/settings.local.json` already allows `Bash(gh repo create:*)`.
 That removes a permission *prompt*. It does not remove checkpoint 1

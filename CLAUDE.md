@@ -67,12 +67,14 @@ Reasoning for each of these is in
 
 Repetitive maintainer procedures are packaged as agent skills too,
 and they live in `.claude/skills/` with a `dev-` prefix. Today there
-are two: `dev-absorb-campaign`, which absorbs a tier-2 campaign into
-the registers, and `dev-cut-release`, which bumps the version, opens
-the release PR, and reads the tag back. The test-repo lifecycle is
-named as a candidate in [decision
-0014](docs/devs/decisions/0014-dev-skills-outside-skills-dir.md) and
-is not built.
+are three, the three named in [decision
+0014](docs/devs/decisions/0014-dev-skills-outside-skills-dir.md):
+`dev-absorb-campaign`, which absorbs a tier-2 campaign into the
+registers; `dev-cut-release`, which bumps the version, opens the
+release PR, and reads the tag back; and `dev-test-repo-lifecycle`,
+which creates, stages, resets, and tears down the test repositories.
+It hands over every deletion, scope grant, and account switch rather
+than running them.
 
 **They never go in `skills/`**, for two independent reasons, and the
 second fails silently:
