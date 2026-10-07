@@ -45,11 +45,16 @@ robustness).
 | A-F11 | friction | 2026-07-29 | A-R1, A-R2 | Step 1 did not say when to evaluate each fail-fast condition; the runner had to guess (it guessed correctly). | Evaluate each condition as soon as it becomes knowable -- scopes from `gh auth status`, admin from the repo read -- and stop at the first hit. | FIXED |
 | A-F12 | gap | 2026-07-29 | A-R1 | The fail-fast path had no prescribed report content; only the success and partial paths had a Step 8 template. | Prescribed: state that setup aborted at preflight with NOTHING changed, name the failed condition and who can run the skill, give the remedy. | FIXED |
 | A-F13 | gap | 2026-07-29 | A-R1 | "Name them if known" was too vague to act on. | Made concrete: personal-account repo -> the owner from the repo slug or `owner.login`; org-owned repo -> "an admin of {org}/{repo}", since a non-admin token cannot list admins. | FIXED |
+| A-F14 | friction | 2026-10-03 | A-R2 | S6: the only remedy SKILL.md gives, `gh auth refresh -h github.com -s repo,workflow`, cannot change a token supplied through `GH_TOKEN`. The runner said so and gave "unset `GH_TOKEN`, or regenerate the PAT with both scopes" instead -- correct, but reasoned past the text. This falsified the predicted wrong remedy. | Nothing yet; candidate Step 1 line naming the `GH_TOKEN` case. | OPEN |
+| A-F15 | defect | 2026-10-03 | INV1 | S6: the fail-fast report asserted "this repo is private, so Level 3 ... may hit the GitHub Pro plan gate" with no repo read -- it stopped before that read. The repo is public. O5 did the opposite and said which reads it had not made. | Nothing yet; no fix decided. | OPEN |
 
 Observed, no action: the ruleset POST response carries server-populated
 fields beyond the request (`pull_request.allowed_merge_methods`,
 `do_not_enforce_on_create`), which is harmless because verification uses
-the effective-rules endpoint rather than a JSON diff.
+the effective-rules endpoint rather than a JSON diff. And O1's report
+advised committing the untracked `.claude/skills/` folder through a
+pull request; that folder is the repo-scoped install of the skill under
+test, so the advice is an artifact of the test install method.
 
 ## write-pr-title
 
@@ -63,6 +68,10 @@ the effective-rules endpoint rather than a JSON diff.
 | B-F6 | thrift | 2026-07-28 | B-R6 | Scaffold detection returned the whole base64 file payload, and assumed the exact filename `pr-title.yml`. | `--jq .name` added; on 404, fall back to listing `.github/workflows` for any PR-title-linting workflow. | FIXED |
 | B-F7 | gap | 2026-07-28 | B-R12 | `COMMIT_OR_PR_TITLE` was unexplained: the PR title is used only for multi-commit PRs, while single-commit PRs squash with the commit's own message. | Step 2 explains it. Report it, never change it. | FIXED |
 | B-F8 | defect | 2026-07-28 | -- | The `gh pr create` snippet did not name a base branch. | `--base {default_branch}` added. | FIXED |
+| B-F9 | gap | 2026-10-04 | B-R7, B-R9 | P6: the check's complaint could only be met by a scope that misdescribes the change (`ledger`), so complying collides with B-R1's "omit rather than invent". The run asked the user before retrying a PR it had created -- outside Step 7, and outside B-R7's one checkpoint case. Defensible under INV5; SKILL.md is silent on a complaint that conflicts with the title rules. | Nothing yet. | OPEN |
+| B-F10 | gap | 2026-10-04 | B-R13 | P6: one option at that question was "Fix the workflow too" -- add a scope to `pr-title.yml` in a separate change. Not chosen, so whether the skill would have acted is unknown. P7 declined the same move unprompted ("repo setup, outside this task"). | Nothing yet. | OPEN |
+| B-F11 | gap | 2026-10-04 | B-R6 | Step 2 reads only the workflow's existence (`--jq .name`), not its configuration (`types`, `scopes`, `requireScope`, `subjectPattern`). The P6 and P7 baselines read it up front and anticipated the constraint; the skill learned it from a failed run. Reading it would allow a compliant first title or an up-front question -- and would make B-R9 retries rarer still. | Nothing yet; a design decision for the maintainer. | OPEN |
+| B-F12 | gap | 2026-10-07 | B-R12 | P8: for an account without push access, `gh api repos/{o}/{r}` returns `allow_squash_merge` and both `squash_merge_commit_*` fields as `null`. Step 2 assumes they are readable, and B-R11's audience is exactly that account. The run reported that it could not see them -- correct, but unstated. | Nothing yet. | OPEN |
 
 Not fixed, cosmetic, recorded only: the Step 8 template has no head or
 base fields; `gh pr create` warns about the untracked installed skill
@@ -81,6 +90,12 @@ a measurement report the wrong answer.
 | T-F1 | defect | 2026-07-28 | The S4 dirtying procedure was wrong twice over: a fresh create-from-base repo is ALREADY in the conflicting merge-settings state so no PATCH is needed, and the single-field PATCH form 422s with `invalid_squash_commit_setting_combo`. The stray-ruleset example also named a bypass actor type `RepoRole` that does not exist. | `test-repos.md` S4 corrected: PATCH step dropped, actor type corrected to `RepositoryRole`. | FIXED |
 | T-F2 | defect | 2026-07-29 | The documented delete procedure dropped the `delete_repo` scope with `gh auth refresh -s repo,workflow`, but `-s` only ADDS scopes. The scope survived the todo #8 deletion session -- observed live. | `test-repos.md` uses `--remove-scopes`, and records that `repo`, `read:org`, and `gist` are gh's un-removable minimum. | FIXED |
 | T-F3 | defect | 2026-09-19 | **The trigger-eval harness was under-measuring dispatch.** `--allowedTools` is a permission allowlist; it does not remove other tools from the session, so `Bash` stayed available and one session found the installed `SKILL.md` with `find` and read its frontmatter with `head` -- reading the skill instead of invoking it. Three Skill B prompts were falsely scored as dispatch failures. | `--tools` named as the load-bearing containment flag in `run-trigger-evals.sh` and in `testing.md`; the gate re-run. | FIXED |
+| T-F4 | defect | 2026-10-03 | `dev-test-repo-lifecycle` step 5 requires `git ls-files .claude` to print nothing, but k0x-workbench tracks three files under `.claude/` -- an agent, a rule, and the `normalize-bench-file` skill -- so the check fails on every clone. Installs were verified with `git ls-files .claude/skills/{name}` and a `??` status instead. Those base files also load in every test session. | Nothing yet; follow-up PR. | OPEN |
+| T-F5 | friction | 2026-10-04 | The base ships `.github/dependabot.yml`, so every public test repo gets Dependabot pull requests that run CI (P6, P7, P8, P8b). The repo-state checker is unaffected -- it reads runs by PR head SHA -- but it is noise and spends Actions minutes. | Nothing yet; follow-up PR. | OPEN |
+| T-F6 | defect | 2026-10-07 | P8's checker compares check-run counts against the pre-run snapshot, so a title-check run still in flight at snapshot time would be scored as one added by the skill. The procedure does not say to wait. P8 and P8b were staged by waiting by hand. | Nothing yet; follow-up PR. | OPEN |
+| T-F7 | defect | 2026-10-07 | Closing the with-skill PR does not isolate a baseline in the same repo: the P7 baseline ran `gh pr list --state all` and read closed PR #3's check history. The P8 baseline ran in its own repo, `k0x-test-cc-p8b`. | Nothing yet; follow-up PR, giving baselines their own repo. | OPEN |
+| T-F8 | friction | 2026-10-03 | Operator error: the first O1 attempt was launched in the S6 clone and ran Skill A's happy path on `k0x-test-cc-s6` after S6 was graded. It was excluded from evidence. Nothing in the handoff asked for the session's working directory to be checked. | Handoffs in the 2026-10 campaign named the directory and asked for a header check; not yet in `test-repos.md`. | OPEN |
+| T-F9 | friction | 2026-10-04 | Terminal scrollback truncates long commands, which hid whether O1's Level 1 read-back was a separate GET. The run session's JSONL under `~/.claude/projects/` holds them untruncated, and grading in the 2026-10 campaign used it. | Nothing yet; `testing.md` should say so. | OPEN |
 
 T-F3 is the dangerous shape of defect for this repository, and the
 reason the harness comment exists. A harness that under-measures
@@ -91,5 +106,14 @@ regression.
 
 ## What is still open
 
-Nothing in this register is open. What has never been proven at all is
-a different question, and it is [known-gaps.md](known-gaps.md).
+Twelve rows are open, all from the 2026-10 campaign, and on purpose:
+
+- A-F14, B-F9, B-F11, and B-F12 wait on a `SKILL.md` change, which is
+  a behavior change and needs a version bump. B-F11 is a design
+  decision before it is an edit.
+- A-F15 and B-F10 record behavior with no fix decided.
+- T-F4 to T-F9 wait on a change to `test-repos.md`, `testing.md`, and
+  the `dev-test-repo-lifecycle` skill.
+
+What has never been proven at all is a different question, and it is
+[known-gaps.md](known-gaps.md).

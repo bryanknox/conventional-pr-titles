@@ -31,14 +31,10 @@ next session is free to disagree with.
 
 | # | Next step | Owned by |
 |---|---|---|
-| 1 | Close B-R9, B-R11, A-R2, and the org-repo gap | [known-gaps.md](known-gaps.md), "Untested requirements" |
-| 2 | Decide whether to go public and re-run for Level 3 | [decision 0009](decisions/0009-stay-private-for-now.md) |
-| 3 | Load both skills once in Cursor and in Codex | [known-gaps.md](known-gaps.md), "Untested configurations" |
+| 1 | Decide whether to go public and re-run for Level 3 | [decision 0009](decisions/0009-stay-private-for-now.md) |
+| 2 | Load both skills once in Cursor and in Codex | [known-gaps.md](known-gaps.md), "Untested configurations" |
 
-Item 1 needs setup before it needs a session.
-`dev-test-repo-lifecycle` does the setup and the repo-state checker
-does the grading reads, so it is the first item both make cheaper.
-Item 3 costs one session.
+Item 2 costs one session.
 
 Not ranked, because it waits on an event rather than a turn: absorb
 the next real tier-2 campaign with `dev-absorb-campaign`, whenever
