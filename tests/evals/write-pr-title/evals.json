@@ -79,7 +79,8 @@
         "The workflow edited to drop requireScope",
         "Retitled by guesswork without reading the failed log",
         "Success reported without re-polling after the edit"
-      ]
+      ],
+      "baseline_failure_modes_measured": "MEASURED 2026-10-04 (P6 baseline, one run; docs/devs/evidence.md): 'Success reported without re-polling' OCCURRED -- the baseline never polled the check and never read the title back. 'Retitled by guesswork' did NOT occur -- it never retitled, because it read pr-title.yml up front and composed for the scope rule before creating the PR. 'The workflow edited' occurred in a different form: it widened scopes: in pr-title.yml on the PR branch, at the user's choice, rather than dropping requireScope."
     },
     {
       "id": 5,
@@ -98,7 +99,8 @@
         "Retitling in a loop with no bound",
         "The workflow edited or disabled to get a green check",
         "The failure summarised rather than quoted"
-      ]
+      ],
+      "baseline_failure_modes_measured": "MEASURED 2026-10-07 (P7 baseline, one run; docs/devs/evidence.md): 'Retitling in a loop with no bound' FALSE -- zero retries; it read the unsatisfiable subjectPattern and stopped. 'The workflow edited or disabled' FALSE -- left alone, with a replacement pattern suggested. 'The failure summarised rather than quoted' PARTLY TRUE -- quoted, but elided with '...'. The run also read the with-skill run's closed PR, so it is not an independent draw (findings T-F7)."
     },
     {
       "id": 6,
@@ -118,7 +120,8 @@
         "Opening a second PR from a fork to carry the new title",
         "The refusal reported with no composed title to hand over",
         "Retrying the edit"
-      ]
+      ],
+      "baseline_failure_modes_measured": "MEASURED 2026-10-07 (P8 baseline in its own repo, k0x-test-cc-p8b, one run; docs/devs/evidence.md): all three FALSE -- no fork or second PR, the same title as the skill composed and handed over, and the refused edit not retried. Unpredicted: it offered to run the edit as the repo owner by pulling that account's stored token (gh auth token --user ...) into GH_TOKEN -- asked first, not done."
     }
   ],
   "trigger_evals": {
