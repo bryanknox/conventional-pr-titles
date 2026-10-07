@@ -103,6 +103,16 @@ else.
 | `k0x-test-cc-p7` | P7 (check can never pass) | recreate |
 | `k0x-test-cc-p8` | P8 (invoker cannot retitle) | recreate |
 
+**A without-skill baseline gets its own repository**: the scenario's
+repo name plus `b` -- `k0x-test-cc-p6b`, or `k0x-test-cc-prb` for a
+P1-P4 baseline, scaffolded the same way. Stage it exactly as the
+scenario and do not install the skill. Never run a baseline in the
+with-skill run's repo, even after closing that run's pull request:
+closed PRs and pushed branches stay readable, and in 2026-10 the P7
+baseline found the with-skill run's closed PR with
+`gh pr list --state all` and read its check history (finding T-F7 in
+[findings.md](findings.md)).
+
 Find leftovers after a test session, in both owners:
 
     gh repo list bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
@@ -136,6 +146,16 @@ A fresh create-from-base repo has GitHub defaults: all three merge
 methods enabled, no rulesets, no workflows. That is exactly the S1
 starting state; scenario-specific setup below starts from there.
 
+**Expect Dependabot pull requests.** The base ships
+`.github/dependabot.yml`, so within minutes of a public create
+Dependabot opens dependency PRs, and they run the base's CI. Leave
+them alone: they are not the skill's, and closing them is not part of
+any scenario. They do not touch a verdict -- the repo-state checker
+reads check runs by the graded PR's head commit -- but they do appear
+in an unfiltered `gh pr list`, which a session under test may read.
+The P1-P4 reset closes them along with everything else, which is
+harmless.
+
 ## Installing a skill under test
 
 Repo-scoped install into the test repo clone -- never user-scoped,
@@ -148,11 +168,23 @@ so the skill under test cannot leak into other sessions:
 concrete 7b target); bind a different path for other harnesses. Do
 NOT commit the copied skill to the test repo: it is not part of the
 scenario state, and keeping it untracked means resets and diffs
-never see it. Start a FRESH session in the test repo clone for each
-eval run (trigger evals especially: dispatch must be observed from
-a cold session).
+never see it. Confirm that with
+`git ls-files .claude/skills/<skill-name>`, which must print nothing.
+Not `git ls-files .claude`: the base tracks its own `.claude/`
+content -- an agent, a rule, and a `normalize-bench-file` skill -- so
+that lists three files on every clone. Those base files also load in
+every test session, alongside the skill under test.
 
-For without-skill baseline runs, remove the folder first:
+Start a FRESH session in the test repo clone for each eval run
+(trigger evals especially: dispatch must be observed from a cold
+session). Name the clone's full path in the handoff, and check that
+the session header shows that directory before typing the prompt. In
+2026-10 a run started in the wrong clone and configured a repository
+that had already been graded (T-F8).
+
+A without-skill baseline runs in its own repository (see "Naming
+convention"), so there is nothing to remove: stage it and skip this
+install. In a clone that ever held the skill, remove it first:
 
     rm -rf .claude/skills/<skill-name>
 
@@ -356,8 +388,8 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
   pr-title check to go red -> green (exercises the bounded retry /
   re-poll path). Covers: B-R7, B-R8, B-R9. Note that every composed
   title has so far passed on the first poll, so P4 cannot exercise
-  the retry itself. P6 and P7 exist for that -- see
-  [known-gaps.md](known-gaps.md).
+  the retry itself. P6 and P7 exist for that, and closed the gap in
+  2026-10 -- see [evidence.md](evidence.md).
 - **P5 unscaffolded repo.** Uses `k0x-test-cc-p5`: create-from-base,
   Skill A NEVER run (GitHub defaults, no workflow). Branch with a
   small change, run Skill B. Expect a conventional title still
@@ -392,12 +424,19 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
   `k0x-test-cc-p8`: create-from-base, then commit the shipped
   template unchanged to `main` as above. As `bryanknox`, push a
   branch with a small change and
-  `gh pr create --title "stuff" --body "wip"`. Snapshot with
-  `--pr <N>`, then switch to `bryanknoxbits`, which is NOT invited:
-  the repo is public, so it can read everything and edit nothing it
-  did not open. Do not reuse S5's push invite. Write access includes
-  triage, which CAN retitle someone else's PR, and the degrade path
-  would never fire. Run Skill B naming the PR. Expect the title
+  `gh pr create --title "stuff" --body "wip"`. Wait until that PR's
+  first title-check run has COMPLETED before the snapshot: P8's check
+  compares run counts against the snapshot, so a run still in flight
+  at snapshot time is scored as one the skill added (T-F6). Poll
+  rather than sleep:
+
+      until gh pr checks <N> | grep 'Validate conventional PR title' | grep -qv pending; do sleep 10; done
+
+  Then snapshot with `--pr <N>`, and switch to `bryanknoxbits`,
+  which is NOT invited: the repo is public, so it can read
+  everything and edit nothing it did not open. Do not reuse S5's
+  push invite. Write access includes triage, which CAN retitle
+  someone else's PR, and the degrade path would never fire. Run Skill B naming the PR. Expect the title
   composed, the edit refused, the composed title and who can apply
   it reported, and nothing mutated. Watch how gh reports the
   refusal: as a GraphQL permissions error, not the literal 403

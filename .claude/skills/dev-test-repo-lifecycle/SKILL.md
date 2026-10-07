@@ -96,6 +96,7 @@ ambiguous, ask.
 |---|---|
 | inventory | Steps 1 and the leftover list. Read-only, no checkpoint |
 | stage {scenario} | Steps 1 to 7 for one scenario |
+| stage {scenario} baseline | Steps 1 to 7 in the baseline's own repository, skipping the install |
 | install or remove {skill} | Steps 1, 2, and 5 against an existing clone |
 | reset | Steps 1, 2, and the reset, against `k0x-test-cc-pr` |
 | teardown | Steps 1, 2, and the teardown |
@@ -118,6 +119,13 @@ except where the table says `test-bryanknox`, the test organization.
 | P6 | bryanknox | `k0x-test-cc-p6` | public | create; fixture workflow, never scaffold |
 | P7 | bryanknox | `k0x-test-cc-p7` | public | create; fixture workflow, never scaffold |
 | P8 | bryanknox | `k0x-test-cc-p8` | public | create; template workflow, never scaffold |
+
+A baseline's repository is the scenario's with `b` appended --
+`k0x-test-cc-p6b`, or `k0x-test-cc-prb` for P1-P4 -- staged exactly
+as the scenario, with the same change, and with no skill installed.
+Never stage a baseline in the with-skill run's repository: closed
+pull requests and pushed branches stay readable, and a baseline that
+reads them is not a baseline.
 
 Which requirements each scenario covers is deliberately not listed
 here. `tests/check-requirement-ids.sh` does not scan this folder, so
@@ -233,6 +241,12 @@ k0x-workbench; the visibility is the one approved; all three merge
 methods are enabled; the workflow read is a 404; the ruleset list is
 empty. For S2 the ruleset read is a 403 naming the plan, which is the
 expected answer on a free-plan private repository, not a failure.
+
+Expect Dependabot pull requests within minutes of a public create:
+the base ships `.github/dependabot.yml`. They are not the skill's
+and not part of any scenario, so never close or count them. Say they
+are there in the report, because a session under test may read them
+in an unfiltered `gh pr list`.
 
 ## Step 4 - Scenario setup
 
@@ -363,11 +377,22 @@ gh pr create --title "stuff" --body "wip"
 gh pr view --json number,title,headRefName,state
 ```
 
-Required as for P4. Take the step-6 snapshot with `--pr {n}`. Do NOT
-invite `bryanknoxbits`: push access includes triage, which can
-retitle the PR, and the scenario needs an invoker who cannot. Then
-hand over `gh auth switch -h github.com -u bryanknoxbits`, wait, and
-read back:
+Required as for P4. Then wait until the PR's first title-check run
+has COMPLETED, polling rather than sleeping:
+
+```
+until gh pr checks {n} | grep 'Validate conventional PR title' | grep -qv pending; do sleep 10; done
+```
+
+P8 is graded by comparing check-run counts with the snapshot, so a
+run still in flight when the snapshot is taken is later scored as
+one the skill added. Only then take the step-6 snapshot with
+`--pr {n}`.
+
+Do NOT invite `bryanknoxbits`: push access includes triage, which
+can retitle the PR, and the scenario needs an invoker who cannot.
+Then hand over `gh auth switch -h github.com -u bryanknoxbits`, wait,
+and read back:
 
 ```
 gh auth status
@@ -399,14 +424,19 @@ Read back:
 
 ```
 diff -r skills/{name} {parent}/k0x-test-cc-{suffix}/.claude/skills/{name}
-git -C {parent}/k0x-test-cc-{suffix} ls-files .claude
+git -C {parent}/k0x-test-cc-{suffix} ls-files .claude/skills/{name}
+git -C {parent}/k0x-test-cc-{suffix} status --porcelain
 ```
 
-Required: the diff prints nothing, and `ls-files` prints nothing --
-the copy is never committed to the test repository, so resets and
-diffs never see it.
+Required: the diff prints nothing, `ls-files` prints nothing, and the
+status shows the copy as untracked (`??`) -- it is never committed to
+the test repository, so resets and diffs never see it. Name the skill
+in the `ls-files` path: the base tracks its own `.claude/` files (an
+agent, a rule, and a `normalize-bench-file` skill), so
+`ls-files .claude` is never empty.
 
-For a without-skill baseline run, remove it instead:
+A baseline is staged in its own repository and skips the install.
+In a clone that ever held the skill, remove it instead:
 
 ```
 rm -rf {parent}/k0x-test-cc-{suffix}/.claude/skills/{name}
@@ -530,7 +560,9 @@ Leftover test repos: {the finder output | none}
 
 Still yours:
 - {each handed-over command not yet run}
-- start a FRESH session in the clone for the eval run
+- start a FRESH session in {parent}/k0x-test-cc-{suffix} for the
+  eval run, and check the session header names that directory before
+  typing the prompt
 - after the run: {check command with --pre and --pr as needed}
 - {S5, O5, P8: gh auth switch -h github.com -u bryanknox}
 - {S6: GH_TOKEN=<the PAT> claude to start the run, then revoke the PAT}
