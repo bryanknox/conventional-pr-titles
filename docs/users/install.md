@@ -171,7 +171,10 @@ gh auth status
 - `enforce-conventional-commits` also needs `workflow`, because it
   commits a workflow file. If it is missing, the skill stops before
   changing anything and tells you to run
-  `gh auth refresh -h github.com -s repo,workflow`.
+  `gh auth refresh -h github.com -s repo,workflow`. If `gh` is using
+  a token from the `GH_TOKEN` environment variable instead,
+  `gh auth refresh` cannot change it, and the skill says so: use a
+  token with both scopes, or unset the variable.
 
 ## Removing a skill
 

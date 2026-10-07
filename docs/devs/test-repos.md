@@ -388,8 +388,9 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
   pr-title check to go red -> green (exercises the bounded retry /
   re-poll path). Covers: B-R7, B-R8, B-R9. Note that every composed
   title has so far passed on the first poll, so P4 cannot exercise
-  the retry itself. P6 and P7 exist for that, and closed the gap in
-  2026-10 -- see [evidence.md](evidence.md).
+  the retry itself. P6 exercised it on 2026-10-04, before the skill
+  read the check's rules -- see the note under P6, and
+  [evidence.md](evidence.md).
 - **P5 unscaffolded repo.** Uses `k0x-test-cc-p5`: create-from-base,
   Skill A NEVER run (GitHub defaults, no workflow). Branch with a
   small change, run Skill B. Expect a conventional title still
@@ -397,29 +398,39 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
   gap recommending enforce-conventional-commits -- with NO attempt
   to scaffold. Covers: INV5, B-R1, B-R6, B-R10, B-R13.
 
-- **P6 the check rejects the composed title (retry succeeds).** The
-  only way to consume a retry is a check that rejects a title the
-  skill itself applied. A bad title put on the PR beforehand is P4,
-  and P4's red run came before the skill retitled. Uses
+- **P6 the check's rules conflict with an honest title (asked up
+  front).** Uses
   `k0x-test-cc-p6`: create-from-base, Skill A NEVER run. Instead,
   commit a copy of the shipped template
   (`skills/enforce-conventional-commits/assets/pr-title-workflow.yml`)
   straight to `main` as `.github/workflows/pr-title.yml` -- there is
   no ruleset to stop it -- with two settings added under `with:`:
   `requireScope: true`, and a `scopes:` list holding one name the
-  diff gives no reason to pick. The skill omits a scope rather than
-  invent one, so its first title fails. Keep the job name unchanged:
-  Skill B finds the check by it, and so does the checker. Snapshot,
-  then branch with a small change, local, no PR. Expect a red run on
-  the skill's own title, a retitle from the failed log, and green
-  within two retries, with the workflow untouched.
-  Covers: INV2, B-R8, B-R9, B-R13.
-- **P7 the check can never pass (retries exhausted).** Uses
+  diff gives no reason to pick. Keep the job name unchanged: Skill B
+  finds the check by it, and so does the checker. Snapshot, then
+  branch with a small change, local, no PR. The skill reads the
+  check's rules before composing, so it should see that a scope is
+  required and that none on the list describes the change, and ask
+  BEFORE creating the PR. Answer: use the title the check accepts.
+  Expect the PR created with that title, read back, and green on
+  its first run -- no failed run at all -- with the workflow
+  untouched and no offer to change it.
+  Covers: B-R6, B-R7, B-R8, B-R9, B-R13.
+
+  Before the skill read the check's rules (`write-pr-title` at
+  `455ac6e`), P6 was the retry scenario: the skill's scope-less
+  title failed, and it retitled from the log. That run, on
+  2026-10-04, is B-R9's retry evidence in
+  [evidence.md](evidence.md). With the rules read up front, P6 no
+  longer reaches the retry, and nothing in this file does.
+- **P7 the check can never pass (raised up front).** Uses
   `k0x-test-cc-p7`, set up as P6 but with a `subjectPattern:` that no
-  subject can match, such as `^(?!)`. Expect at most two retries --
-  at most three runs: one on open, one per retitle -- then the
-  complaint quoted verbatim, and the workflow untouched.
-  Covers: INV5, B-R9, B-R13.
+  subject can match, such as `^(?!)`. Expect the conflict raised
+  BEFORE the PR is created. Answer: open it anyway. Expect the PR
+  created with the rule-following title, exactly one failed run, the
+  complaint quoted verbatim, no retitle, the workflow untouched, and
+  a report of what an admin could change.
+  Covers: INV5, B-R6, B-R7, B-R9, B-R13.
 - **P8 the invoker cannot retitle (degrade).** Uses
   `k0x-test-cc-p8`: create-from-base, then commit the shipped
   template unchanged to `main` as above. As `bryanknox`, push a
@@ -436,12 +447,14 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
   which is NOT invited: the repo is public, so it can read
   everything and edit nothing it did not open. Do not reuse S5's
   push invite. Write access includes triage, which CAN retitle
-  someone else's PR, and the degrade path would never fire. Run Skill B naming the PR. Expect the title
-  composed, the edit refused, the composed title and who can apply
-  it reported, and nothing mutated. Watch how gh reports the
-  refusal: as a GraphQL permissions error, not the literal 403
-  SKILL.md names. Switch back to `bryanknox` afterward.
-  Covers: INV5, B-R5, B-R11.
+  someone else's PR, and the degrade path would never fire. Run
+  Skill B naming the PR. Expect the title composed, the edit
+  refused, the composed title and who can apply it reported, the
+  squash settings reported as unreadable, no other account's
+  credentials used or offered, and nothing mutated. gh reports the
+  refusal as a GraphQL permissions error rather than an HTTP 403;
+  SKILL.md names both. Switch back to `bryanknox` afterward.
+  Covers: INV5, B-R5, B-R11, B-R12.
 
 Integration property: P1-P4 deliberately run inside a repo
 scaffolded by Skill A; P5 deliberately runs outside one. P6-P8 run

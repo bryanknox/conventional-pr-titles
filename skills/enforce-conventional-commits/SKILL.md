@@ -92,14 +92,22 @@ Fail fast (before ANY mutation) when:
   org-owned repo say "an admin of {org}/{repo}" (a non-admin token
   cannot list who that is).
 - Token lacks `repo` or `workflow` scope: report the missing scope
-  and the remedy: `gh auth refresh -h github.com -s repo,workflow`.
+  and the remedy for the credential `gh auth status` says is in use.
+  For a keyring login: `gh auth refresh -h github.com -s
+  repo,workflow`. For a token from the `GH_TOKEN` or `GITHUB_TOKEN`
+  environment variable, `gh auth refresh` cannot change it: the
+  remedy is a token with both scopes, or unsetting the variable so
+  a keyring login with both scopes is used.
 
 Evaluate these as soon as each becomes knowable (scopes from the
 `gh auth status` read; admin from the repo read) and stop at the
 first hit -- the remaining preflight reads are unnecessary. The
 fail-fast report replaces the Step 8 report: state that setup was
 aborted at preflight with NOTHING changed, name the failed
-condition and who can run the skill, and give the remedy.
+condition and who can run the skill, and give the remedy. State
+only what was read: a fact the stopped preflight never reached --
+visibility, plan, rulesets, the workflow -- is unknown, not
+inferred.
 
 Detect the private-plan gap: rulesets on private personal repos
 require GitHub Pro. On a free-plan private repo ALL ruleset

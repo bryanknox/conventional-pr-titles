@@ -68,11 +68,10 @@ CITES = {
     "P5_NOSCAFFOLD": ("B-CE3#4", True),
     "S6_UNCHANGED": ("A-CE3#1", True),
     "O5_UNCHANGED": ("A-CE4#1", True),
-    "P6_REJECTED": ("B-CE4#1", True),
     "P6_GREEN": ("B-CE4#4", True),
     "P6_NOSCAFFOLD": ("B-CE4#5", False),
-    "P7_CAP": ("B-CE5#1", True),
-    "P7_NOSCAFFOLD": ("B-CE5#3", False),
+    "P7_ONERUN": ("B-CE5#2", True),
+    "P7_NOSCAFFOLD": ("B-CE5#3", True),
     "P8_TITLE": ("B-CE6#2", True),
     "P8_NOMUTATION": ("B-CE6#5", True),
 }
@@ -544,31 +543,30 @@ def run_scenario(name, rep, snap, pre, tpl, expect_title):
                   "P5_NOSCAFFOLD", "no rulesets (HTTP %d, %d found)"
                   % (snap["rulesets"]["status"], len(snap["rulesets"]["items"])))
     elif name == "P6":
-        # The skill opened this PR, so every run is on a title it wrote.
-        # A failure before the green run is a rejection of its own title,
-        # which is the only thing that consumes a retry.
+        # The skill reads the check's rules first, so with the scripted
+        # answer ("use the title the check accepts") the PR is created
+        # with a passing title: one run, green, and no failure before it.
+        # A failed run here means the conflict was missed up front.
         assert_title(rep, snap, tpl, None)
         concl = [r["conclusion"] for r in snap["check_runs"]]
-        red = [i for i, c in enumerate(concl) if c == "failure"]
-        rep.check(red, "P6_REJECTED", "the check rejected at least one title the "
-                  "skill applied (runs: %s)" % ", ".join(map(str, concl)))
-        rep.check(len(concl) <= 3, "P6_REJECTED",
-                  "at most 3 runs: opened plus at most 2 retitles (found %d)" % len(concl))
+        rep.check("failure" not in concl, "P6_GREEN",
+                  "no failed run before green -- the rule was met up front (runs: %s)"
+                  % ", ".join(map(str, concl)))
         assert_check_green(rep, snap, tpl, "P6_GREEN")
         assert_unchanged(rep, pre, snap, "P6_NOSCAFFOLD")
     elif name == "P7":
-        # The check here can never pass, so every run is a failure and
-        # the count bounds the retries: one run on open, one per retitle.
+        # The check here can never pass. With the scripted answer ("open it
+        # anyway") the PR is created once and not retitled, so there is
+        # exactly one run, a failure.
         concl = [r["conclusion"] for r in snap["check_runs"]]
         rep.check(concl and all(c == "failure" for c in concl), None,
                   "every run failed, as the fixture guarantees (runs: %s)"
                   % ", ".join(map(str, concl)))
-        rep.check(1 <= len(concl) <= 3, "P7_CAP",
-                  "at most 3 runs: opened plus at most 2 retitles (found %d)" % len(concl))
+        rep.check(len(concl) == 1, "P7_ONERUN",
+                  "exactly one run: opened, never retitled (found %d)" % len(concl))
+        rep.info("the 'edited' trigger also fires on a body-only edit, so a second "
+                 "run needs the transcript before it is called a retitle")
         assert_unchanged(rep, pre, snap, "P7_NOSCAFFOLD")
-    if name in ("P6", "P7"):
-        rep.info("the 'edited' trigger also fires on a body-only edit, so a run "
-                 "count over 3 needs the transcript before it is called a fourth retry")
     elif name == "P8":
         rep.check(snap["pr"]["title"] == pre["pr"]["title"], "P8_TITLE",
                   "title unchanged since the pre-run snapshot (%r)" % snap["pr"]["title"])
