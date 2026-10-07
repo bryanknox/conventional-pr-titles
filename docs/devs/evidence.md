@@ -28,7 +28,7 @@ B-CE1-6) in `tests/evals/<skill>/evals.json`.
 | INV4 | A-CE1/S1 expectation 2 | [S1](validation-records/setup-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
 | INV5 | S2, P5 | [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
 | A-R1 | S5; O5 / A-CE4 (org-owned: "an admin of {org}/{repo}") | [S5](validation-records/s5-non-admin.md), [2026-10 runs](#enforce-conventional-commits) | 2026-07-29, 2026-10-04 | PROVEN |
-| A-R2 | S6 / A-CE3 | [2026-10 runs](#enforce-conventional-commits) | 2026-10-03 | PROVEN |
+| A-R2 | S6 / A-CE3 | [2026-10 runs](#enforce-conventional-commits) | 2026-10-03 | **PARTIAL** -- amended in #35, not yet re-run; see [known-gaps.md](known-gaps.md) |
 | A-R3 | A-CE1/S1, A-CE2/S2, S4 | [S1](validation-records/setup-conventional-commits-step8.md), [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
 | A-R4 | A-CE1/S1, A-CE2/S2, S4 | [S1](validation-records/setup-conventional-commits-step8.md), [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
 | A-R5 | A-CE1/S1, S4 | [S1](validation-records/setup-conventional-commits-step8.md), [todo #8](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
@@ -46,14 +46,14 @@ B-CE1-6) in `tests/evals/<skill>/evals.json`.
 | B-R3 | P1-P5; P5's title independently measured at 45 chars, no trailing period, no invented scope | [P1-P4](validation-records/pr-conventional-commits-step8.md), [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
 | B-R4 | B-CE2/P2 | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
 | B-R5 | B-CE1/P1 expectation 1 | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| B-R6 | B-CE1/P1 (present), B-CE3/P5 (absent) | [P1-P4](validation-records/pr-conventional-commits-step8.md), [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| B-R7 | P4 -- checkpoint fired on a PR the session did not create, recorded verbatim | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
+| B-R6 | B-CE1/P1 (present), B-CE3/P5 (absent) | [P1-P4](validation-records/pr-conventional-commits-step8.md), [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | **PARTIAL** -- amended in #35, not yet re-run; see [known-gaps.md](known-gaps.md) |
+| B-R7 | P4 -- checkpoint fired on a PR the session did not create, recorded verbatim | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | **PARTIAL** -- amended in #35, not yet re-run; see [known-gaps.md](known-gaps.md) |
 | B-R8 | P1-P4, every title read back exact | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
 | B-R9 | P1-P4 polled; P6 / B-CE4 retry consumed, red -> green; P7 / B-CE5 no futile retry | [P1-P4](validation-records/pr-conventional-commits-step8.md), [2026-10 runs](#write-pr-title) | 2026-07-28, 2026-10-04/06 | PROVEN -- the two-retry limit itself was never reached: P7 stopped at zero because no title could pass |
 | B-R10 | B-CE3/P5 | [P5](validation-records/todo8-degraded-idempotency.md) | 2026-07-28 | PROVEN |
-| B-R11 | P8 / B-CE6 | [2026-10 runs](#write-pr-title) | 2026-10-07 | PROVEN |
-| B-R12 | B-CE1/P1 expectation 6, B-CE2/P2 expectation 3 | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | PROVEN |
-| B-R13 | B-CE3/P5 expectation 4 -- no scaffold attempted in a repo it detected as unscaffolded; P6, P7 -- workflow untouched under a failing check | [P5](validation-records/todo8-degraded-idempotency.md), [2026-10 runs](#write-pr-title) | 2026-07-28, 2026-10-04/06 | PROVEN |
+| B-R11 | P8 / B-CE6 | [2026-10 runs](#write-pr-title) | 2026-10-07 | **PARTIAL** -- amended in #35, not yet re-run; see [known-gaps.md](known-gaps.md) |
+| B-R12 | B-CE1/P1 expectation 6, B-CE2/P2 expectation 3 | [P1-P4](validation-records/pr-conventional-commits-step8.md) | 2026-07-28 | **PARTIAL** -- amended in #35, not yet re-run; see [known-gaps.md](known-gaps.md) |
+| B-R13 | B-CE3/P5 expectation 4 -- no scaffold attempted in a repo it detected as unscaffolded; P6, P7 -- workflow untouched under a failing check | [P5](validation-records/todo8-degraded-idempotency.md), [2026-10 runs](#write-pr-title) | 2026-07-28, 2026-10-04/06 | **PARTIAL** -- amended in #35, not yet re-run; see [known-gaps.md](known-gaps.md) |
 | B-R14 | -- | -- | -- | **NOT PROVEN** -- see [known-gaps.md](known-gaps.md) |
 
 ## Runs
