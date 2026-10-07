@@ -45,8 +45,8 @@ robustness).
 | A-F11 | friction | 2026-07-29 | A-R1, A-R2 | Step 1 did not say when to evaluate each fail-fast condition; the runner had to guess (it guessed correctly). | Evaluate each condition as soon as it becomes knowable -- scopes from `gh auth status`, admin from the repo read -- and stop at the first hit. | FIXED |
 | A-F12 | gap | 2026-07-29 | A-R1 | The fail-fast path had no prescribed report content; only the success and partial paths had a Step 8 template. | Prescribed: state that setup aborted at preflight with NOTHING changed, name the failed condition and who can run the skill, give the remedy. | FIXED |
 | A-F13 | gap | 2026-07-29 | A-R1 | "Name them if known" was too vague to act on. | Made concrete: personal-account repo -> the owner from the repo slug or `owner.login`; org-owned repo -> "an admin of {org}/{repo}", since a non-admin token cannot list admins. | FIXED |
-| A-F14 | friction | 2026-10-03 | A-R2 | S6: the only remedy SKILL.md gives, `gh auth refresh -h github.com -s repo,workflow`, cannot change a token supplied through `GH_TOKEN`. The runner said so and gave "unset `GH_TOKEN`, or regenerate the PAT with both scopes" instead -- correct, but reasoned past the text. This falsified the predicted wrong remedy. | Nothing yet; candidate Step 1 line naming the `GH_TOKEN` case. | OPEN |
-| A-F15 | defect | 2026-10-03 | INV1 | S6: the fail-fast report asserted "this repo is private, so Level 3 ... may hit the GitHub Pro plan gate" with no repo read -- it stopped before that read. The repo is public. O5 did the opposite and said which reads it had not made. | Nothing yet; no fix decided. | OPEN |
+| A-F14 | friction | 2026-10-03 | A-R2 | S6: the only remedy SKILL.md gives, `gh auth refresh -h github.com -s repo,workflow`, cannot change a token supplied through `GH_TOKEN`. The runner said so and gave "unset `GH_TOKEN`, or regenerate the PAT with both scopes" instead -- correct, but reasoned past the text. This falsified the predicted wrong remedy. | Step 1 gives the remedy for the credential `gh auth status` reports: `gh auth refresh` for a keyring login, a token with both scopes or an unset variable for `GH_TOKEN`/`GITHUB_TOKEN`. A-R2 and `docs/users/install.md` say the same. | FIXED |
+| A-F15 | defect | 2026-10-03 | INV1 | S6: the fail-fast report asserted "this repo is private, so Level 3 ... may hit the GitHub Pro plan gate" with no repo read -- it stopped before that read. The repo is public. O5 did the opposite and said which reads it had not made. | The fail-fast report now states only what was read: a fact the stopped preflight never reached is unknown, not inferred. | FIXED |
 
 Observed, no action: the ruleset POST response carries server-populated
 fields beyond the request (`pull_request.allowed_merge_methods`,
@@ -68,10 +68,10 @@ test, so the advice is an artifact of the test install method.
 | B-F6 | thrift | 2026-07-28 | B-R6 | Scaffold detection returned the whole base64 file payload, and assumed the exact filename `pr-title.yml`. | `--jq .name` added; on 404, fall back to listing `.github/workflows` for any PR-title-linting workflow. | FIXED |
 | B-F7 | gap | 2026-07-28 | B-R12 | `COMMIT_OR_PR_TITLE` was unexplained: the PR title is used only for multi-commit PRs, while single-commit PRs squash with the commit's own message. | Step 2 explains it. Report it, never change it. | FIXED |
 | B-F8 | defect | 2026-07-28 | -- | The `gh pr create` snippet did not name a base branch. | `--base {default_branch}` added. | FIXED |
-| B-F9 | gap | 2026-10-04 | B-R7, B-R9 | P6: the check's complaint could only be met by a scope that misdescribes the change (`ledger`), so complying collides with B-R1's "omit rather than invent". The run asked the user before retrying a PR it had created -- outside Step 7, and outside B-R7's one checkpoint case. Defensible under INV5; SKILL.md is silent on a complaint that conflicts with the title rules. | Nothing yet. | OPEN |
-| B-F10 | gap | 2026-10-04 | B-R13 | P6: one option at that question was "Fix the workflow too" -- add a scope to `pr-title.yml` in a separate change. Not chosen, so whether the skill would have acted is unknown. P7 declined the same move unprompted ("repo setup, outside this task"). | Nothing yet. | OPEN |
-| B-F11 | gap | 2026-10-04 | B-R6 | Step 2 reads only the workflow's existence (`--jq .name`), not its configuration (`types`, `scopes`, `requireScope`, `subjectPattern`). The P6 and P7 baselines read it up front and anticipated the constraint; the skill learned it from a failed run. Reading it would allow a compliant first title or an up-front question -- and would make B-R9 retries rarer still. | Nothing yet; a design decision for the maintainer. | OPEN |
-| B-F12 | gap | 2026-10-07 | B-R12 | P8: for an account without push access, `gh api repos/{o}/{r}` returns `allow_squash_merge` and both `squash_merge_commit_*` fields as `null`. Step 2 assumes they are readable, and B-R11's audience is exactly that account. The run reported that it could not see them -- correct, but unstated. | Nothing yet. | OPEN |
+| B-F9 | gap | 2026-10-04 | B-R7, B-R9 | P6: the check's complaint could only be met by a scope that misdescribes the change (`ledger`), so complying collides with B-R1's "omit rather than invent". The run asked the user before retrying a PR it had created -- outside Step 7, and outside B-R7's one checkpoint case. Defensible under INV5; SKILL.md is silent on a complaint that conflicts with the title rules. | Steps 4 and 5 define a CONFLICT -- every title the check accepts breaks the title rules -- and make it the second checkpoint case, asked before the PR is created or retitled; Step 7 routes a complaint that only a rule-breaking title satisfies to the same checkpoint. B-R7 amended; eval B-CE4 and scenario P6 rewritten to test it. | FIXED |
+| B-F10 | gap | 2026-10-04 | B-R13 | P6: one option at that question was "Fix the workflow too" -- add a scope to `pr-title.yml` in a separate change. Not chosen, so whether the skill would have acted is unknown. P7 declined the same move unprompted ("repo setup, outside this task"). | Steps 5 and 7 say never to change, or offer to change, the workflow or its allowed values, and to say what an admin could change. B-R13 amended. | FIXED |
+| B-F11 | gap | 2026-10-04 | B-R6 | Step 2 reads only the workflow's existence (`--jq .name`), not its configuration (`types`, `scopes`, `requireScope`, `subjectPattern`). The P6 and P7 baselines read it up front and anticipated the constraint; the skill learned it from a failed run. Reading it would allow a compliant first title or an up-front question -- and would make B-R9 retries rarer still. | Decided: read the rules. Step 2 reads the workflow raw and notes `types`, `requireScope`, `scopes`, and `subjectPattern`; Step 4 composes within them. B-R6 amended. Consequence: P6 no longer reaches B-R9's retry path -- see the P6 note in `test-repos.md`. | FIXED |
+| B-F12 | gap | 2026-10-07 | B-R12 | P8: for an account without push access, `gh api repos/{o}/{r}` returns `allow_squash_merge` and both `squash_merge_commit_*` fields as `null`. Step 2 assumes they are readable, and B-R11's audience is exactly that account. The run reported that it could not see them -- correct, but unstated. | Step 2 treats `null` squash fields as unreadable and reports the effect as unknown. B-R12 amended; eval B-CE6 gains the expectation. | FIXED |
 
 Not fixed, cosmetic, recorded only: the Step 8 template has no head or
 base fields; `gh pr create` warns about the untracked installed skill
@@ -106,12 +106,5 @@ regression.
 
 ## What is still open
 
-Six rows are open, all from the 2026-10 campaign, and on purpose:
-
-- A-F14, B-F9, B-F11, and B-F12 wait on a `SKILL.md` change, which is
-  a behavior change and needs a version bump. B-F11 is a design
-  decision before it is an edit.
-- A-F15 and B-F10 record behavior with no fix decided.
-
-What has never been proven at all is a different question, and it is
-[known-gaps.md](known-gaps.md).
+Nothing in this register is open. What has never been proven at all is
+a different question, and it is [known-gaps.md](known-gaps.md).

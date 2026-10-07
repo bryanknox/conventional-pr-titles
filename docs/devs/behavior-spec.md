@@ -53,7 +53,7 @@ reasoning is in [architecture.md](architecture.md) and
 | Id | Requirement |
 |---|---|
 | A-R1 | Requires `admin` on the target repo. Without it, fail before any mutation, naming the missing permission and who can run the skill. |
-| A-R2 | Requires gh token scopes `repo` AND `workflow`. Without either, fail before any mutation, naming the missing scope. |
+| A-R2 | Requires gh token scopes `repo` AND `workflow`. Without either, fail before any mutation, naming the missing scope and a remedy that works for the credential in use: `gh auth refresh` for a keyring login, a new token or an unset variable for a token supplied through the environment. |
 
 ### Target state
 
@@ -110,19 +110,19 @@ extrapolated.
 | Id | Requirement |
 |---|---|
 | B-R5 | The branch diff, the existing pull request if any, and the repository's configuration are all read; nothing is recalled. |
-| B-R6 | Whether the repository has the enforce-conventional-commits scaffold is detected, not assumed. |
-| B-R7 | A checkpoint is presented *only* when retitling a pull request this session did not create. Creating a PR, or retitling one just created, needs no approval. |
+| B-R6 | Whether the repository has the enforce-conventional-commits scaffold is detected, not assumed -- and so are the title rules its check enforces (allowed types and scopes, whether a scope is required, any subject pattern), read from the workflow before the title is composed. |
+| B-R7 | A checkpoint is presented in two cases only: when retitling a pull request this session did not create, and when every title the repository's check would accept breaks B-R1 to B-R3 -- asked before the PR is created or retitled, even one this session creates. Otherwise creating a PR, or retitling one just created, needs no approval. |
 | B-R8 | After creating or editing, the title is read back and confirmed to match exactly. |
 | B-R9 | Where the PR-title check exists, poll it and report the result, with at most two retries. |
 | B-R10 | In a repository without the scaffold: compose and apply a conventional title anyway, skip check polling entirely, and report that the repository does not enforce PR titles, recommending that an admin run `enforce-conventional-commits`. |
-| B-R11 | Without permission to apply the title, compose it anyway and report what could not be applied. |
-| B-R12 | The report gives a one-sentence type rationale. For a breaking change it also states whether the footer will ride into the squash commit, based on the repo's `squash_merge_commit_message` setting, without changing that setting. |
+| B-R11 | Without permission to apply the title, compose it anyway and report what could not be applied and who can apply it. Never retry the refused edit, and never use another identity's credentials to get past it. |
+| B-R12 | The report gives a one-sentence type rationale. For a breaking change it also states whether the footer will ride into the squash commit, based on the repo's `squash_merge_commit_message` setting, without changing that setting. Where the invoker cannot read the squash settings, the report says their effect is unknown rather than guessing it. |
 
 ### Boundaries
 
 | Id | Requirement |
 |---|---|
-| B-R13 | Never creates or modifies a workflow, repository setting, or ruleset -- **even when it detects the scaffold is missing.** It reports the gap and recommends the sibling skill. |
+| B-R13 | Never creates or modifies a workflow, repository setting, or ruleset -- **even when it detects the scaffold is missing**, and never offers to. It reports the gap or the conflicting rule and says what an admin could change, recommending the sibling skill where the scaffold is missing. |
 | B-R14 | Never rewrites, squashes, or lints the branch's own commits. |
 
 B-R13 is the boundary most likely to be eroded by a well-meaning

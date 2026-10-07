@@ -85,7 +85,7 @@ there is nothing to open a PR for and stop.
 ### Step 2 - Detect the scaffold
 
 ```
-gh api repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml --jq .name   # 404 = absent; --jq trims the base64 payload
+gh api -H "Accept: application/vnd.github.raw" repos/{owner}/{repo}/contents/.github/workflows/pr-title.yml   # 404 = absent; raw = the file itself
 gh api repos/{owner}/{repo} --jq '{allow_squash_merge: .allow_squash_merge, squash_merge_commit_title: .squash_merge_commit_title, squash_merge_commit_message: .squash_merge_commit_message}'
 ```
 
@@ -93,13 +93,26 @@ SCAFFOLDED = the PR-title workflow exists. If that exact filename
 is 404, list `.github/workflows` and treat any workflow that lints
 the PR title (e.g. uses amannn/action-semantic-pull-request) as
 the scaffold; the listing may include subdirectories -- inspect
-only `.yml`/`.yaml` entries. Also note the
-`squash_merge_commit_title` value: `PR_TITLE` means the title
-literally becomes the commit on the default branch;
+only `.yml`/`.yaml` entries, and read the match the same raw way.
+
+Read the check's title rules from that file, not only its
+existence: the `with:` settings of the PR-title step. The ones that
+constrain a title are `types` (the allowed types), `requireScope`
+and `scopes` (whether a scope is mandatory, and which are allowed),
+and `subjectPattern` (a regex the description must match). Absent
+means the action's default. A value taken from a variable
+(`${{ vars.X }}`) cannot be read here; treat it as unknown. These
+rules are what step 7's check will hold the title to, so compose
+for them in step 4.
+
+Also note the `squash_merge_commit_title` value: `PR_TITLE` means
+the title literally becomes the commit on the default branch;
 `COMMIT_OR_PR_TITLE` (GitHub's default) means the title is used
 only for MULTI-commit PRs -- a single-commit PR squashes with the
 commit's own message instead. State the setting's effect in the
-report; never change the setting.
+report; never change the setting. If the squash fields come back
+`null`, the account cannot see them (it has no push access): report
+the effect as unknown, never guess it.
 
 Not scaffolded? Continue anyway -- a conventional title is
 valuable on its own -- but skip step 7 (check polling) and carry
@@ -147,15 +160,38 @@ If step 2 found the squash message setting is not
 squash commit); note that in the report rather than trying to
 change the setting.
 
+Compose within the check's rules from step 2: a type from its
+allowed list, a scope from its allowed list when one is required.
+A required scope is not an invented one when an allowed scope
+genuinely names the area the diff touches.
+
+Then test the title against those rules. A CONFLICT is when every
+title the check would accept breaks the title rules above -- a
+required scope with none in the list that describes the change, the
+change's real type missing from the allowed list, or a
+`subjectPattern` no honest description can match.
+
 ### Step 5 - Checkpoint (conditional)
 
-Required ONLY when editing a PR whose title this session did not
-compose, or whose author (from step 1) is not the current `gh`
-user: present `old title -> new title` plus the one-sentence type
-rationale, and wait for approval before editing. PRs created fresh
-in this session need no checkpoint, and a request that names the
-PR and asks for the retitle ("fix the title on PR 5") is itself
-the approval -- apply directly and show old -> new in the report.
+Required in two cases, and only these:
+
+- Editing a PR whose title this session did not compose, or whose
+  author (from step 1) is not the current `gh` user: present
+  `old title -> new title` plus the one-sentence type rationale,
+  and wait for approval before editing. A request that names the PR
+  and asks for the retitle ("fix the title on PR 5") is itself the
+  approval -- apply directly and show old -> new in the report.
+- A CONFLICT from step 4, BEFORE creating or retitling -- even a PR
+  this session creates. Show the rule-following title, the rule in
+  the check that rejects it, and the choice: apply the
+  rule-following title (the check stays red until an admin changes
+  the rule), or the title the check accepts (and name the title
+  rule it breaks). Never offer to change the workflow or its allowed
+  values yourself; that is repo administration. Say what an admin
+  could change instead.
+
+Otherwise no checkpoint: a PR created fresh in this session, with a
+title that fits the check's rules, needs no approval.
 
 ### Step 6 - Apply and verify
 
@@ -165,9 +201,12 @@ gh pr edit {number} --title "{title}"             # existing PR
 ```
 
 Read back with `gh pr view {number} --json title,body` and confirm
-the title matches exactly. A 403 on editing someone else's PR
-means the invoker lacks `triage` on the repo: report the composed
-title and who can apply it; do not retry.
+the title matches exactly. A refused edit on someone else's PR --
+an HTTP 403, or gh's GraphQL "does not have the correct permissions
+to execute `UpdatePullRequest`" -- means the invoker lacks `triage`
+on the repo: report the composed title and who can apply it (the
+PR's author, or anyone with triage); do not retry, and do not reach
+for another account's credentials.
 
 ### Step 7 - Verify the check (scaffolded repos only)
 
@@ -183,7 +222,10 @@ intervals instead.
 On failure: read the exact complaint
 (`gh run view {run_id} --log-failed`), fix the title accordingly,
 `gh pr edit`, and re-poll. Maximum 2 retries; after that, report
-the check's complaint verbatim and stop.
+the check's complaint verbatim and stop. If the only fix the
+complaint allows would break the title rules, that is a CONFLICT:
+stop and use the step 5 checkpoint rather than retitling. Either
+way, never change the workflow; report what an admin could change.
 
 ### Step 8 - Report
 

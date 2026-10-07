@@ -48,6 +48,11 @@ type(scope)!: description
   trailing period.
 - The whole title stays within 72 characters.
 
+In a repository with the PR-title check, it first reads the check's
+own rules -- which types it allows, whether it requires a scope and
+from which list, and any pattern the description must match -- and
+composes a title that passes them on the first try.
+
 Then it creates or updates the PR, reads the title back to confirm it
 applied, and -- in a repository that has the PR-title check -- waits
 for that check specifically and reports the result.
@@ -59,7 +64,8 @@ for that check specifically and reports the result.
 - It does not configure the repository. If it notices the PR-title
   check is missing it says so and suggests an admin run
   [enforce-conventional-commits](enforce-conventional-commits.md), but it
-  will not do that itself.
+  will not do that itself. Nor will it change, or offer to change,
+  the rules of a check that is there.
 - It waits only for the PR-title check, not your build or tests.
 
 ## When it asks before acting
@@ -74,6 +80,13 @@ reason for the type before anything changes.
 Naming the PR yourself is itself the approval -- "fix the title on
 PR 5" gets applied directly, with the before and after shown in the
 report.
+
+It also asks, even for a PR it is about to create, when the
+repository's check would reject every honest title -- for example a
+required scope with nothing on the allowed list that describes your
+change. You choose between the honest title, which leaves the check
+red until an admin changes the rule, and the title the check
+accepts. It tells you what an admin could change.
 
 ## In a repository without the setup
 
@@ -91,7 +104,9 @@ so a carefully composed title can be quietly discarded.
 [enforce-conventional-commits](enforce-conventional-commits.md) sets this
 to `PR_TITLE`, which always uses the title. This skill reads the
 setting and tells you which behavior is in effect, but never changes
-it -- that is repository configuration, not title authoring.
+it -- that is repository configuration, not title authoring. Without
+push access GitHub does not show the setting at all, and then the
+skill says the effect is unknown rather than guessing.
 
 The same setting decides whether a `BREAKING CHANGE:` footer in the
 PR body rides along into the squash commit. It does so only when the
@@ -109,7 +124,15 @@ leaving you to guess whether the footer survived.
 
 It reads the check's actual complaint, corrects the title, and
 re-checks -- up to two attempts. After that it stops and shows you
-the complaint verbatim rather than guessing further.
+the complaint verbatim rather than guessing further. If the only
+correction the complaint allows would make the title dishonest, it
+stops and asks instead, as above. It never edits the check to make
+it pass.
+
+If you lack permission to change the title, it still composes it and
+tells you who can apply it: the PR's author, or anyone with triage
+access. It does not retry, and it does not borrow another account's
+credentials to get around the refusal.
 
 ## Choosing a type
 
