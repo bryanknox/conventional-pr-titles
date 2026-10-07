@@ -42,15 +42,18 @@ one produces a verdict. See below.
 
 ## What no register owns
 
-**Exercising `dev-test-repo-lifecycle` on a real campaign.** Only
-its read-only inventory has run: once, on 2026-10-03, from a cold
-headless session that dispatched to it and made exactly the two
-preflight reads. Stage, reset, and teardown need a real repository
-and have never run. Their first real use is the setup for item 1.
-The thing to watch is the one test-repos.md warns about: that each
-checkpoint is still answered by a human deciding, and not approved
-straight through because the skill asked politely. That matters most
-at a `gh repo create`, which no permission prompt guards any more.
+**Exercising `dev-test-repo-lifecycle` on a real campaign.** Stage
+and teardown have now run for real, in the 2026-10 campaign: nine
+stagings (S6, O1, O5, P6, P7, P8, and the three P baselines) across
+seven created repositories, all seven torn down one confirmed delete
+at a time. Every
+create and every delete was a decision the maintainer made at the
+moment. Real use found four procedure faults, T-F4, T-F5, T-F6, and
+T-F7 in [findings.md](findings.md), fixed afterwards. Reset has still
+never run: it belongs to `k0x-test-cc-pr`, which no campaign since
+2026-07 has needed. Watch the same thing as before -- that each
+checkpoint is answered by a human deciding rather than approved
+straight through -- and watch reset the first time it runs.
 
 **Exercising `dev-cut-release` on a real release.** It has never
 run on one. One is already due:
@@ -62,18 +65,16 @@ things to watch are the two places release.md says a session misleads
 by summarising: the manifest named on validate, and the warning list
 copied rather than reduced to a verdict.
 
-**Exercising `dev-absorb-campaign` on a real campaign.** It has been
-run once, on a synthetic, discardable campaign: a fictional brief
-absorbed in a throwaway worktree, graded against a checklist the
-runner never saw, then deleted. Nothing reached the registers. The
-brief was built to reach every branch -- a planted wrong read-back, a
-run on a repo that no longer exists, a falsified prediction, and an
-out-of-scope request. The skill passed, and the four places that
-worked only because the runner improvised were fixed in PR #24.
+**Exercising `dev-absorb-campaign` on a real campaign.** It first ran
+on a synthetic, discardable campaign, whose four improvised places
+were fixed in PR #24. Then it absorbed the real 2026-10 campaign in
+PR #33. That run took live read-backs for every server-state claim.
+It wrote NOT INDEPENDENTLY VERIFIED for every report-content claim,
+and for the one repository a later run had altered it cited the saved
+read-back and said why. One approval covered the whole diff.
 
-What a dry run cannot show is how the skill does on a real campaign's
-transcript against live repositories, and whether a human still reads
-every result once the novelty is gone.
+What one real run cannot show is whether a human still reads every
+result once the novelty is gone.
 
 There is no register row to point at, and that is a consequence of
 [decision 0014](decisions/0014-dev-skills-outside-skills-dir.md)

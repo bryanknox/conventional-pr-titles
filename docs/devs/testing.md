@@ -281,15 +281,30 @@ in [test-repos.md](test-repos.md).
 
 A session can carry out a content eval run, with one structural
 caveat: the with-skill and without-skill runs are two **fresh**
-sessions in the test repo clone, not one session doing both. A
-session that has already run the skill has seen it, and the second
-half of the pair stops being a baseline.
+sessions, not one session doing both. A session that has already run
+the skill has seen it, and the second half of the pair stops being a
+baseline. The baseline also gets its own repository, for the same
+reason one level up: a repo the with-skill run used still holds that
+run's pull requests and branches -- see
+[test-repos.md](test-repos.md), "Naming convention".
 
 Grading stays with you. Whether two transcripts are
 indistinguishable is a judgement about the session under test, and
 it is not one that session can make about itself. The repo-state
 half of the expectations is the exception: a script settles it,
 below. The transcript half and the verdict stay yours.
+
+Grade the transcript half from the run session's file, not from the
+terminal. Claude Code keeps every session as JSONL under
+`~/.claude/projects/`, in a folder named after the session's working
+directory with path separators turned into dashes -- for example
+`C---BkGit--agent-skills-dev-test-repos-k0x-test-cc-p6/` -- one
+`<session id>.jsonl` per session; the run just finished is usually
+the most recently modified. It holds every
+command and result untruncated. The terminal cuts long commands off
+with an ellipsis, and in 2026-10 that hid whether a Level 1 read-back
+was a separate GET (T-F9). The file also records the CLI version and
+model that [evidence.md](evidence.md) wants beside a result.
 
 ### Checking repo state
 
@@ -342,8 +357,8 @@ run -- S2 expects both. Like the trigger runner, it is not in CI. It
 reads live repositories that exist only during a campaign.
 
 It was proven read-only against this repository, which is in the S2
-end state, before any campaign used it. Its first real campaign has
-not happened yet.
+end state, before any campaign used it. Its first real campaign was
+2026-10: S6, O1, O5, P6-P8, and their baselines.
 
 ### Driving the repo-state check from a session
 
