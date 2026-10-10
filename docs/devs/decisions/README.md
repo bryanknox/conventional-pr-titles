@@ -19,10 +19,11 @@ obvious from the code.
 | [0006](0006-apply-order-workflow-before-ruleset.md) | Apply the workflow before the ruleset |
 | [0007](0007-one-approval-not-three.md) | One approval, not one per level |
 | [0008](0008-maintainer-material-outside-skill-folders.md) | Maintainer material stays outside the skill folders |
-| [0009](0009-stay-private-for-now.md) | Stay private for now, and what going public would take |
+| [0009](0009-stay-private-for-now.md) | Stay private for now, and what going public would take (superseded by 0016) |
 | [0010](0010-declare-a-plugin-version.md) | Declare a plugin version, and bump it every release |
 | [0011](0011-name-skills-for-the-job.md) | Name the skills for the job, not the convention |
 | [0012](0012-harvest-records-into-durable-artifacts.md) | Harvest the validation records into durable artifacts |
 | [0013](0013-archive-the-validation-records.md) | Archive the validation records rather than maintain them |
 | [0014](0014-dev-skills-outside-skills-dir.md) | Internal dev skills live outside `skills/` |
 | [0015](0015-number-levels-in-apply-order.md) | Number the levels in the order they are applied |
+| [0016](0016-go-public.md) | Go public, and require both checks on `main` |

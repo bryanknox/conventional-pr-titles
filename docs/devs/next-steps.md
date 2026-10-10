@@ -31,10 +31,9 @@ next session is free to disagree with.
 
 | # | Next step | Owned by |
 |---|---|---|
-| 1 | Decide whether to go public and re-run for Level 3 | [decision 0009](decisions/0009-stay-private-for-now.md) |
-| 2 | Load both skills once in Cursor and in Codex | [known-gaps.md](known-gaps.md), "Untested configurations" |
+| 1 | Load both skills once in Cursor and in Codex | [known-gaps.md](known-gaps.md), "Untested configurations" |
 
-Item 2 costs one session. The campaign working logs are outside the
+Item 1 costs one session. The campaign working logs are outside the
 repo, in `../test-repos/` beside this checkout.
 
 Not ranked, because it waits on an event rather than a turn: absorb

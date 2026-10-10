@@ -4,6 +4,11 @@
 Level 3 ruleset cannot exist here and that the PR-title check is
 therefore advisory rather than required.
 
+**Status:** superseded 2026-10-10 by
+[decision 0016](0016-go-public.md), which followed the "Reversing
+this" steps below. Kept as the record of why the repository was
+private and what reversing it took.
+
 ## Why
 
 The audience is the author. Nothing here needs an outside reader

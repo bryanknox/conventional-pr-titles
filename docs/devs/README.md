@@ -204,18 +204,15 @@ Merge is squash-only with the PR title as the commit subject, and
 [`pr-title.yml`](../../.github/workflows/pr-title.yml) validates
 that title on every pull request.
 
-The branch ruleset that would make the check *required* could not
-be created: ruleset endpoints are plan-gated on a private
-free-plan repository. So the check is advisory, direct pushes to
-`main` are still possible, and using PRs here is a choice rather
-than enforcement.
+The branch ruleset makes the check *required*: a pull request is
+the only way onto `main`, and both the title check and `Tier 1
+checks` must pass before it merges. The bypass list is empty, so
+that holds for the owner too. See
+[decision 0016](decisions/0016-go-public.md).
 
 With `claude --plugin-dir .`, the repository's own
 `write-pr-title` will title a pull request here -- the skill applied
-to the repository that develops it. Worth doing, with one caveat
-that follows from the paragraph above: because the check is
-advisory, a red one blocks nothing. Nobody is stopped by a bad
-title here, so somebody has to look.
+to the repository that develops it.
 
 ## Checking an enforced repository
 
@@ -253,14 +250,14 @@ the skill's defaults, deliberately:
 `delete_branch_on_merge` is on. The skill offers both on request, so
 neither is drift.
 
-Level 3 cannot be read at all. *Both* ruleset endpoints answer
-`403 Upgrade to GitHub Pro or make this repository public`, not
-just the listing one, so on a free-plan private repository the
-exists-versus-enforced distinction above is not observable -- there
-is nothing to be ambiguous about, because no ruleset could be
-created. That is the expected reading here rather than a
-regression; see
-[decision 0009](decisions/0009-stay-private-for-now.md).
+On that date Level 3 could not be read at all: while the
+repository was private, *both* ruleset endpoints answered
+`403 Upgrade to GitHub Pro or make this repository public`, so the
+exists-versus-enforced distinction above was not observable. Since
+2026-10-10 the repository is public, and the effective-rules read
+returns all four rules from `conventional-commits-main`, with
+`Tier 1 checks` required beside the title check; see
+[decision 0016](decisions/0016-go-public.md).
 
 When a read-back disagrees with what you expect, re-running
 `enforce-conventional-commits` is the fix -- it is idempotent, and
