@@ -288,16 +288,29 @@ ones it leaves to the grader.
   Create-from-base, public, then snapshot as `bryanknox` from the
   keyring. The operator mints a classic PAT for `bryanknox` with the
   `repo` scope only, in the browser, and starts the run session from
-  a shell that sets it for that one process:
+  a fresh Git Bash in the clone, checking the token BEFORE launching:
 
-      GH_TOKEN=<the PAT> claude
+      export GH_TOKEN=<the PAT>
+      gh auth status
+      claude
+
+  `gh auth status` must show an entry
+  `Logged in to github.com account bryanknox (GH_TOKEN)` with
+  `'repo'` as its only scope; if it does not, stop before `claude`.
+  CORRECTED 2026-10-09: the one-line `GH_TOKEN=<the PAT> claude` form
+  did not reach the session, cause unknown, and the run configured
+  the repo with the keyring token (T-F10 in
+  [findings.md](findings.md)). The run's own first `gh auth status`
+  is the second check: if it shows only the keyring logins, do not
+  approve the skill's checkpoint.
 
   The PAT never goes in the keyring, never reaches the dev session,
-  and is revoked as soon as the run ends. Admin is satisfied, so the
-  missing scope is the ONLY failing variable -- the mirror image of
-  S5. Assert it fails BEFORE any mutation and names `workflow`.
-  Watch the remedy: the skill gives `gh auth refresh`, which cannot
-  change a token supplied through `GH_TOKEN`.
+  and is revoked as soon as the run ends; `unset GH_TOKEN` and close
+  the shell. Admin is satisfied, so the missing scope is the ONLY
+  failing variable -- the mirror image of S5. Assert it fails BEFORE
+  any mutation and names `workflow`, and that the remedy fits a token
+  from `GH_TOKEN` -- a token with both scopes, or the variable unset
+  -- rather than `gh auth refresh` alone (A-CE3 expectation 4).
   Covers: INV3, INV5, A-R2.
 
 ## Organization scenarios (recreate per scenario)

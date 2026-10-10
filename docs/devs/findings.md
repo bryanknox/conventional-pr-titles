@@ -54,7 +54,11 @@ fields beyond the request (`pull_request.allowed_merge_methods`,
 the effective-rules endpoint rather than a JSON diff. And O1's report
 advised committing the untracked `.claude/skills/` folder through a
 pull request; that folder is the repo-scoped install of the skill under
-test, so the advice is an artifact of the test install method.
+test, so the advice is an artifact of the test install method. S6's
+2026-10-09 re-run gave the unset-variable remedy in PowerShell form
+(`Remove-Item Env:GH_TOKEN`) though the session was launched from Git
+Bash; the session's own shell tool was PowerShell, so the form matched
+the tool rather than the user's shell.
 
 ## write-pr-title
 
@@ -77,7 +81,10 @@ Not fixed, cosmetic, recorded only: the Step 8 template has no head or
 base fields; `gh pr create` warns about the untracked installed skill
 directory (an artifact of the test install method, not shipped
 behavior); `git log {default_branch}..HEAD` and `origin/main` were used
-interchangeably by runners, harmlessly.
+interchangeably by runners, harmlessly. P7's 2026-10-10 re-run quoted
+the check's complaint with its middle elided and marked by "...", and
+waited once rather than polling in a loop -- the check had completed by
+then. B-CE5 expectation 2 was graded PASS with both noted.
 
 ## Tooling and procedure
 
@@ -96,6 +103,7 @@ a measurement report the wrong answer.
 | T-F7 | defect | 2026-10-07 | Closing the with-skill PR does not isolate a baseline in the same repo: the P7 baseline ran `gh pr list --state all` and read closed PR #3's check history. The P8 baseline ran in its own repo, `k0x-test-cc-p8b`. | A baseline gets its own repository, the scenario's name plus `b`: `test-repos.md` "Naming convention" and "Installing a skill under test", `testing.md` "Tier 2: content evals", and a `stage {scenario} baseline` operation in the lifecycle skill. | FIXED |
 | T-F8 | friction | 2026-10-03 | Operator error: the first O1 attempt was launched in the S6 clone and ran Skill A's happy path on `k0x-test-cc-s6` after S6 was graded. It was excluded from evidence. Nothing in the handoff asked for the session's working directory to be checked. | `test-repos.md` "Installing a skill under test" and the lifecycle skill's report both name the clone's full path and say to check the session header shows it before the prompt. | FIXED |
 | T-F9 | friction | 2026-10-04 | Terminal scrollback truncates long commands, which hid whether O1's Level 1 read-back was a separate GET. The run session's JSONL under `~/.claude/projects/` holds them untruncated, and grading in the 2026-10 campaign used it. | `testing.md` "Tier 2: content evals" says to grade from the session JSONL under `~/.claude/projects/`, and how to find it. | FIXED |
+| T-F10 | friction | 2026-10-09 | S6's first re-run was void: the run session was started from Git Bash with `GH_TOKEN=<the PAT> claude` on one line, yet its first `gh auth status` showed only the keyring logins, so Skill A saw a token holding `workflow` and ran its full happy path. Cause unknown. The second attempt -- `export GH_TOKEN`, then `gh auth status` in the launching shell showing the `(GH_TOKEN)` entry with `'repo'` only, then `claude` -- worked. The repo was deleted and recreated, and the void run excluded from evidence. Nothing checked the token before the session started. | `test-repos.md` S6 and the lifecycle skill's S6 setup and report: export the PAT, confirm the `(GH_TOKEN)` entry with `repo` only before launching, and stop at the skill's checkpoint if the run's own `gh auth status` does not show it. The `test-repos.md` sentence predicting a `gh auth refresh` remedy was replaced with A-CE3 expectation 4. | FIXED |
 
 T-F3 is the dangerous shape of defect for this repository, and the
 reason the harness comment exists. A harness that under-measures
@@ -103,6 +111,12 @@ dispatch is indistinguishable from a skill whose description stopped
 working -- and the documented remedy for the latter is to edit the
 description, which would have turned a measurement error into a real
 regression.
+
+Observed, no action: P8's 2026-10-10 staging pushed a hand-edited
+change with a broken C# literal and amended it twice, so PR #1 had
+three title-check runs before the snapshot. T-F6's wait absorbed it --
+all three had completed, and the snapshot counted the one on the PR
+head. The baselines copied the scenario change as a diff instead.
 
 ## What is still open
 

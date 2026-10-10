@@ -22,12 +22,6 @@ that [evidence.md](evidence.md) marks NOT PROVEN or PARTIAL.
 
 | Requirement | What is unproven | Why | What would close it |
 |---|---|---|---|
-| A-R2 | The credential-aware remedy added in #35: for a token from `GH_TOKEN`, a new token or an unset variable rather than `gh auth refresh`. S6 passed on the earlier wording, where the runner reached that remedy unprompted. | The contract moved after the last run. | Re-run S6 (fresh `repo`-only PAT through `GH_TOKEN`) against the current skill, asserting A-CE3 expectation 4 from the text rather than from improvisation. |
-| B-R6 | That the check's title rules (`types`, `requireScope`, `scopes`, `subjectPattern`) are read from the workflow before the title is composed. Scaffold detection itself is proven by P1 and P5. | Added in #35; no run has used it. | Re-run P6 and P7 against the current skill, asserting B-CE4 and B-CE5 expectation 1. |
-| B-R7 | The second checkpoint case added in #35: a conflict between the check's rules and the title rules, asked before a PR is created or retitled. The first case is proven by P4. | Added in #35; no run has used it. | Re-run P6 (answer "use the title the check accepts") and P7 (answer "open it anyway"), asserting B-CE4 expectation 2 and B-CE5 expectation 1. |
-| B-R11 | The clause added in #35: never use another identity's credentials to get past a refused edit. The degrade itself is proven by P8, whose with-skill run did not; the P8 baseline offered to. | The contract moved after the last run. | Re-run P8 against the current skill, asserting B-CE6 expectation 7. |
-| B-R12 | The clause added in #35: unreadable squash settings reported as unknown. P8's with-skill run already did this, unprompted, on the earlier wording. | The contract moved after the last run. | Re-run P8 against the current skill, asserting B-CE6 expectation 6. |
-| B-R13 | The clause added in #35: never offer to change the workflow. P6's run on the earlier wording did offer it (finding B-F10). | The contract moved after the last run. | Re-run P6 and P7 against the current skill, asserting B-CE4 and B-CE5 expectation 3. |
 | A-R13 | That the skill does not create the repository or scaffold application code. | No scenario asks it to. Every test repo already exists before the run. | A scenario that prompts for setup in a directory with no `origin`, or asks for repo creation outright, asserting it declines and says why. |
 | A-R14 | That the skill does not compose PR titles. Dispatch is covered -- trigger case A-N9 correctly routes "open a PR with a conventional commit title" away -- but behavior is not. | Boundary requirements are only exercised by prompts that try to cross them, and no content eval does. | A content eval whose prompt asks Skill A for a PR title mid-run, asserting it declines and names the sibling. |
 | B-R14 | That the skill never rewrites, squashes, or lints branch commits. | All runs left branch commits alone, but no run tempted it. The P1 setup came closest -- a deliberately vague commit message -- and the skill correctly used it only as a hint. | A prompt that explicitly asks for the branch commits to be cleaned up as well, asserting it declines and explains that branch commits are unconstrained by design. |
@@ -75,12 +69,14 @@ are set wide enough to tolerate this, but no confidence interval
 exists and none is claimed.
 
 **Baselines were single runs too.** Every value-delta measurement --
-S1b, the P baseline, and the P6, P7, and P8 baselines -- is one run
-each. The P baseline already showed how much that matters: it
-falsified a predicted failure mode, and one more run might have
-falsified a different one. Same-repo baselines are not independent
-draws either: the P7 baseline read the with-skill run's closed pull
-request (T-F7).
+S1b, the P baseline, and the P6, P7, and P8 baselines of 2026-10-04/07
+and of 2026-10-10 -- is one run each. The P baseline already showed how
+much that matters: it falsified a predicted failure mode, and one more
+run might have falsified a different one. The two P8 baselines diverged
+on exactly the behavior being measured: one asked before borrowing the
+owner's token, the other used it without asking. Same-repo baselines
+are not independent draws either: the 2026-10-07 P7 baseline read the
+with-skill run's closed pull request (T-F7).
 
 ## Gaps in this repository's own setup
 

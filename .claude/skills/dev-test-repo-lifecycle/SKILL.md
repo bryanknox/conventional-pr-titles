@@ -272,9 +272,15 @@ Required: the list read shows exactly the one stray ruleset.
 **S6 -- a token missing `workflow`.** Nothing on the repository.
 Take the step-6 snapshot as `bryanknox` from the keyring. The token
 is the maintainer's: they mint a classic PAT with the `repo` scope
-only, and start the run session from the clone with
-`GH_TOKEN=<the PAT> claude`. Never ask for the token and never run
-that line. The report carries the launch line and the revoke.
+only, and start the run session from a fresh Git Bash in the clone
+with `export GH_TOKEN=<the PAT>`, then `gh auth status`, then
+`claude`. The status must show a `bryanknox (GH_TOKEN)` entry with
+`'repo'` as its only scope before `claude` is started; the one-line
+`GH_TOKEN=<the PAT> claude` form once failed to reach the session.
+If the run's own first `gh auth status` shows only keyring logins,
+the maintainer must not approve the skill's checkpoint. Never ask for
+the token and never run these lines. The report carries the launch
+lines, both checks, and the revoke.
 
 **O1.** None; as S1.
 
@@ -565,5 +571,7 @@ Still yours:
   typing the prompt
 - after the run: {check command with --pre and --pr as needed}
 - {S5, O5, P8: gh auth switch -h github.com -u bryanknox}
-- {S6: GH_TOKEN=<the PAT> claude to start the run, then revoke the PAT}
+- {S6: export GH_TOKEN=<the PAT>; gh auth status shows the
+  (GH_TOKEN) entry with repo only; then claude. After the run, unset
+  GH_TOKEN and revoke the PAT}
 ```
