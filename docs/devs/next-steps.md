@@ -31,16 +31,11 @@ next session is free to disagree with.
 
 | # | Next step | Owned by |
 |---|---|---|
-| 1 | Cut the release that ships #35 | [release.md](release.md), "Cutting a release" |
-| 2 | Decide whether to go public and re-run for Level 3 | [decision 0009](decisions/0009-stay-private-for-now.md) |
-| 3 | Load both skills once in Cursor and in Codex | [known-gaps.md](known-gaps.md), "Untested configurations" |
+| 1 | Decide whether to go public and re-run for Level 3 | [decision 0009](decisions/0009-stay-private-for-now.md) |
+| 2 | Load both skills once in Cursor and in Codex | [known-gaps.md](known-gaps.md), "Untested configurations" |
 
-Item 1's gates are met: #35 moved the contract, and the S6, P6, P7,
-and P8 re-runs with their baselines passed and were absorbed
-([evidence.md](evidence.md)). What remains is `dev-cut-release` with
-the bump the maintainer states. The campaign working logs are outside
-the repo, in `../test-repos/` beside this checkout. Item 3 costs one
-session.
+Item 2 costs one session. The campaign working logs are outside the
+repo, in `../test-repos/` beside this checkout.
 
 Not ranked, because it waits on an event rather than a turn: absorb
 the next real tier-2 campaign with `dev-absorb-campaign`, whenever
@@ -61,15 +56,20 @@ never run: it belongs to `k0x-test-cc-pr`, which no campaign since
 checkpoint is answered by a human deciding rather than approved
 straight through -- and watch reset the first time it runs.
 
-**Exercising `dev-cut-release` on a real release.** It has never
-run on one. One is already due:
-`skills/enforce-conventional-commits/SKILL.md` has changed since
-`conventional-pr-titles--v2.0.0` (#25), and nothing has bumped the
-version since. Whether that change is worth releasing yet is the
-maintainer's call. The skill does not make it. When it runs, the
-things to watch are the two places release.md says a session misleads
-by summarising: the manifest named on validate, and the warning list
-copied rather than reduced to a verdict.
+**Exercising `dev-cut-release` on a real release.** It has run once,
+for 2.1.0 (#38, tag `conventional-pr-titles--v2.1.0`). It stopped to
+ask for the bump size rather than picking one, though #35 being a
+`feat` made minor look obvious. It validated each manifest by name
+and copied the one expected warning verbatim, before and after the
+bump. One checkpoint covered the whole PR. It handed over
+`claude plugin tag` and read the tag back against `origin/main`. Two
+places improvised: Git Bash mangled `origin/main:path` until
+`MSYS_NO_PATHCONV=1` was set, and nothing prompted retiring this
+page's row, which is why the tag-phase report now names it. Watch the
+same two things as before -- the manifest named on validate, and the
+warning list copied rather than reduced to a verdict -- and whether
+the bump question is still answered by deciding rather than by
+accepting the first option.
 
 **Exercising `dev-absorb-campaign` on a real campaign.** It first ran
 on a synthetic, discardable campaign, whose four improvised places
