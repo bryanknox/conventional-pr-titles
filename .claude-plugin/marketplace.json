@@ -10,7 +10,7 @@
       "name": "conventional-pr-titles",
       "source": "./",
       "description": "Enforce Conventional Commits through pull request titles: one skill configures a GitHub repository, the other writes the title.",
-      "version": "2.0.0"
+      "version": "2.1.0"
     }
   ]
 }
