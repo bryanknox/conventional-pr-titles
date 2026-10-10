@@ -31,18 +31,16 @@ next session is free to disagree with.
 
 | # | Next step | Owned by |
 |---|---|---|
-| 1 | Re-run S6, P6, P7, and P8 against the contract #35 amended, absorb, then release | [known-gaps.md](known-gaps.md), "Untested requirements" |
+| 1 | Cut the release that ships #35 | [release.md](release.md), "Cutting a release" |
 | 2 | Decide whether to go public and re-run for Level 3 | [decision 0009](decisions/0009-stay-private-for-now.md) |
 | 3 | Load both skills once in Cursor and in Codex | [known-gaps.md](known-gaps.md), "Untested configurations" |
 
-Item 1 is a release gate. #35 moved the contract, so release.md's
-gates 3 and 4 apply before the next release: the four re-runs, with
-baselines in their own repos for P6-P8, absorbed with
-`dev-absorb-campaign`, then `dev-cut-release` with the bump the
-maintainer states. S6 needs a fresh `repo`-only PAT and P8 the
-`bryanknoxbits` switch. The 2026-10 campaign's working log is outside
-the repo, at `../test-repos/_campaign-2026-10-03.md` beside this
-checkout. Item 3 costs one session.
+Item 1's gates are met: #35 moved the contract, and the S6, P6, P7,
+and P8 re-runs with their baselines passed and were absorbed
+([evidence.md](evidence.md)). What remains is `dev-cut-release` with
+the bump the maintainer states. The campaign working logs are outside
+the repo, in `../test-repos/` beside this checkout. Item 3 costs one
+session.
 
 Not ranked, because it waits on an event rather than a turn: absorb
 the next real tier-2 campaign with `dev-absorb-campaign`, whenever

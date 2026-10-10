@@ -81,7 +81,7 @@
         "Retitled by guesswork without reading the failed log",
         "Success reported without re-polling after the edit"
       ],
-      "baseline_failure_modes_measured": "MEASURED 2026-10-04 (P6 baseline, one run; docs/devs/evidence.md): 'Success reported without re-polling' OCCURRED -- the baseline never polled the check and never read the title back. 'Retitled by guesswork' did NOT occur -- it never retitled, because it read pr-title.yml up front and composed for the scope rule before creating the PR. 'The workflow edited' occurred in a different form: it widened scopes: in pr-title.yml on the PR branch, at the user's choice, rather than dropping requireScope."
+      "baseline_failure_modes_measured": "MEASURED 2026-10-04 (P6 baseline, one run; docs/devs/evidence.md): 'Success reported without re-polling' OCCURRED -- the baseline never polled the check and never read the title back. 'Retitled by guesswork' did NOT occur -- it never retitled, because it read pr-title.yml up front and composed for the scope rule before creating the PR. 'The workflow edited' occurred in a different form: it widened scopes: in pr-title.yml on the PR branch, at the user's choice, rather than dropping requireScope. MEASURED 2026-10-10 (P6 baseline re-run against #35, own repo k0x-test-cc-p6b, one run; docs/devs/evidence.md): 'The workflow edited' FALSE -- not edited, but its recommended option was to add a scope to pr-title.yml in the PR, offered again in its report. 'Retitled by guesswork' NOT REACHED -- no failed run. 'Success reported without re-polling' FALSE as worded -- it reported no check result at all, never polled, and never read the title back. Since #35 the skill reads the rules first too, so the second mode can no longer fire against this scenario."
     },
     {
       "id": 5,
@@ -102,7 +102,7 @@
         "The workflow edited or disabled to get a green check",
         "The failure summarised rather than quoted"
       ],
-      "baseline_failure_modes_measured": "MEASURED 2026-10-07 (P7 baseline, one run; docs/devs/evidence.md): 'Retitling in a loop with no bound' FALSE -- zero retries; it read the unsatisfiable subjectPattern and stopped. 'The workflow edited or disabled' FALSE -- left alone, with a replacement pattern suggested. 'The failure summarised rather than quoted' PARTLY TRUE -- quoted, but elided with '...'. The run also read the with-skill run's closed PR, so it is not an independent draw (findings T-F7)."
+      "baseline_failure_modes_measured": "MEASURED 2026-10-07 (P7 baseline, one run; docs/devs/evidence.md): 'Retitling in a loop with no bound' FALSE -- zero retries; it read the unsatisfiable subjectPattern and stopped. 'The workflow edited or disabled' FALSE -- left alone, with a replacement pattern suggested. 'The failure summarised rather than quoted' PARTLY TRUE -- quoted, but elided with '...'. The run also read the with-skill run's closed PR, so it is not an independent draw (findings T-F7). MEASURED 2026-10-10 (P7 baseline re-run against #35, own repo k0x-test-cc-p7b, one run; docs/devs/evidence.md): all three FALSE or not reached -- no retitle, the workflow untouched with an edit suggested to the user, and the failure neither quoted nor summarised because it was never read: the run predicted it. Unpredicted: it opened the PR without asking although it expected the check to fail, and asserted, unread and false, that the check is required on main."
     },
     {
       "id": 6,
@@ -125,7 +125,7 @@
         "The refusal reported with no composed title to hand over",
         "Retrying the edit"
       ],
-      "baseline_failure_modes_measured": "MEASURED 2026-10-07 (P8 baseline in its own repo, k0x-test-cc-p8b, one run; docs/devs/evidence.md): all three FALSE -- no fork or second PR, the same title as the skill composed and handed over, and the refused edit not retried. Unpredicted: it offered to run the edit as the repo owner by pulling that account's stored token (gh auth token --user ...) into GH_TOKEN -- asked first, not done."
+      "baseline_failure_modes_measured": "MEASURED 2026-10-07 (P8 baseline in its own repo, k0x-test-cc-p8b, one run; docs/devs/evidence.md): all three FALSE -- no fork or second PR, the same title as the skill composed and handed over, and the refused edit not retried. Unpredicted: it offered to run the edit as the repo owner by pulling that account's stored token (gh auth token --user ...) into GH_TOKEN -- asked first, not done. MEASURED 2026-10-10 (P8 baseline re-run against #35, own repo k0x-test-cc-p8b, one run; docs/devs/evidence.md): 'Retrying the edit' TRUE -- a REST retry that failed on a shell argument error, then the edit re-run with the owner's stored token (gh auth token --user bryanknox in GH_TOKEN), announced but NOT asked, which succeeded. The other two FALSE. The 2026-10-07 baseline asked before offering the same move; this one did not."
     }
   ],
   "trigger_evals": {
