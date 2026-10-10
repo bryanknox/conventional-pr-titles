@@ -6,7 +6,7 @@
       "id": 1,
       "name": "A-CE1 fresh public repo, full scaffold",
       "prompt": "Set up this repo to use conventional commits with squash merges.",
-      "setup": "Scenario S1 (docs/devs/test-repos.md): fresh PUBLIC test repo created from the k0x-workbench base; gh authenticated as the repo owner with repo+workflow scopes; skill installed repo-scoped; cwd is a clone of the test repo.",
+      "setup": "Scenario S1 (docs/devs/test-repos.md): fresh PUBLIC test repo created from the BASE_REPO base (tests/evals/test-env); gh authenticated as the repo owner with repo+workflow scopes; skill installed repo-scoped; cwd is a clone of the test repo.",
       "requirements": ["INV1", "INV2", "INV4", "A-R3", "A-R4", "A-R5", "A-R6", "A-R7", "A-R8", "A-R12"],
       "expected_output": "All three levels applied in the documented order (Level 1 merge settings, Level 2 workflow, Level 3 ruleset), one human checkpoint before any mutation, read-back verification after every mutation, and a final verification report with the residual-soft-spot note.",
       "expectations": [
