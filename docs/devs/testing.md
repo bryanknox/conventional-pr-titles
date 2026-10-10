@@ -297,8 +297,9 @@ below. The transcript half and the verdict stay yours.
 Grade the transcript half from the run session's file, not from the
 terminal. Claude Code keeps every session as JSONL under
 `~/.claude/projects/`, in a folder named after the session's working
-directory with path separators turned into dashes -- for example
-`C---BkGit--agent-skills-dev-test-repos-k0x-test-cc-p6/` -- one
+directory, with the drive colon and every path separator and
+underscore turned into a dash -- a clone at `C:\work\${REPO_PREFIX}p6`
+gets `C--work-${REPO_PREFIX}p6/` -- one
 `<session id>.jsonl` per session; the run just finished is usually
 the most recently modified. It holds every
 command and result untruncated. The terminal cuts long commands off
@@ -311,19 +312,21 @@ model that [evidence.md](evidence.md) wants beside a result.
 `tests/evals/check-repo-state.sh` reads back the server state a
 scenario is graded on, saves the reads, and asserts the scenario's
 expected state against them. It covers S1-S6, O1, O5, and P1-P8.
+The examples assume the [test environment
+config](test-repos.md#test-environment-config) is sourced.
 
 ```
-bash tests/evals/check-repo-state.sh check S1 bryanknox/k0x-test-cc-s1 <outdir>
-bash tests/evals/check-repo-state.sh check P1 bryanknox/k0x-test-cc-pr <outdir> --pr 7 --expect-title "<title from the transcript>"
+bash tests/evals/check-repo-state.sh check S1 $ADMIN_ACCOUNT/${REPO_PREFIX}s1 <outdir>
+bash tests/evals/check-repo-state.sh check P1 $ADMIN_ACCOUNT/${REPO_PREFIX}pr <outdir> --pr 7 --expect-title "<title from the transcript>"
 ```
 
 **S3-S6, O5, and P6-P8 compare against the state before the run**,
 so take a snapshot first and pass it in:
 
 ```
-bash tests/evals/check-repo-state.sh snapshot bryanknox/k0x-test-cc-s1 <pre-dir>
+bash tests/evals/check-repo-state.sh snapshot $ADMIN_ACCOUNT/${REPO_PREFIX}s1 <pre-dir>
 # ... run the skill ...
-bash tests/evals/check-repo-state.sh check S3 bryanknox/k0x-test-cc-s1 <outdir> --pre <pre-dir>
+bash tests/evals/check-repo-state.sh check S3 $ADMIN_ACCOUNT/${REPO_PREFIX}s1 <outdir> --pre <pre-dir>
 ```
 
 The P scenarios need `--pr`. `--expect-title` is optional, and takes
@@ -349,7 +352,8 @@ What it settles and what it does not:
   output taken by the dev session, which is what
   [evidence.md](evidence.md) means by an independent read-back.
 - **It reads, it never writes.** Every call is a GET. Run it as
-  `bryanknox` even for S5: the switch back is part of that procedure.
+  `$ADMIN_ACCOUNT` even for S5: the switch back is part of that
+  procedure.
 
 Exit status is 0 when every check passes, 1 when one fails, and 2
 when the check could not run. A 403 or 404 is data, not a failure to

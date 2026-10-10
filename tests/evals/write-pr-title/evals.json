@@ -6,7 +6,7 @@
       "id": 1,
       "name": "B-CE1 bug-fix branch, scaffolded repo",
       "prompt": "Open a PR for this.",
-      "setup": "Scenario P1 (docs/devs/test-repos.md): scaffolded test repo k0x-test-cc-pr (enforce-conventional-commits already run); current branch contains a single bug fix ahead of the default branch; no existing PR; gh authenticated as a user who can push.",
+      "setup": "Scenario P1 (docs/devs/test-repos.md): scaffolded test repo ${REPO_PREFIX}pr (tests/evals/test-env) (enforce-conventional-commits already run); current branch contains a single bug fix ahead of the default branch; no existing PR; gh authenticated as a user who can push.",
       "requirements": ["INV1", "INV2", "B-R1", "B-R2", "B-R3", "B-R5", "B-R6", "B-R8", "B-R9", "B-R12"],
       "expected_output": "A PR whose title is 'fix: <imperative summary>' composed from the actual diff, created via gh, title read back, PR-title check polled to green, and a short report with the type rationale.",
       "expectations": [
@@ -46,7 +46,7 @@
       "id": 3,
       "name": "B-CE3 unscaffolded repo, degrade and recommend",
       "prompt": "Open a PR for this.",
-      "setup": "Scenario P5 (docs/devs/test-repos.md): fresh clone of the k0x-workbench base pushed as a new test repo with enforce-conventional-commits NEVER run (no pr-title workflow, default merge settings); current branch has a small change ahead of the default branch.",
+      "setup": "Scenario P5 (docs/devs/test-repos.md): fresh clone of the BASE_REPO base (tests/evals/test-env) pushed as a new test repo with enforce-conventional-commits NEVER run (no pr-title workflow, default merge settings); current branch has a small change ahead of the default branch.",
       "requirements": ["INV5", "B-R1", "B-R6", "B-R10", "B-R13"],
       "expected_output": "A conventional title is still composed and applied; check polling is skipped; the report states the repo does not enforce PR titles and recommends a repo admin run enforce-conventional-commits; no scaffold is attempted.",
       "expectations": [

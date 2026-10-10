@@ -71,9 +71,36 @@ prompt to remind anyone the question exists. That is the point worth
 carrying into every one of these procedures: the checkpoints are
 answered by a human deciding, not by tooling being allowed.
 
+## Test environment config
+
+The accounts, organization, base, and name prefix these procedures
+use are not written into them. Each maintainer keeps their own in
+`tests/evals/test-env`, which is gitignored. Copy
+[`tests/evals/test-env.example`](../../tests/evals/test-env.example)
+to that path and fill in every value:
+
+| Key | What it names |
+|---|---|
+| `ADMIN_ACCOUNT` | The gh account that owns the base and the personal test repos, and runs every scenario except the non-admin ones |
+| `NONADMIN_ACCOUNT` | A second gh account on the same machine: the non-admin invoker in S5, O5, and P8 |
+| `TEST_ORG` | A free organization `ADMIN_ACCOUNT` owns, for O1 and O5 |
+| `BASE_REPO` | `owner/name` of the base repo below |
+| `REPO_PREFIX` | The prefix of every test repo name, ending in `-` |
+
+Every command on this page is written against those keys. Load them
+once per shell, from the repository root, and the commands run as
+written:
+
+    source tests/evals/test-env
+
+`dev-test-repo-lifecycle` reads the same file, and stops before
+doing anything if it is missing or still holds a placeholder.
+
 ## Base repo (READ-ONLY)
 
-`bryanknox/k0x-workbench` -- https://github.com/bryanknox/k0x-workbench
+`$BASE_REPO`, on GitHub. Any small repository with a `main` branch
+and a little code will do. Owning it under `$ADMIN_ACCOUNT` keeps
+it readable to every account the scenarios use.
 
 Every test repo is created FROM this base. Never mutate the base:
 no pushes, no settings changes, no rulesets, no workflows, no PRs.
@@ -81,31 +108,30 @@ Nothing in the procedures below targets it except `git clone`.
 
 ## Naming convention
 
-All test repos: `k0x-test-cc-<suffix>`, in the `bryanknox`
+All test repos: `${REPO_PREFIX}<suffix>`, in the `$ADMIN_ACCOUNT`
 personal account -- except O1 and O5, which exist to test an
-organization and so live in `test-bryanknox`
-(https://github.com/test-bryanknox): a free organization owned by
-`bryanknox`, created 2026-10-03 for that purpose and holding nothing
+organization and so live in `$TEST_ORG`: a free organization owned
+by `$ADMIN_ACCOUNT`, created for that purpose and holding nothing
 else.
 
 | Repo | Scenarios | Lifecycle |
 |---|---|---|
-| `k0x-test-cc-s1` | S1, then S3 (reuses S1's end state) | recreate |
-| `k0x-test-cc-s2` | S2 (private) | recreate |
-| `k0x-test-cc-s4` | S4 (pre-dirtied) | recreate |
-| `k0x-test-cc-s5` | S5 (non-admin invoker) | recreate |
-| `k0x-test-cc-s6` | S6 (token missing `workflow`) | recreate |
-| `test-bryanknox/k0x-test-cc-o1` | O1 (S1 in an organization) | recreate |
-| `test-bryanknox/k0x-test-cc-o5` | O5 (S5 in an organization) | recreate |
-| `k0x-test-cc-pr` | P1-P4 (scaffolded once by Skill A) | reuse + reset |
-| `k0x-test-cc-p5` | P5 (never scaffolded) | recreate |
-| `k0x-test-cc-p6` | P6 (check rejects the first title) | recreate |
-| `k0x-test-cc-p7` | P7 (check can never pass) | recreate |
-| `k0x-test-cc-p8` | P8 (invoker cannot retitle) | recreate |
+| `${REPO_PREFIX}s1` | S1, then S3 (reuses S1's end state) | recreate |
+| `${REPO_PREFIX}s2` | S2 (private) | recreate |
+| `${REPO_PREFIX}s4` | S4 (pre-dirtied) | recreate |
+| `${REPO_PREFIX}s5` | S5 (non-admin invoker) | recreate |
+| `${REPO_PREFIX}s6` | S6 (token missing `workflow`) | recreate |
+| `$TEST_ORG/${REPO_PREFIX}o1` | O1 (S1 in an organization) | recreate |
+| `$TEST_ORG/${REPO_PREFIX}o5` | O5 (S5 in an organization) | recreate |
+| `${REPO_PREFIX}pr` | P1-P4 (scaffolded once by Skill A) | reuse + reset |
+| `${REPO_PREFIX}p5` | P5 (never scaffolded) | recreate |
+| `${REPO_PREFIX}p6` | P6 (check rejects the first title) | recreate |
+| `${REPO_PREFIX}p7` | P7 (check can never pass) | recreate |
+| `${REPO_PREFIX}p8` | P8 (invoker cannot retitle) | recreate |
 
 **A without-skill baseline gets its own repository**: the scenario's
-repo name plus `b` -- `k0x-test-cc-p6b`, or `k0x-test-cc-prb` for a
-P1-P4 baseline, scaffolded the same way. Stage it exactly as the
+repo name plus `b` -- `${REPO_PREFIX}p6b`, or `${REPO_PREFIX}prb`
+for a P1-P4 baseline, scaffolded the same way. Stage it exactly as the
 scenario and do not install the skill. Never run a baseline in the
 with-skill run's repo, even after closing that run's pull request:
 closed PRs and pushed branches stay readable, and in 2026-10 the P7
@@ -115,28 +141,28 @@ baseline found the with-skill run's closed PR with
 
 Find leftovers after a test session, in both owners:
 
-    gh repo list bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
-    gh repo list test-bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
+    gh repo list $ADMIN_ACCOUNT --json name --jq '.[].name' | grep "^$REPO_PREFIX"
+    gh repo list $TEST_ORG --json name --jq '.[].name' | grep "^$REPO_PREFIX"
 
 ## Create-from-base procedure
 
 gh account note: this machine has two gh accounts; the standing
-default is `bryanknox`, which is also the account the test repos
+default is `$ADMIN_ACCOUNT`, which is also the account the test repos
 live in. Verify with `gh auth status` before a campaign; if some
 other account happens to be active, run
-`gh auth switch -h github.com -u bryanknox`. No switch-back
-afterward -- `bryanknox` active IS the normal state.
+`gh auth switch -h github.com -u $ADMIN_ACCOUNT`. No switch-back
+afterward -- `$ADMIN_ACCOUNT` active IS the normal state.
 
 Creating a repo in the personal account is a HUMAN CHECKPOINT:
 confirm with the operator before each `gh repo create`.
 
-    git clone https://github.com/bryanknox/k0x-workbench k0x-test-cc-<suffix>
-    cd k0x-test-cc-<suffix>
+    git clone https://github.com/$BASE_REPO ${REPO_PREFIX}<suffix>
+    cd ${REPO_PREFIX}<suffix>
     git remote rename origin base
-    gh repo create bryanknox/k0x-test-cc-<suffix> --public --source . --push
+    gh repo create $ADMIN_ACCOUNT/${REPO_PREFIX}<suffix> --public --source . --push
 
-Use `--private` instead of `--public` for S2, and `test-bryanknox/`
-instead of `bryanknox/` for O1 and O5. The remote rename is
+Use `--private` instead of `--public` for S2, and `$TEST_ORG/`
+instead of `$ADMIN_ACCOUNT/` for O1 and O5. The remote rename is
 required: `gh repo create --source .` adds a remote named `origin`
 and fails if one exists. After this, `origin` is the test repo and
 `base` still points at the read-only base -- double-check any push
@@ -192,13 +218,13 @@ install. In a clone that ever held the skill, remove it first:
 
 Assert outcomes with the repo-state checker, after the run:
 
-    bash tests/evals/check-repo-state.sh check <S1|S2> bryanknox/k0x-test-cc-<suffix> <outdir>
+    bash tests/evals/check-repo-state.sh check <S1|S2> $ADMIN_ACCOUNT/${REPO_PREFIX}<suffix> <outdir>
 
 S3, S4, and S5 compare against the state before the run, so take a
 snapshot first, then pass it to the check after the run with
 `--pre <pre-dir>`:
 
-    bash tests/evals/check-repo-state.sh snapshot bryanknox/k0x-test-cc-<suffix> <pre-dir>
+    bash tests/evals/check-repo-state.sh snapshot $ADMIN_ACCOUNT/${REPO_PREFIX}<suffix> <pre-dir>
 
 It reads the same endpoints the skill itself uses: `repos/{o}/{r}`
 for merge settings,
@@ -225,7 +251,7 @@ ones it leaves to the grader.
   the UI; the former banner checkpoint does not apply.
   Covers: INV3, INV5, A-R3, A-R4, A-R11.
 - **S3 already-configured repo (idempotent no-op).** Run Skill A a
-  SECOND time on the repo S1 just configured (`k0x-test-cc-s1`).
+  SECOND time on the repo S1 just configured (`${REPO_PREFIX}s1`).
   Expect a no-op diff declared at the checkpoint and no mutations.
   Run S3 immediately after S1 passes, before deleting that repo.
   Covers: A-R9.
@@ -239,7 +265,7 @@ ones it leaves to the grader.
   send both together if a PATCH is ever needed). Only the stray
   ruleset must be added:
 
-      gh api -X POST repos/bryanknox/k0x-test-cc-s4/rulesets \
+      gh api -X POST repos/$ADMIN_ACCOUNT/${REPO_PREFIX}s4/rulesets \
         --input stray-ruleset.json
 
   (Any stray ruleset works -- e.g. a `main` ruleset with only a
@@ -253,30 +279,30 @@ ones it leaves to the grader.
   Covers: A-R10.
 - **S5 non-admin invoker (fail fast).** Needs HUMAN ADMIN
   participation. DECIDED 2026-07-29: use the second gh account
-  already on this machine (`bryanknoxbits`, keyring; its token has
-  both `repo` and `workflow` scopes) as a plain push collaborator,
+  already on this machine (`$NONADMIN_ACCOUNT`, keyring; its token
+  has both `repo` and `workflow` scopes) as a plain push collaborator,
   NOT a scoped-down PAT. Rationale: zero credential setup (both
   accounts are already logged in); it exercises the
   `permissions.admin: false` fail-fast branch, the one whose
   report must name who CAN run the skill (with a scoped token the
   invoker IS the admin, so that half of the assertion degenerates);
-  it leaves the standing `bryanknox` token -- including the
+  it leaves the standing `$ADMIN_ACCOUNT` token -- including the
   `delete_repo` grant state -- untouched; and since the
   collaborator token has both scopes, missing admin access is the
   ONLY failing variable. Setup after create-from-base:
 
       gh api -X PUT \
-        repos/bryanknox/k0x-test-cc-s5/collaborators/bryanknoxbits \
+        repos/$ADMIN_ACCOUNT/${REPO_PREFIX}s5/collaborators/$NONADMIN_ACCOUNT \
         -f permission=push
-      gh auth switch -h github.com -u bryanknoxbits
+      gh auth switch -h github.com -u $NONADMIN_ACCOUNT
       gh api user/repository_invitations \
         --jq '.[] | [.id, .repository.full_name] | @tsv'
       gh api -X PATCH user/repository_invitations/<id>
 
-  Run Skill A as `bryanknoxbits`; assert it fails BEFORE any
+  Run Skill A as `$NONADMIN_ACCOUNT`; assert it fails BEFORE any
   mutation and names the missing permission and who can run the
   skill (the repo owner). Then
-  `gh auth switch -h github.com -u bryanknox` and verify no
+  `gh auth switch -h github.com -u $ADMIN_ACCOUNT` and verify no
   settings changed via the same read-backs.
   Covers: INV3, A-R1. The adjacent A-R2 branch -- missing the
   `workflow` scope -- is S6.
@@ -285,17 +311,18 @@ ones it leaves to the grader.
   gap rather than mint a credential: `gh auth refresh` can only ADD
   scopes, so no keyring token on this machine can lack `workflow`,
   and one short-lived token costs less than leaving A-R2 unproven.
-  Create-from-base, public, then snapshot as `bryanknox` from the
-  keyring. The operator mints a classic PAT for `bryanknox` with the
-  `repo` scope only, in the browser, and starts the run session from
-  a fresh Git Bash in the clone, checking the token BEFORE launching:
+  Create-from-base, public, then snapshot as `$ADMIN_ACCOUNT` from
+  the keyring. The operator mints a classic PAT for `$ADMIN_ACCOUNT`
+  with the `repo` scope only, in the browser, and starts the run
+  session from a fresh Git Bash in the clone, checking the token
+  BEFORE launching:
 
       export GH_TOKEN=<the PAT>
       gh auth status
       claude
 
   `gh auth status` must show an entry
-  `Logged in to github.com account bryanknox (GH_TOKEN)` with
+  `Logged in to github.com account $ADMIN_ACCOUNT (GH_TOKEN)` with
   `'repo'` as its only scope; if it does not, stop before `claude`.
   CORRECTED 2026-10-09: the one-line `GH_TOKEN=<the PAT> claude` form
   did not reach the session, cause unknown, and the run configured
@@ -321,26 +348,26 @@ non-admin token cannot list the org's admins, so Skill A must say
 "an admin of {org}/{repo}" rather than name anyone. Org repos also
 differ in ruleset and permission behavior.
 
-DECIDED 2026-10-03: a free organization owned by `bryanknox`, used
-for nothing else, rather than any org that holds real repositories.
+DECIDED 2026-10-03: a free organization owned by `$ADMIN_ACCOUNT`,
+used for nothing else, rather than any org that holds real repositories.
 Free orgs get rulesets on public repos, so O1 can reach Level 3.
 
 - **O1 org-owned public repo (happy path).** S1, with
-  `test-bryanknox/k0x-test-cc-o1` as the repo. Run Skill A as
-  `bryanknox`, the org owner. Graded as S1, against A-CE1.
+  `$TEST_ORG/${REPO_PREFIX}o1` as the repo. Run Skill A as
+  `$ADMIN_ACCOUNT`, the org owner. Graded as S1, against A-CE1.
   Covers: as S1.
 - **O5 org-owned repo, non-admin invoker (fail fast).** S5, with
-  `test-bryanknox/k0x-test-cc-o5` and `bryanknoxbits` added as an
+  `$TEST_ORG/${REPO_PREFIX}o5` and `$NONADMIN_ACCOUNT` added as an
   outside collaborator with push -- the same invite, switch, and
-  accept commands, with `test-bryanknox` in place of `bryanknox` in
+  accept commands, with `$TEST_ORG` in place of `$ADMIN_ACCOUNT` in
   the repo path. Snapshot BEFORE the switch. Assert it fails before
   any mutation, names the missing admin permission, and says "an
-  admin of test-bryanknox/k0x-test-cc-o5" without presenting the org
+  admin of $TEST_ORG/${REPO_PREFIX}o5" without presenting the org
   or anyone as that admin. Covers: INV3, A-R1.
 
 ## Skill B repo: scaffold once, reset between runs
 
-One-time setup of `k0x-test-cc-pr`: create-from-base (public),
+One-time setup of `${REPO_PREFIX}pr`: create-from-base (public),
 then run **Skill A** on it (this is also a cheap re-exercise of the
 S1 path) so P1-P4 run against real enforcement: squash-only
 merges, the pr-title check, and an active `main` ruleset.
@@ -354,10 +381,10 @@ block any of this -- branch deletion is remote-branch cleanup, not
       | xargs -I{} gh pr close {} --delete-branch
 
     # delete any stray remote branches other than the default
-    gh api repos/bryanknox/k0x-test-cc-pr/branches --jq '.[].name' \
+    gh api repos/$ADMIN_ACCOUNT/${REPO_PREFIX}pr/branches --jq '.[].name' \
       | grep -v '^main$' \
       | xargs -I{} gh api -X DELETE \
-          repos/bryanknox/k0x-test-cc-pr/git/refs/heads/{}
+          repos/$ADMIN_ACCOUNT/${REPO_PREFIX}pr/git/refs/heads/{}
 
     # reset the local clone
     git checkout main
@@ -378,7 +405,7 @@ Expected titles and check behavior live in the eval `expectations`
 (`tests/evals/write-pr-title/evals.json`). After the run, check the
 PR's state against them:
 
-    bash tests/evals/check-repo-state.sh check <P1-P8> bryanknox/k0x-test-cc-<pr|p5|p6|p7|p8> <outdir> --pr <N> --expect-title "<title from the transcript>"
+    bash tests/evals/check-repo-state.sh check <P1-P8> $ADMIN_ACCOUNT/${REPO_PREFIX}<pr|p5|p6|p7|p8> <outdir> --pr <N> --expect-title "<title from the transcript>"
 
 P6, P7, and P8 compare against the state before the run as well, so
 they also take `--pre <pre-dir>`, from a snapshot taken at staging.
@@ -404,7 +431,7 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
   the retry itself. P6 exercised it on 2026-10-04, before the skill
   read the check's rules -- see the note under P6, and
   [evidence.md](evidence.md).
-- **P5 unscaffolded repo.** Uses `k0x-test-cc-p5`: create-from-base,
+- **P5 unscaffolded repo.** Uses `${REPO_PREFIX}p5`: create-from-base,
   Skill A NEVER run (GitHub defaults, no workflow). Branch with a
   small change, run Skill B. Expect a conventional title still
   composed and applied, check-polling skipped, and a report of the
@@ -413,7 +440,7 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
 
 - **P6 the check's rules conflict with an honest title (asked up
   front).** Uses
-  `k0x-test-cc-p6`: create-from-base, Skill A NEVER run. Instead,
+  `${REPO_PREFIX}p6`: create-from-base, Skill A NEVER run. Instead,
   commit a copy of the shipped template
   (`skills/enforce-conventional-commits/assets/pr-title-workflow.yml`)
   straight to `main` as `.github/workflows/pr-title.yml` -- there is
@@ -437,7 +464,7 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
   [evidence.md](evidence.md). With the rules read up front, P6 no
   longer reaches the retry, and nothing in this file does.
 - **P7 the check can never pass (raised up front).** Uses
-  `k0x-test-cc-p7`, set up as P6 but with a `subjectPattern:` that no
+  `${REPO_PREFIX}p7`, set up as P6 but with a `subjectPattern:` that no
   subject can match, such as `^(?!)`. Expect the conflict raised
   BEFORE the PR is created. Answer: open it anyway. Expect the PR
   created with the rule-following title, exactly one failed run, the
@@ -445,8 +472,8 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
   a report of what an admin could change.
   Covers: INV5, B-R6, B-R7, B-R9, B-R13.
 - **P8 the invoker cannot retitle (degrade).** Uses
-  `k0x-test-cc-p8`: create-from-base, then commit the shipped
-  template unchanged to `main` as above. As `bryanknox`, push a
+  `${REPO_PREFIX}p8`: create-from-base, then commit the shipped
+  template unchanged to `main` as above. As `$ADMIN_ACCOUNT`, push a
   branch with a small change and
   `gh pr create --title "stuff" --body "wip"`. Wait until that PR's
   first title-check run has COMPLETED before the snapshot: P8's check
@@ -456,7 +483,7 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
 
       until gh pr checks <N> | grep 'Validate conventional PR title' | grep -qv pending; do sleep 10; done
 
-  Then snapshot with `--pr <N>`, and switch to `bryanknoxbits`,
+  Then snapshot with `--pr <N>`, and switch to `$NONADMIN_ACCOUNT`,
   which is NOT invited: the repo is public, so it can read
   everything and edit nothing it did not open. Do not reuse S5's
   push invite. Write access includes triage, which CAN retitle
@@ -466,7 +493,7 @@ they also take `--pre <pre-dir>`, from a snapshot taken at staging.
   squash settings reported as unreadable, no other account's
   credentials used or offered, and nothing mutated. gh reports the
   refusal as a GraphQL permissions error rather than an HTTP 403;
-  SKILL.md names both. Switch back to `bryanknox` afterward.
+  SKILL.md names both. Switch back to `$ADMIN_ACCOUNT` afterward.
   Covers: INV5, B-R5, B-R11, B-R12.
 
 Integration property: P1-P4 deliberately run inside a repo
@@ -481,7 +508,7 @@ scope is not part of normal auth; the operator grants it
 explicitly, deletions happen, then the scope is dropped:
 
     gh auth refresh -h github.com -s delete_repo   # operator approves in browser
-    gh repo delete bryanknox/k0x-test-cc-<suffix> --yes   # test-bryanknox/ for O1, O5
+    gh repo delete $ADMIN_ACCOUNT/${REPO_PREFIX}<suffix> --yes   # $TEST_ORG/ for O1, O5
     gh auth refresh -h github.com --remove-scopes delete_repo
 
 CORRECTED 2026-07-29: the drop step formerly used
@@ -493,7 +520,7 @@ are gh's un-removable minimum and need not be re-listed.
 
 Never script a loop over `gh repo delete`; delete one repo per
 confirmed command. The leftover-finder one-liner under Naming
-convention is the pre-delete inventory. `k0x-test-cc-pr` is
+convention is the pre-delete inventory. `${REPO_PREFIX}pr` is
 long-lived across the P1-P4 campaign -- delete it only when Skill B
 validation (plan todo #7) is done.
 
@@ -510,13 +537,13 @@ grants a tool and decides nothing.
 3. S2: RESOLVED 2026-07-28 -- the live ruleset-create POST status
    was recorded (403 refusal; no ruleset exists, so there is no
    UI banner to eyeball). No longer an open checkpoint.
-4. S5 and O5: the collaborator invite to `bryanknoxbits`, the switch
-   to that account for the run, and the switch back to `bryanknox`
+4. S5 and O5: the collaborator invite to `$NONADMIN_ACCOUNT`, the switch
+   to that account for the run, and the switch back to `$ADMIN_ACCOUNT`
    afterward. P8: the same two switches, with no invite.
 5. Skill A's own in-run approval gate (the B10 checkpoint before
    mutations) -- part of every A scenario run, answered by the
    operator, not pre-approved by test tooling.
-6. Creating `test-bryanknox`, once, in the browser. Deleting it, if
+6. Creating `$TEST_ORG`, once, in the browser. Deleting it, if
    that is ever decided, is the same kind of decision as deleting a
    repo.
 7. S6: minting the `repo`-only classic PAT, and revoking it as soon

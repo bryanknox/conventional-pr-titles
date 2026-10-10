@@ -28,6 +28,9 @@
 *.env
 .env
 .env.*
+# Each maintainer's GitHub names for the tier-2 evals; the tracked
+# template is tests/evals/test-env.example.
+tests/evals/test-env
 
 # Python, for the PyYAML that tests/check-workflow-template.sh needs
 .venv/

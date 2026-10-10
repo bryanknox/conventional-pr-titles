@@ -2,17 +2,17 @@
 name: dev-test-repo-lifecycle
 description: >-
   Use this skill in the conventional-pr-titles repository to create,
-  stage, reset, or tear down the k0x-test-cc test repositories that
-  tier-2 evals run against: create one from the k0x-workbench base,
-  stage scenario S1-S6, O1, O5, or P1-P8, install or remove the
-  skill under test, take the pre-run snapshot, reset k0x-test-cc-pr
-  between P runs, or list and delete leftover test repos. Stops at
-  every human checkpoint and reads back every mutation.
-  Maintainer-only: does NOT run either skill under test, does NOT
-  grade a run or run the repo-state check, does NOT run gh repo
-  delete, grant scopes, or switch gh accounts (it hands those over
-  and reads the result back), does NOT touch the base repo, and does
-  NOT absorb campaigns or cut a release.
+  stage, reset, or tear down the test repositories that tier-2 evals
+  run against: create one from the base repo, stage scenario S1-S6,
+  O1, O5, or P1-P8, install or remove the skill under test, take the
+  pre-run snapshot, reset the P1-P4 repository between P runs, or
+  list and delete leftover test repos. Stops at every human
+  checkpoint and reads back every mutation. Maintainer-only: does NOT
+  run either skill under test, does NOT grade a run or run the
+  repo-state check, does NOT run gh repo delete, grant scopes, or
+  switch gh accounts (it hands those over and reads the result back),
+  does NOT touch the base repo, and does NOT absorb campaigns or cut
+  a release.
 ---
 
 # Test-Repo Lifecycle (create, stage, reset, tear down)
@@ -36,7 +36,7 @@ maintainer's, and the run itself must happen in a fresh session. It
 does NOT run `gh repo delete`, does NOT grant or drop a gh scope, and
 does NOT switch gh accounts. Each of those is handed over as a
 command, and the result is read back. It never mutates
-`bryanknox/k0x-workbench`.
+`$BASE_REPO`.
 
 ## Who can run this
 
@@ -44,8 +44,8 @@ command, and the result is read back. It never mutates
 |---|---|
 | Intended user | The maintainer, working in this repository |
 | Runs how often | Before each content eval run, between P runs, and once at the end of a campaign |
-| Mutates | `bryanknox/k0x-test-cc-*` and `test-bryanknox/k0x-test-cc-*` repositories, and local clones under the parent directory the maintainer names |
-| Does not touch | `bryanknox/k0x-workbench`, the `test-bryanknox` organization itself, this repository's tracked files, gh auth state, any token, anything under `skills/` |
+| Mutates | `$ADMIN_ACCOUNT/${REPO_PREFIX}*` and `$TEST_ORG/${REPO_PREFIX}*` repositories, and local clones under the parent directory the maintainer names |
+| Does not touch | `$BASE_REPO`, the `$TEST_ORG` organization itself, this repository's tracked files, gh auth state, any token, anything under `skills/` |
 | On no parent directory stated | Stop and ask -- never pick one |
 
 ## The commands are corrections
@@ -72,9 +72,9 @@ Numbered as in test-repos.md, "Human checkpoints (consolidated)".
 |---|---|---|---|
 | 1 | Every `gh repo create` | The maintainer approves | Asks at step 2, one create per approval |
 | 2 | The `delete_repo` grant, and each deletion | The maintainer runs them | Hands over each command, one repository at a time, and reads back |
-| 4 | S5 and O5: the invite, the switch to `bryanknoxbits`, the switch back. P8: the two switches, no invite | The maintainer switches | Sends the invite after approval, hands over both switches |
+| 4 | S5 and O5: the invite, the switch to `$NONADMIN_ACCOUNT`, the switch back. P8: the two switches, no invite | The maintainer switches | Sends the invite after approval, hands over both switches |
 | 5 | Skill A's own approval gate in a run | The maintainer, in the run | Out of scope -- it never runs a skill under test |
-| 6 | Creating `test-bryanknox` | The maintainer, in the browser | Never creates or deletes it; a missing org stops O1 and O5 at step 1 |
+| 6 | Creating `$TEST_ORG` | The maintainer, in the browser | Never creates or deletes it; a missing org stops O1 and O5 at step 1 |
 | 7 | S6: minting the `repo`-only PAT, and revoking it | The maintainer, in the browser | Never sees the token; hands over the launch line and the revoke |
 
 **A permission rule is not a checkpoint.**
@@ -98,30 +98,30 @@ ambiguous, ask.
 | stage {scenario} | Steps 1 to 7 for one scenario |
 | stage {scenario} baseline | Steps 1 to 7 in the baseline's own repository, skipping the install |
 | install or remove {skill} | Steps 1, 2, and 5 against an existing clone |
-| reset | Steps 1, 2, and the reset, against `k0x-test-cc-pr` |
+| reset | Steps 1, 2, and the reset, against `${REPO_PREFIX}pr` |
 | teardown | Steps 1, 2, and the teardown |
 
-From the naming table in test-repos.md. `{owner}` is `bryanknox`
-except where the table says `test-bryanknox`, the test organization.
+From the naming table in test-repos.md. `{owner}` is `$ADMIN_ACCOUNT`
+except where the table says `$TEST_ORG`, the test organization.
 
 | Scenario | Owner | Repository | Visibility | Lifecycle |
 |---|---|---|---|---|
-| S1 | bryanknox | `k0x-test-cc-s1` | public | create |
-| S2 | bryanknox | `k0x-test-cc-s2` | private | create |
-| S3 | bryanknox | `k0x-test-cc-s1` | public | reuse S1's end state; no create |
-| S4 | bryanknox | `k0x-test-cc-s4` | public | create |
-| S5 | bryanknox | `k0x-test-cc-s5` | public | create |
-| S6 | bryanknox | `k0x-test-cc-s6` | public | create |
-| O1 | `test-bryanknox` | `k0x-test-cc-o1` | public | create |
-| O5 | `test-bryanknox` | `k0x-test-cc-o5` | public | create |
-| P1-P4 | bryanknox | `k0x-test-cc-pr` | public | create and scaffold once, then reset per run |
-| P5 | bryanknox | `k0x-test-cc-p5` | public | create; never scaffold |
-| P6 | bryanknox | `k0x-test-cc-p6` | public | create; fixture workflow, never scaffold |
-| P7 | bryanknox | `k0x-test-cc-p7` | public | create; fixture workflow, never scaffold |
-| P8 | bryanknox | `k0x-test-cc-p8` | public | create; template workflow, never scaffold |
+| S1 | $ADMIN_ACCOUNT | `${REPO_PREFIX}s1` | public | create |
+| S2 | $ADMIN_ACCOUNT | `${REPO_PREFIX}s2` | private | create |
+| S3 | $ADMIN_ACCOUNT | `${REPO_PREFIX}s1` | public | reuse S1's end state; no create |
+| S4 | $ADMIN_ACCOUNT | `${REPO_PREFIX}s4` | public | create |
+| S5 | $ADMIN_ACCOUNT | `${REPO_PREFIX}s5` | public | create |
+| S6 | $ADMIN_ACCOUNT | `${REPO_PREFIX}s6` | public | create |
+| O1 | `$TEST_ORG` | `${REPO_PREFIX}o1` | public | create |
+| O5 | `$TEST_ORG` | `${REPO_PREFIX}o5` | public | create |
+| P1-P4 | $ADMIN_ACCOUNT | `${REPO_PREFIX}pr` | public | create and scaffold once, then reset per run |
+| P5 | $ADMIN_ACCOUNT | `${REPO_PREFIX}p5` | public | create; never scaffold |
+| P6 | $ADMIN_ACCOUNT | `${REPO_PREFIX}p6` | public | create; fixture workflow, never scaffold |
+| P7 | $ADMIN_ACCOUNT | `${REPO_PREFIX}p7` | public | create; fixture workflow, never scaffold |
+| P8 | $ADMIN_ACCOUNT | `${REPO_PREFIX}p8` | public | create; template workflow, never scaffold |
 
 A baseline's repository is the scenario's with `b` appended --
-`k0x-test-cc-p6b`, or `k0x-test-cc-prb` for P1-P4 -- staged exactly
+`${REPO_PREFIX}p6b`, or `${REPO_PREFIX}prb` for P1-P4 -- staged exactly
 as the scenario, with the same change, and with no skill installed.
 Never stage a baseline in the with-skill run's repository: closed
 pull requests and pushed branches stay readable, and a baseline that
@@ -134,8 +134,32 @@ an id transcribed here would be a citation nothing resolves. Read the
 
 Every operation except inventory needs the parent directory that
 holds the local clones, stated by the maintainer. The clone is
-`{parent}/k0x-test-cc-{suffix}`. If the parent was not stated, stop
+`{parent}/${REPO_PREFIX}{suffix}`. If the parent was not stated, stop
 and ask.
+
+### The test environment
+
+Account, organization, base, and prefix names are not written in
+this skill. They come from `tests/evals/test-env`, a gitignored copy
+of `tests/evals/test-env.example` that each maintainer fills in:
+
+| Key | Names |
+|---|---|
+| `ADMIN_ACCOUNT` | The gh account that owns the base and the personal test repos, and runs every scenario but the non-admin ones |
+| `NONADMIN_ACCOUNT` | The second gh account, the non-admin invoker in S5, O5, and P8 |
+| `TEST_ORG` | The free organization `ADMIN_ACCOUNT` owns, for O1 and O5 |
+| `BASE_REPO` | `owner/name` of the base every test repo is created from |
+| `REPO_PREFIX` | The prefix of every test repository name, ending in `-` |
+
+Read the file before anything else. If it is missing, if a key is
+absent or empty, or if a value still holds a `<...>` placeholder from
+the example, stop and point the maintainer at the example. Nothing
+has been read or mutated yet, which is the point.
+
+Every `$KEY` below is one of those values. Shell state does not
+survive between commands here, so write the value into each command
+literally rather than relying on `source`, and show the resolved
+command in the read-backs.
 
 ## Step 1 - Preflight (read-only)
 
@@ -147,24 +171,24 @@ first.
 
 ```
 gh auth status
-gh repo list bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
-gh repo list test-bryanknox --json name --jq '.[].name' | grep '^k0x-test-cc-'
-gh repo view {owner}/k0x-test-cc-{suffix} --json name,visibility
-ls -d {parent}/k0x-test-cc-{suffix}
-gh api repos/bryanknox/k0x-workbench --jq .pushed_at
+gh repo list $ADMIN_ACCOUNT --json name --jq '.[].name' | grep "^$REPO_PREFIX"
+gh repo list $TEST_ORG --json name --jq '.[].name' | grep "^$REPO_PREFIX"
+gh repo view {owner}/${REPO_PREFIX}{suffix} --json name,visibility
+ls -d {parent}/${REPO_PREFIX}{suffix}
+gh api repos/$BASE_REPO --jq .pushed_at
 ```
 
 Required:
 
-- `bryanknox` is the active account. If another account is active,
-  hand over `gh auth switch -h github.com -u bryanknox` and wait.
+- `$ADMIN_ACCOUNT` is the active account. If another account is active,
+  hand over `gh auth switch -h github.com -u $ADMIN_ACCOUNT` and wait.
   Do not run it.
-- For O1 and O5, `test-bryanknox` exists and `bryanknox` is an
+- For O1 and O5, `$TEST_ORG` exists and `$ADMIN_ACCOUNT` is an
   owner of it: the membership read below answers `admin`. A missing
   org is the maintainer's to create, never this skill's.
 
   ```
-  gh api orgs/test-bryanknox/memberships/bryanknox --jq .role
+  gh api orgs/$TEST_ORG/memberships/$ADMIN_ACCOUNT --jq .role
   ```
 - For a create, the repository does not exist and the clone path
   does not exist. Either one present stops the run: a leftover is
@@ -174,16 +198,16 @@ Required:
   repository is deleted.
 - The base's `pushed_at` is recorded. Step 7 reads it again.
 
-For P1-P4, also confirm the scaffold on `k0x-test-cc-pr` with the
+For P1-P4, also confirm the scaffold on `${REPO_PREFIX}pr` with the
 four reads from "Checking an enforced repository" in
 `docs/devs/README.md` -- the endpoints the skill itself verifies
 through, so this check cannot drift from it:
 
 ```
-gh api repos/bryanknox/k0x-test-cc-pr
-gh api repos/bryanknox/k0x-test-cc-pr/contents/.github/workflows/pr-title.yml
-gh api repos/bryanknox/k0x-test-cc-pr/rulesets
-gh api repos/bryanknox/k0x-test-cc-pr/rules/branches/main
+gh api repos/$ADMIN_ACCOUNT/${REPO_PREFIX}pr
+gh api repos/$ADMIN_ACCOUNT/${REPO_PREFIX}pr/contents/.github/workflows/pr-title.yml
+gh api repos/$ADMIN_ACCOUNT/${REPO_PREFIX}pr/rulesets
+gh api repos/$ADMIN_ACCOUNT/${REPO_PREFIX}pr/rules/branches/main
 ```
 
 Required: squash merge only, `squash_merge_commit_title` is
@@ -198,6 +222,7 @@ For inventory, report the leftover list and stop.
 Present everything the run will do as ONE reviewable block, then
 wait:
 
+- the five test-env values, as read
 - the operation, the scenario, the repository, and its visibility
 - the clone path
 - every mutation in order: the create, the scenario setup, the
@@ -216,10 +241,10 @@ maintainer's to run when the skill asks for each one.
 Skip for S3 and for any operation that is not a create.
 
 ```
-git clone https://github.com/bryanknox/k0x-workbench {parent}/k0x-test-cc-{suffix}
-cd {parent}/k0x-test-cc-{suffix}
+git clone https://github.com/$BASE_REPO {parent}/${REPO_PREFIX}{suffix}
+cd {parent}/${REPO_PREFIX}{suffix}
 git remote rename origin base
-gh repo create {owner}/k0x-test-cc-{suffix} --public --source . --push
+gh repo create {owner}/${REPO_PREFIX}{suffix} --public --source . --push
 ```
 
 `--private` instead of `--public` for S2 only. Return to this
@@ -229,15 +254,15 @@ is relative to it.
 Read back:
 
 ```
-git -C {parent}/k0x-test-cc-{suffix} remote -v
-gh repo view {owner}/k0x-test-cc-{suffix} --json visibility,defaultBranchRef
-gh api repos/{owner}/k0x-test-cc-{suffix}
-gh api repos/{owner}/k0x-test-cc-{suffix}/contents/.github/workflows/pr-title.yml
-gh api repos/{owner}/k0x-test-cc-{suffix}/rulesets
+git -C {parent}/${REPO_PREFIX}{suffix} remote -v
+gh repo view {owner}/${REPO_PREFIX}{suffix} --json visibility,defaultBranchRef
+gh api repos/{owner}/${REPO_PREFIX}{suffix}
+gh api repos/{owner}/${REPO_PREFIX}{suffix}/contents/.github/workflows/pr-title.yml
+gh api repos/{owner}/${REPO_PREFIX}{suffix}/rulesets
 ```
 
 Required: `origin` is the test repository and `base` is
-k0x-workbench; the visibility is the one approved; all three merge
+`$BASE_REPO`; the visibility is the one approved; all three merge
 methods are enabled; the workflow read is a 404; the ruleset list is
 empty. For S2 the ruleset read is a 403 naming the plan, which is the
 expected answer on a free-plan private repository, not a failure.
@@ -263,18 +288,18 @@ rule, with a non-empty bypass list of actor type `RepositoryRole`
 and actor id 5 (repository admin). Then:
 
 ```
-gh api -X POST repos/bryanknox/k0x-test-cc-s4/rulesets --input {scratch}/stray-ruleset.json
-gh api repos/bryanknox/k0x-test-cc-s4/rulesets
+gh api -X POST repos/$ADMIN_ACCOUNT/${REPO_PREFIX}s4/rulesets --input {scratch}/stray-ruleset.json
+gh api repos/$ADMIN_ACCOUNT/${REPO_PREFIX}s4/rulesets
 ```
 
 Required: the list read shows exactly the one stray ruleset.
 
 **S6 -- a token missing `workflow`.** Nothing on the repository.
-Take the step-6 snapshot as `bryanknox` from the keyring. The token
+Take the step-6 snapshot as `$ADMIN_ACCOUNT` from the keyring. The token
 is the maintainer's: they mint a classic PAT with the `repo` scope
 only, and start the run session from a fresh Git Bash in the clone
 with `export GH_TOKEN=<the PAT>`, then `gh auth status`, then
-`claude`. The status must show a `bryanknox (GH_TOKEN)` entry with
+`claude`. The status must show a `$ADMIN_ACCOUNT (GH_TOKEN)` entry with
 `'repo'` as its only scope before `claude` is started; the one-line
 `GH_TOKEN=<the PAT> claude` form once failed to reach the session.
 If the run's own first `gh auth status` shows only keyring logins,
@@ -285,29 +310,29 @@ lines, both checks, and the revoke.
 **O1.** None; as S1.
 
 **S5 and O5 -- a non-admin invoker.** Take the step-6 snapshot FIRST,
-while `bryanknox` is still active. Then:
+while `$ADMIN_ACCOUNT` is still active. Then:
 
 ```
-gh api -X PUT repos/{owner}/k0x-test-cc-{suffix}/collaborators/bryanknoxbits -f permission=push
+gh api -X PUT repos/{owner}/${REPO_PREFIX}{suffix}/collaborators/$NONADMIN_ACCOUNT -f permission=push
 ```
 
-Hand over `gh auth switch -h github.com -u bryanknoxbits` and wait.
+Hand over `gh auth switch -h github.com -u $NONADMIN_ACCOUNT` and wait.
 After the maintainer says it has run:
 
 ```
 gh auth status
 gh api user/repository_invitations --jq '.[] | [.id, .repository.full_name] | @tsv'
 gh api -X PATCH user/repository_invitations/{id}
-gh api repos/{owner}/k0x-test-cc-{suffix}/collaborators/bryanknoxbits/permission --jq .permission
+gh api repos/{owner}/${REPO_PREFIX}{suffix}/collaborators/$NONADMIN_ACCOUNT/permission --jq .permission
 ```
 
-Required: `bryanknoxbits` active, exactly one invitation for
-`{owner}/k0x-test-cc-{suffix}` accepted, and the permission reads
+Required: `$NONADMIN_ACCOUNT` active, exactly one invitation for
+`{owner}/${REPO_PREFIX}{suffix}` accepted, and the permission reads
 `write`. The
-switch back to `bryanknox` comes after the eval run, so it goes in
+switch back to `$ADMIN_ACCOUNT` comes after the eval run, so it goes in
 the report as the maintainer's.
 
-**`k0x-test-cc-pr`, the one-time scaffold.** After the create, the
+**`${REPO_PREFIX}pr`, the one-time scaffold.** After the create, the
 scaffold is a Skill A run, and a skill run is out of scope here.
 Install `enforce-conventional-commits` into the clone (step 5), then
 hand over: start a fresh session in the clone and run it there. The
@@ -328,8 +353,8 @@ repository's files:
 For P4 only:
 
 ```
-git -C {parent}/k0x-test-cc-pr push -u origin {branch}
-cd {parent}/k0x-test-cc-pr
+git -C {parent}/${REPO_PREFIX}pr push -u origin {branch}
+cd {parent}/${REPO_PREFIX}pr
 gh pr create --title "stuff" --body "wip"
 gh pr view --json number,title,headRefName,state
 ```
@@ -343,8 +368,8 @@ the default branch with no PR.
 Read back for every P branch:
 
 ```
-git -C {parent}/k0x-test-cc-pr log --oneline main..HEAD
-git -C {parent}/k0x-test-cc-pr diff --stat main..HEAD
+git -C {parent}/${REPO_PREFIX}pr log --oneline main..HEAD
+git -C {parent}/${REPO_PREFIX}pr diff --stat main..HEAD
 ```
 
 **P5.** After the create, never install or run Skill A. Create one
@@ -363,22 +388,22 @@ commit it straight to `main` and push -- no ruleset exists to stop
 it:
 
 ```
-git -C {parent}/k0x-test-cc-{suffix} add .github/workflows/pr-title.yml
-git -C {parent}/k0x-test-cc-{suffix} commit -m "ci: add the PR title check fixture"
-git -C {parent}/k0x-test-cc-{suffix} push origin main
-gh api repos/{owner}/k0x-test-cc-{suffix}/contents/.github/workflows/pr-title.yml --jq .content
+git -C {parent}/${REPO_PREFIX}{suffix} add .github/workflows/pr-title.yml
+git -C {parent}/${REPO_PREFIX}{suffix} commit -m "ci: add the PR title check fixture"
+git -C {parent}/${REPO_PREFIX}{suffix} push origin main
+gh api repos/{owner}/${REPO_PREFIX}{suffix}/contents/.github/workflows/pr-title.yml --jq .content
 ```
 
 Required: the decoded content equals the file in the clone. Then,
 for P6 and P7, take the step-6 snapshot and create one branch with a
 small change, left local, read back as for P1-P4.
 
-For P8, as `bryanknox`, push a branch with a small change and open
+For P8, as `$ADMIN_ACCOUNT`, push a branch with a small change and open
 the badly titled PR, exactly as for P4:
 
 ```
-git -C {parent}/k0x-test-cc-p8 push -u origin {branch}
-cd {parent}/k0x-test-cc-p8
+git -C {parent}/${REPO_PREFIX}p8 push -u origin {branch}
+cd {parent}/${REPO_PREFIX}p8
 gh pr create --title "stuff" --body "wip"
 gh pr view --json number,title,headRefName,state
 ```
@@ -395,18 +420,18 @@ run still in flight when the snapshot is taken is later scored as
 one the skill added. Only then take the step-6 snapshot with
 `--pr {n}`.
 
-Do NOT invite `bryanknoxbits`: push access includes triage, which
+Do NOT invite `$NONADMIN_ACCOUNT`: push access includes triage, which
 can retitle the PR, and the scenario needs an invoker who cannot.
-Then hand over `gh auth switch -h github.com -u bryanknoxbits`, wait,
-and read back:
+Then hand over `gh auth switch -h github.com -u $NONADMIN_ACCOUNT`,
+wait, and read back:
 
 ```
 gh auth status
-gh api repos/{owner}/k0x-test-cc-p8 --jq .permissions
+gh api repos/{owner}/${REPO_PREFIX}p8 --jq .permissions
 ```
 
-Required: `bryanknoxbits` active, and `push`, `triage`, and `admin`
-all false. The switch back to `bryanknox` goes in the report.
+Required: `$NONADMIN_ACCOUNT` active, and `push`, `triage`, and `admin`
+all false. The switch back to `$ADMIN_ACCOUNT` goes in the report.
 
 ## Step 5 - Install or remove the skill under test
 
@@ -422,16 +447,16 @@ A non-empty status means uncommitted edits are being installed. That
 is allowed -- it is often the point -- and it goes in the report.
 
 ```
-mkdir -p {parent}/k0x-test-cc-{suffix}/.claude/skills
-cp -r skills/{name} {parent}/k0x-test-cc-{suffix}/.claude/skills/{name}
+mkdir -p {parent}/${REPO_PREFIX}{suffix}/.claude/skills
+cp -r skills/{name} {parent}/${REPO_PREFIX}{suffix}/.claude/skills/{name}
 ```
 
 Read back:
 
 ```
-diff -r skills/{name} {parent}/k0x-test-cc-{suffix}/.claude/skills/{name}
-git -C {parent}/k0x-test-cc-{suffix} ls-files .claude/skills/{name}
-git -C {parent}/k0x-test-cc-{suffix} status --porcelain
+diff -r skills/{name} {parent}/${REPO_PREFIX}{suffix}/.claude/skills/{name}
+git -C {parent}/${REPO_PREFIX}{suffix} ls-files .claude/skills/{name}
+git -C {parent}/${REPO_PREFIX}{suffix} status --porcelain
 ```
 
 Required: the diff prints nothing, `ls-files` prints nothing, and the
@@ -445,8 +470,8 @@ A baseline is staged in its own repository and skips the install.
 In a clone that ever held the skill, remove it instead:
 
 ```
-rm -rf {parent}/k0x-test-cc-{suffix}/.claude/skills/{name}
-ls -d {parent}/k0x-test-cc-{suffix}/.claude/skills/{name}
+rm -rf {parent}/${REPO_PREFIX}{suffix}/.claude/skills/{name}
+ls -d {parent}/${REPO_PREFIX}{suffix}/.claude/skills/{name}
 ```
 
 Required: the `ls` fails.
@@ -459,19 +484,19 @@ builds its own fixture.
 These are graded against the state before the run.
 
 ```
-bash tests/evals/check-repo-state.sh snapshot {owner}/k0x-test-cc-{suffix} {pre-dir}
+bash tests/evals/check-repo-state.sh snapshot {owner}/${REPO_PREFIX}{suffix} {pre-dir}
 ```
 
 For P8, add `--pr {n}`. The pre-dir is the maintainer's to name, and
 it must outlive this session. Read the script's summary line; a run
 with exit status 2 did not take the snapshot. For S5, O5, and P8
-this runs before the account switch. For S6 it runs as `bryanknox`
+this runs before the account switch. For S6 it runs as `$ADMIN_ACCOUNT`
 from the keyring, never with the PAT.
 
 ## Step 7 - Base read-back, then report
 
 ```
-gh api repos/bryanknox/k0x-workbench --jq .pushed_at
+gh api repos/$BASE_REPO --jq .pushed_at
 ```
 
 Required: identical to the step-1 value. A difference means
@@ -489,9 +514,9 @@ documented procedure; closing a PR and deleting a branch are not the
 one-way step that the loop rule below is about.
 
 ```
-cd {parent}/k0x-test-cc-pr
+cd {parent}/${REPO_PREFIX}pr
 gh pr list --state open --json number --jq '.[].number' | xargs -I{} gh pr close {} --delete-branch
-gh api repos/bryanknox/k0x-test-cc-pr/branches --jq '.[].name' | grep -v '^main$' | xargs -I{} gh api -X DELETE repos/bryanknox/k0x-test-cc-pr/git/refs/heads/{}
+gh api repos/$ADMIN_ACCOUNT/${REPO_PREFIX}pr/branches --jq '.[].name' | grep -v '^main$' | xargs -I{} gh api -X DELETE repos/$ADMIN_ACCOUNT/${REPO_PREFIX}pr/git/refs/heads/{}
 git checkout main
 git fetch --prune origin
 git reset --hard origin/main
@@ -503,10 +528,10 @@ are the scaffold. Read back:
 
 ```
 gh pr list --state open --json number
-gh api repos/bryanknox/k0x-test-cc-pr/branches --jq '.[].name'
-git -C {parent}/k0x-test-cc-pr status --porcelain
-git -C {parent}/k0x-test-cc-pr rev-parse HEAD origin/main
-git -C {parent}/k0x-test-cc-pr branch
+gh api repos/$ADMIN_ACCOUNT/${REPO_PREFIX}pr/branches --jq '.[].name'
+git -C {parent}/${REPO_PREFIX}pr status --porcelain
+git -C {parent}/${REPO_PREFIX}pr rev-parse HEAD origin/main
+git -C {parent}/${REPO_PREFIX}pr branch
 ```
 
 Required: no open PRs, `main` the only remote branch, a clean tree,
@@ -521,7 +546,7 @@ repos" sounds like a loop, and a loop is the first shape anyone
 reaches for. Deletion is one confirmed command per repository.
 
 1. List the leftovers with the step-1 finder. The maintainer names
-   which to delete, in either owner. If `k0x-test-cc-pr` is on the
+   which to delete, in either owner. If `${REPO_PREFIX}pr` is on the
    list, say that it is long-lived across the P1-P4 campaign and ask
    whether that campaign is finished.
 2. Hand over the grant, and wait:
@@ -529,13 +554,13 @@ reaches for. Deletion is one confirmed command per repository.
    approves it in a browser. Read back `gh auth status` and confirm
    `delete_repo` is among the scopes.
 3. For each repository, one at a time: hand over exactly one command,
-   `gh repo delete {owner}/k0x-test-cc-{suffix} --yes`, and wait.
+   `gh repo delete {owner}/${REPO_PREFIX}{suffix} --yes`, and wait.
    Then read back
-   `gh repo view {owner}/k0x-test-cc-{suffix} --json name` and
+   `gh repo view {owner}/${REPO_PREFIX}{suffix} --json name` and
    require a not-found. Only then name the next one. Never put two
    repositories in one command.
 4. Remove each approved local clone, only after its remote read-back
-   is a not-found: `rm -rf {parent}/k0x-test-cc-{suffix}`, then
+   is a not-found: `rm -rf {parent}/${REPO_PREFIX}{suffix}`, then
    `ls -d` it and require a failure.
 5. Hand over the drop, and wait:
    `gh auth refresh -h github.com --remove-scopes delete_repo`. Read
@@ -549,8 +574,8 @@ reaches for. Deletion is one confirmed command per repository.
 ```markdown
 ## Test repo {inventory | stage | install | remove | reset | teardown}: {scenario}, {date}
 
-Repository: {owner}/k0x-test-cc-{suffix} ({visibility})
-Clone: {parent}/k0x-test-cc-{suffix}
+Repository: {owner}/${REPO_PREFIX}{suffix} ({visibility})
+Clone: {parent}/${REPO_PREFIX}{suffix}
 gh account at start: {account}
 
 Read-backs:
@@ -566,11 +591,11 @@ Leftover test repos: {the finder output | none}
 
 Still yours:
 - {each handed-over command not yet run}
-- start a FRESH session in {parent}/k0x-test-cc-{suffix} for the
+- start a FRESH session in {parent}/${REPO_PREFIX}{suffix} for the
   eval run, and check the session header names that directory before
   typing the prompt
 - after the run: {check command with --pre and --pr as needed}
-- {S5, O5, P8: gh auth switch -h github.com -u bryanknox}
+- {S5, O5, P8: gh auth switch -h github.com -u $ADMIN_ACCOUNT}
 - {S6: export GH_TOKEN=<the PAT>; gh auth status shows the
   (GH_TOKEN) entry with repo only; then claude. After the run, unset
   GH_TOKEN and revoke the PAT}

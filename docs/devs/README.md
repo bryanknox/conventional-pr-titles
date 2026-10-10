@@ -76,6 +76,7 @@ The four cheapest things to get wrong, in order:
 | Check whether something was ever proven | [evidence.md](evidence.md) | -- | -- |
 | Find what still needs proving | [known-gaps.md](known-gaps.md) | -- | -- |
 | Set up or reset a test repository | [test-repos.md](test-repos.md) | `dev-test-repo-lifecycle` | -- |
+| Fork the repository, or run tier 2 under your own accounts | [forking.md](forking.md) | -- | `tests/evals/test-env` (local, gitignored) |
 | Absorb a campaign that produced a verdict | [testing.md](testing.md), "Finishing a campaign" | `dev-absorb-campaign`, then tier 1 | [findings.md](findings.md), [evidence.md](evidence.md), [known-gaps.md](known-gaps.md), and the spec if the contract moved |
 | Pick up work rather than bring it | [next-steps.md](next-steps.md) | -- | delete the row when it is done |
 | Cut a release | [release.md](release.md) | all four gates, then `dev-cut-release` | the version in both manifests |

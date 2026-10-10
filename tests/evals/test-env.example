@@ -1,0 +1,30 @@
+# Test environment for the tier-2 evals: the GitHub names that
+# docs/devs/test-repos.md and the dev-test-repo-lifecycle skill use.
+#
+# Copy this file to tests/evals/test-env (gitignored) and replace
+# every <...> value with your own. Then, from the repository root:
+#
+#     source tests/evals/test-env
+#
+# Values stay quoted so the file can be sourced as it is; a value
+# still holding <...> is a placeholder, and the dev skill refuses it.
+
+# gh account that owns BASE_REPO and the personal test repos, and
+# runs every scenario except the non-admin ones.
+ADMIN_ACCOUNT='<your-gh-user>'
+
+# Second gh account on the same machine: the non-admin invoker in
+# S5, O5, and P8.
+NONADMIN_ACCOUNT='<second-gh-user>'
+
+# Free organization owned by ADMIN_ACCOUNT, holding nothing else.
+# Used by O1 and O5.
+TEST_ORG='<free-org-you-own>'
+
+# owner/name of the base every test repo is created from. Never
+# mutated by any procedure.
+BASE_REPO='<owner>/<base-repo>'
+
+# Prefix of every test repo name, ending in a dash: test repos are
+# ${REPO_PREFIX}s1, ${REPO_PREFIX}pr, ${REPO_PREFIX}p6b, and so on.
+REPO_PREFIX='<prefix>-'

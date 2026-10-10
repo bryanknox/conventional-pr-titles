@@ -51,7 +51,7 @@ at a time. Every
 create and every delete was a decision the maintainer made at the
 moment. Real use found four procedure faults, T-F4, T-F5, T-F6, and
 T-F7 in [findings.md](findings.md), fixed afterwards. Reset has still
-never run: it belongs to `k0x-test-cc-pr`, which no campaign since
+never run: it belongs to `${REPO_PREFIX}pr`, which no campaign since
 2026-07 has needed. Watch the same thing as before -- that each
 checkpoint is answered by a human deciding rather than approved
 straight through -- and watch reset the first time it runs.
