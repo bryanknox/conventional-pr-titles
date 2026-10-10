@@ -204,8 +204,10 @@ at squash-merge time. `enforce-conventional-commits` has been run
 here: merge is squash-only with the PR title as the commit subject,
 and `.github/workflows/pr-title.yml` validates that title.
 
-The branch ruleset is not in place -- ruleset endpoints are
-plan-gated on a private free-plan repository -- so the title check
-is advisory, not required. Direct pushes to `main` remain
-possible; using PRs here is a choice, not enforcement. Making the
-repository public and re-running the skill adds only the ruleset.
+The repository is public, so the branch ruleset is in place too:
+a pull request is required, and both `Validate conventional PR
+title` and `Tier 1 checks` are required status checks. The bypass
+list is empty, so direct pushes to `main` are refused for the owner
+as well -- every change, a one-line doc fix included, goes through
+a branch and a PR. See [decision
+0016](docs/devs/decisions/0016-go-public.md).

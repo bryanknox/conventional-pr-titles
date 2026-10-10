@@ -53,10 +53,9 @@ then arrive through `claude plugin update` rather than by copying
 folders.
 
 Copying the skill folder by hand still works and is documented as
-the fallback, because a marketplace entry pointing at a private
-repository resolves only for someone who can already read it. That
-constraint is [decision 0009](decisions/0009-stay-private-for-now.md),
-not a property of the packaging.
+the fallback, for anyone who wants the skills without a plugin.
+The repository is public, so both paths are open to anyone; see
+[decision 0016](decisions/0016-go-public.md).
 
 ## Cutting a release
 
@@ -197,8 +196,3 @@ Deferred deliberately, recorded so the reasoning is not lost:
   -- a spec change, a real run, and a minor bump -- and because it
   should be designed against that runbook once the runbook has been
   used a few times, not ahead of it.
-- **Going public.** Currently private, which blocks this repository
-  from getting its own ruleset and limits installation to accounts
-  that can already read it. The reasoning, and the ordered steps
-  for reversing it, are in
-  [decision 0009](decisions/0009-stay-private-for-now.md).

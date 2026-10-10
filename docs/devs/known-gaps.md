@@ -77,14 +77,3 @@ on exactly the behavior being measured: one asked before borrowing the
 owner's token, the other used it without asking. Same-repo baselines
 are not independent draws either: the 2026-10-07 P7 baseline read the
 with-skill run's closed pull request (T-F7).
-
-## Gaps in this repository's own setup
-
-**The PR-title check here is advisory, not required.** Ruleset
-endpoints are plan-gated on a private free-plan repository, which is
-finding A-F5 applied to this repo itself. `enforce-conventional-commits`
-has been run here and Levels 1 and 2 are in place, but Level 3 is
-blocked, so direct pushes to `main` remain possible and using pull
-requests is a choice rather than enforcement. Making the repository
-public and re-running the skill adds only the ruleset. See
-[decision 0009](decisions/0009-stay-private-for-now.md).

@@ -34,21 +34,6 @@ are available in every project, not just the one you were in.
 repository's settings instead of your user settings, so anyone who
 clones it is offered the same plugin.
 
-### It is a private repository
-
-Installation resolves the marketplace by cloning it, so it works
-only for an account that can already read
-`bryanknox/conventional-pr-titles`. If the clone fails with a not-found
-error, that is what it means -- the repository is not missing, you
-are not on the list. Check with:
-
-```
-gh repo view bryanknox/conventional-pr-titles
-```
-
-Copying the folders, below, needs the same access. There is no
-install path that does not.
-
 ### Updating
 
 ```

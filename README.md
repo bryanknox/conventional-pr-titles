@@ -45,5 +45,4 @@ catalogued by this repository. The skills themselves are
 harness-portable; only the install path is specific, so other
 harnesses are a packaging change rather than a rewrite.
 
-This repository is private, so installing from it works only for an
-account that can read it.
+This repository is public, so anyone can install from it.
