@@ -106,6 +106,11 @@ claude plugin tag . --push
 That creates `conventional-pr-titles--v{version}`, after checking
 that the manifests agree and the tree is clean.
 
+**4. Retire the release from [next-steps.md](next-steps.md).** Do it
+in a docs PR once the tag is on the remote. Not in the bump PR,
+which carries the two version lines and nothing else, and not
+before the tag, because until then the row is still true.
+
 ### Cutting a release from a session
 
 The bump size is the part to decide yourself. It is a judgement

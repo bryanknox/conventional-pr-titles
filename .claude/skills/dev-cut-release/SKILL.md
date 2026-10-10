@@ -348,5 +348,7 @@ two version lines
 {tag} Tag: {ls-remote line} -- {matches | does NOT match}
 origin/main {sha}
 
-Next: {merge the PR, then invoke again for the tag phase | done}
+Next: {merge the PR, then invoke again for the tag phase |
+remove this release's row from docs/devs/next-steps.md and
+update its dev-cut-release note, in a docs PR}
 ```
