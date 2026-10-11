@@ -4,6 +4,11 @@ Agent skills for enforcing
 [Conventional Commits](https://www.conventionalcommits.org/) through
 pull request titles.
 
+> Enforcing conventional commits on the default branch via conventional
+PR tiles promote freedom of commit message expression on other
+branches. Avoiding the tyranny of pre-commits and other mechanisms
+that suppress developer flow.
+
 Two skills, used together or separately:
 
 - **enforce-conventional-commits** configures a GitHub repository so
